@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+	
+	The ISATAB Spreadsheet format 
+
+-->
+<format-set id="isatab">
+
+    <format id="investigation" label="Investigation File">
+
+        <!-- For sections non belonging to a block, you can define the export-priority, which drives the position on the
+                     spreadsheet where the section contents is put -->
+        <section id="ontoSources" type="many-in-cols" header="ONTOLOGY SOURCE REFERENCE" export-priority="100">
+            <field id="Term Source Name" cardinality="1-"/>
+            <field id="Term Source File" cardinality="1-"/>
+            <field id="Term Source Version" cardinality="1-"/>
+            <field id="Term Source Description" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+        <section id="investigation" type="one-in-col" header="INVESTIGATION">
+            <field id="Investigation Identifier" cardinality="1-"/>
+            <field id="Investigation Title" cardinality="1-"/>
+            <field id="Investigation Description" cardinality="1-"/>
+            <field id="Investigation Submission Date" cardinality="1-"/>
+            <field id="Investigation Public Release Date" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="invPubs" type="many-in-cols" header="INVESTIGATION PUBLICATIONS">
+            <field id="Investigation PubMed ID" cardinality="1-"/>
+            <field id="Investigation Publication DOI" cardinality="1-"/>
+            <field id="Investigation Publication Author List" cardinality="1-"/>
+            <field id="Investigation Publication Title" cardinality="1-"/>
+            <field id="Investigation Publication Status" cardinality="1-"/>
+            <field id="Investigation Publication Status Term Accession Number" cardinality="1-"/>
+            <field id="Investigation Publication Status Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="invContacts" type="many-in-cols" header="INVESTIGATION CONTACTS">
+            <field id="Investigation Person Last Name" cardinality="1-"/>
+            <field id="Investigation Person First Name" cardinality="1-"/>
+            <field id="Investigation Person Mid Initials" cardinality="1-"/>
+            <field id="Investigation Person Email" cardinality="1-"/>
+            <field id="Investigation Person Phone" cardinality="1-"/>
+            <field id="Investigation Person Fax" cardinality="1-"/>
+            <field id="Investigation Person Address" cardinality="1-"/>
+            <field id="Investigation Person Affiliation" cardinality="1-"/>
+            <field id="Investigation Person Roles" cardinality="1-"/>
+            <field id="Investigation Person Roles Term Accession Number" cardinality="1-"/>
+            <field id="Investigation Person Roles Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+
+        <!--  __________________________ BEGIN: repeatable Study block ______________________________________ -->
+
+        <section id="study" type="one-in-col" header="STUDY">
+            <field id="Study Identifier" cardinality="1"/>
+            <field id="Study Title" cardinality="supposed 1"/>
+            <field id="Study Description" cardinality="supposed 1"/>
+            <field id="Study Submission Date" cardinality="supposed 1"/>
+            <field id="Study Public Release Date" cardinality="supposed 1"/>
+            <field id="Study File Name" cardinality="1"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="studyDesigns" type="many-in-cols" header="STUDY DESIGN DESCRIPTORS">
+            <field id="Study Design Type" cardinality="1-"/>
+            <field id="Study Design Type Term Accession Number" cardinality="1-"/>
+            <field id="Study Design Type Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="factors" type="many-in-cols" header="STUDY FACTORS">
+            <field id="Study Factor Name" cardinality="1-"/>
+            <field id="Study Factor Type" cardinality="1-"/>
+            <field id="Study Factor Type Term Accession Number" cardinality="1-"/>
+            <field id="Study Factor Type Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+        <section id="assays" type="many-in-cols" header="STUDY ASSAYS">
+            <field id="Study Assay Measurement Type" cardinality="1"/>
+            <field id="Study Assay Measurement Type Term Accession Number" cardinality="1-"/>
+            <field id="Study Assay Measurement Type Term Source REF" cardinality="1-"/>
+            <field id="Study Assay Technology Type" cardinality="1"/>
+            <field id="Study Assay Technology Type Term Accession Number" cardinality="1-"/>
+            <field id="Study Assay Technology Type Term Source REF" cardinality="1-"/>
+            <field id="Study Assay File Name" cardinality="1"/>
+            <field id="Study Assay Technology Platform" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="studyPubs" type="many-in-cols" header="STUDY PUBLICATIONS">
+            <field id="Study PubMed ID" cardinality="1-"/>
+            <field id="Study Publication DOI" cardinality="1-"/>
+            <field id="Study Publication Author List" cardinality="1-"/>
+            <field id="Study Publication Title" cardinality="1-"/>
+            <field id="Study Publication Status" cardinality="1-"/>
+            <field id="Study Publication Status Term Accession Number" cardinality="1-"/>
+            <field id="Study Publication Status Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+        <section id="contacts" type="many-in-cols" header="STUDY CONTACTS">
+            <field id="Study Person Last Name" cardinality="1-"/>
+            <field id="Study Person First Name" cardinality="1-"/>
+            <field id="Study Person Mid Initials" cardinality="1-"/>
+            <field id="Study Person Email" cardinality="1-"/>
+            <field id="Study Person Phone" cardinality="1-"/>
+            <field id="Study Person Fax" cardinality="1-"/>
+            <field id="Study Person Address" cardinality="1-"/>
+            <field id="Study Person Affiliation" cardinality="1-"/>
+            <field id="Study Person Roles" cardinality="1-"/>
+            <field id="Study Person Roles Term Accession Number" cardinality="1-"/>
+            <field id="Study Person Roles Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+        <section id="protocols" type="many-in-cols" header="STUDY PROTOCOLS">
+            <field id="Study Protocol Name" cardinality="1-"/>
+            <field id="Study Protocol URI" cardinality="1-"/>
+            <field id="Study Protocol Version" cardinality="1-"/>
+            <field id="Study Protocol Type" cardinality="1-"/>
+            <field id="Study Protocol Type Term Accession Number" cardinality="1-"/>
+            <field id="Study Protocol Type Term Source REF" cardinality="1-"/>
+            <field id="Study Protocol Description" cardinality="1-"/>
+            <field id="Study Protocol Parameters Name" cardinality="1-"/>
+            <!-- TODO: remove type, it's kept here only to avoid re-crafting test cases -->
+            <field id="Study Protocol Parameters Type" cardinality="1-"/>
+            <field id="Study Protocol Parameters Name Term Accession Number" cardinality="1-"/>
+            <field id="Study Protocol Parameters Name Term Source REF" cardinality="1-"/>
+            <field id="Study Protocol Components Name" cardinality="1-"/>
+            <field id="Study Protocol Components Type" cardinality="1-"/>
+            <field id="Study Protocol Components Type Term Accession Number" cardinality="1-"/>
+            <field id="Study Protocol Components Type Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+
+        <!--  __________________________ END: repeatable Study block ______________________________________ -->
+
+    </format>
+
+
+    <format id="study_samples" label="Sample File">
+
+        <section id="study_samples" type='many-in-rows' header="SAMPLES" is-header-omitted="true"
+                 is-exported-header-omitted="true">
+            <!--
+                           cardinality: allows to specify a mandatory/suggested cardinality. Values
+                           can be number (exact), number+ (min number), number- (max number). Can have the prefix "supposed ", meaning that
+                           it is not mandatory, but a suggestion which of violation should raise a warning instead of an error.
+
+                           follows: allows to specify which headers should/must follow this one. Can be prefixed by "supposed ".
+                           Can be [nothing], meaning it should/must be the first node
+
+                           precedes: similar to follows. The code supports simmetry/transitivity of "follows" and
+                           "precedes", so that order rules can be specified only once.
+
+                           TODO: these restrictions are checked in node fields (e.g.: Source Name or Sample Name) and certain attributes
+                           (e.g.: characteristics). Other fields are checked in the code without restriction specification (e.g.: units,
+                           ontologies). The whole thing is to be tidied up.
+                         -->
+            <field id="Source Name" follows="supposed [nothing]"/>
+            <field id="Description"/>
+
+            <field id="Provider"/>
+
+            <!-- For typed fields the cardinality of every different type is counted, e.g.: Characteristis[Organism] and
+              Characteristics[Age] are 2 different occurrences that count 1 each and independently
+         -->
+            <field id="Characteristics" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Unit"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+            <field id="Material Type"/>
+
+            <!--
+             TODO: "follows" and "precedes" are not so good for defining order rules in the protocol applications. That the
+             protocol must be between material/data nodes is enforced by the code in any case. We would need rules
+             for the protocol types (e.g.: here extraction protocol is the only valid).
+         -->
+            <field id="Protocol REF"/>
+
+            <field id="Parameter Value" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Performer"/>
+            <field id="Date"/>
+
+            <field id="Sample Name" follows="supposed Source Name"/>
+            <field id="Factor Value" type="typed(string)" cardinality="supposed 1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+    </format>
+
+
+    <format id="generic_assay" label="Generic Assay File">
+
+        <section id="generic_assay_pipeline" type='many-in-rows' header="ASSAYS" is-header-omitted="true"
+                 is-exported-header-omitted="true">
+            <field id="Sample Name" cardinality="1+"/>
+            <field id="Description"/>
+            <field id="Characteristics" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Material Type"/>
+
+            <field id="Factor Value" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Unit"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+            <field id="Material Type"/>
+
+            <field id="Protocol REF"/>
+            <field id="Parameter Value" type="typed(string)" cardinality="supposed 1-"/>
+
+            <field id="Performer"/>
+            <field id="Date"/>
+
+            <field id="Extract Name" follows="supposed Sample Name"/>
+
+            <field id="Labeled Extract Name" follows="supposed Extract Name"/>
+            <field id="Label"/>
+
+            <field id="Assay Name" follows="supposed Labeled Extract Name" cardinality="1"/>
+
+            <field id="Raw Data File" ref-file-type="raw"/>
+            <field id="Image File" ref-file-type="generic"/>
+
+            <field id="Normalization Name" follows="supposed Assay Name"/>
+            <field id="Derived Data File" ref-file-type="processed"/>
+
+            <field id="Data Transformation Name" follows="supposed Normalization Name"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+    </format>
+
+
+    <format id="transcriptomics_assay" label="Transcriptomics Assay File">
+
+        <section id="transcriptomics_pipeline" type='many-in-rows' header="ASSAYS"
+                 is-header-omitted="true" is-exported-header-omitted="true">
+            <field id="Sample Name" cardinality="1+"/>
+            <field id="Description"/>
+            <field id="Characteristics" type="typed(string)" cardinality="1-"/>
+            <field id="Material Type"/>
+
+            <field id="Factor Value" type="typed(string)" cardinality="1-"/>
+            <field id="Unit"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+            <field id="Material Type"/>
+
+            <field id="Protocol REF"/>
+            <field id="Parameter Value" type="typed(string)" cardinality="1-"/>
+
+            <field id="Performer"/>
+            <field id="Date"/>
+
+            <field id="Extract Name" follows="supposed Sample Name"/>
+
+            <field id="Labeled Extract Name" follows="supposed Extract Name"/>
+            <field id="Label"/>
+
+            <field id="Hybridization Assay Name" follows="supposed Labeled Extract Name"/>
+            <field id="Array Design REF"/>
+
+            <field id="Scan Name" follows="supposed Hybridization Assay Name"/>
+            <field id="Array Data File" ref-file-type="raw"/>
+            <field id="Array Data Matrix File" ref-file-type="raw"/>
+            <field id="Image File" ref-file-type="generic"/>
+
+            <field id="Normalization Name" follows="supposed Scan Name"/>
+            <field id="Derived Array Data File" ref-file-type="processed"/>
+            <field id="Derived Array Data Matrix File" ref-file-type="processed"/>
+
+            <field id="Data Transformation Name" follows="supposed Normalization Name"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+    </format>
+
+
+    <format id="ms_spec_assay" label="MS/SPEC Assay File">
+
+        <section id="ms_spec_pipeline" type='many-in-rows' header="ASSAYS"
+                 is-header-omitted="true" is-exported-header-omitted="true">
+            <field id="Sample Name" cardinality="1+"/>
+            <field id="Description"/>
+            <field id="Characteristics" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Material Type"/>
+
+            <field id="Factor Value" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Unit"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+
+            <field id="Protocol REF"/>
+            <field id="Parameter Value" type="typed(string)" cardinality="supposed 1-"/>
+
+            <field id="Performer"/>
+            <field id="Date"/>
+
+            <field id="Extract Name" follows="supposed Sample Name"/>
+
+            <field id="Labeled Extract Name" follows="supposed Extract Name"/>
+            <field id="Label"/>
+
+            <field id="MS Assay Name" follows="supposed Labeled Extract Name"/>
+            <field id="Protein Assignment File" ref-file-type="generic"/>
+            <field id="Peptide Assignment File" ref-file-type="generic"/>
+            <field id="Post Translational Modification Assignment File" ref-file-type="generic"/>
+            <field id="Raw Spectral Data File" ref-file-type="raw"/>
+
+            <field id="Normalization Name" follows="supposed MS Assay Name"/>
+
+            <!-- This is kept for backward compatibility -->
+            <field id="Derived Spectral Data File" ref-file-type="processed"/>
+            <field id="Derived Data File" ref-file-type="processed"/>
+
+            <field id="Data Transformation Name" follows="supposed Normalization Name"/>
+
+            <!-- TODO: for the moment it is ignored, how to deal with this? -->
+            <field id="Metabolite Assignment File" ref-file-type="generic"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+    </format>
+
+
+    <format id="nmr_spec_assay" label="NMR/Spec Assay File">
+
+        <section id="nmr_spec_pipeline" type='many-in-rows' header="ASSAYS"
+                 is-header-omitted="true" is-exported-header-omitted="true">
+            <field id="Sample Name" cardinality="1+"/>
+            <field id="Description"/>
+            <field id="Characteristics" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Material Type"/>
+
+            <field id="Factor Value" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Unit"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+
+            <field id="Protocol REF"/>
+            <field id="Parameter Value" type="typed(string)"/>
+
+            <!-- TODO: To be mapped yet -->
+            <field id="Performer"/>
+            <field id="Date"/>
+
+
+            <field id="Extract Name" follows="supposed Sample Name"/>
+
+            <field id="Labeled Extract Name" follows="supposed Extract Name"/>
+            <field id="Label"/>
+
+            <field id="NMR Assay Name" follows="supposed Labeled Extract Name"/>
+
+            <field id="Free Induction Decay Data File" ref-file-type="raw"/>
+
+            <!-- This is kept for backward compatibility -->
+            <field id="Derived Spectral Data File" ref-file-type="processed"/>
+            <field id="Derived Data File" ref-file-type="processed"/>
+
+
+            <field id="Normalization Name" follwos="supposed NMR Assay Name"/>
+
+            <!-- TODO: do we need it as file-ref? -->
+            <field id="Data Transformation Name" follows="supposed Normalization Name"/>
+
+            <field id="Normalized Spectral Data File" ref-file-type="processed"/>
+
+            <field id="Acquisition Parameter Data File" ref-file-type="generic"/>
+
+            <!-- TODO: for the moment it is ignored, how to deal with this? -->
+            <field id="Metabolite Assignment File" ref-file-type="generic"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+    </format>
+
+
+    <format id="gel_electrophoresis_assay" label="Gel/Electrophoresis Assay File">
+
+        <section id="gel_electrophoresis_pipeline" type='many-in-rows' header="ASSAYS"
+                 is-header-omitted="true" is-exported-header-omitted="true">
+            <field id="Sample Name" cardinality="1+"/>
+            <field id="Description"/>
+            <field id="Characteristics" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Material Type"/>
+
+            <field id="Factor Value" type="typed(string)" cardinality="supposed 1-"/>
+            <field id="Unit"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+
+            <field id="Protocol REF"/>
+            <field id="Parameter Value" type="typed(string)" cardinality="supposed 1-"/>
+
+            <field id="Performer"/>
+            <field id="Date"/>
+
+            <field id="Extract Name" follows="supposed Sample Name"/>
+
+            <field id="Labeled Extract Name" follows="supposed Extract Name"/>
+            <field id="Label"/>
+
+            <field id="Gel Electrophoresis Assay Name" follows="supposed Labeled Extract Name"/>
+            <field id="First Dimension"/>
+            <field id="Second Dimension"/>
+
+            <field id="Scan Name" follows="Gel Electrophoresis Assay Name"/>
+
+            <field id="Raw Data File" ref-file-type="raw"/>
+            <field id="Image File" ref-file-type="generic"/>
+
+            <field id="Normalization Name"/>
+            <field id="Derived Data File" ref-file-type="processed"/>
+
+            <field id="Data Transformation Name"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+    </format>
+
+</format-set>

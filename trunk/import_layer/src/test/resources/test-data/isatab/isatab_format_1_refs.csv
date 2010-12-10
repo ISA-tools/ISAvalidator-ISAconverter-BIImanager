@@ -1,0 +1,18 @@
+Contacts
+Person Last Name	Maier	Fleckenstein	Li	Laufs	Zeller	Freuhauf	Herskind	Wenz
+Person First Name	Patrick	Katharina	Li	Stephanie	Jens	Stephan	Carsten	Frederik
+Person Mid Initials					W			
+Person Email	patrick.maier@radonk.ma.uni-heidelberg.de	fleck.kat@x.y.com	li.li@heidelberg.de	freuhauf@here.net	zeller@somewhere.net	stephan@silly.department.go.uk	carsten@bla.net	w.frederik@dot.net
+Person Phone	491334787822							
+Person Fax								
+Person Address	Theodor-Kutzer-Ufer 1-3							
+Person Affiliation	Department of Radiation Oncology, University of Heidelberg	Department of Radiation Oncology, University of Heidelberg	University of Heidelberg, ZMF	DKFZ, Heidelberg	DKFZ, Heidelberg	University of Heidelberg, Department of Int Med V	Department of Radiation Oncology, University of Heidelberg	Department of Radiation Oncology, University of Heidelberg
+Person Roles	submitter	investigator	investigator	investigator	investigator	submitter	investigator	foo.role
+Person Roles Term Source REF	OBI	OBI	OBI	OBI	OBI	OBI	OBI	FOO.REF.SOURCE
+
+Ontology Source References
+Term Source Name	CTO	MO	ncbitax	PSI	OBI	FOO.REF.SOURCE		
+Term Source File	http://obo.sourceforge.net/cgi-bin/detail.cgi?cell	http://mged.sourceforge.net/ontologies/MGEDontology.php	http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/	http://obo.sourceforge.net/cgi-bin/detail.cgi?pride	http://somewhere.net/obi	http://wherever.net		
+Term Source Version		1.3.0.1	0.0.0			1.2		
+Term Source Description		The Microarray Ontology	The Organism Taxonomy from the NCBI	The NCBI Taxonomy	The Ontology for Bioinvestigation	A foo ref source made by test suite		
+

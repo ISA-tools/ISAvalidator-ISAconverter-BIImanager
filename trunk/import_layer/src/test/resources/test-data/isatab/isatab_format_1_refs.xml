@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<format-set id="biomaptab">
+    <format id="references">
+
+        <section id="contacts" type="many-in-cols" header="Contacts">
+            <field id="Person Last Name"/>
+            <field id="Person First Name"/>
+            <field id="Person Mid Initials"/>
+            <field id="Person Email"/>
+            <field id="Person Phone"/>
+            <field id="Person Fax"/>
+            <field id="Person Address"/>
+            <field id="Person Affiliation"/>
+            <field id="Person Roles"/>
+            <field id="Person Roles Term Source REF"/>
+        </section>
+
+
+        <section id="ontoSources" type="many-in-cols" header="Ontology Source References">
+            <field id="Term Source Name"/>
+            <field id="Term Source File"/>
+            <field id="Term Source Version"/>
+            <field id="Term Source Description"/>
+        </section>
+
+    </format>
+</format-set>
+
+

@@ -1,0 +1,36 @@
+<isatab-config-file xmlns="http://www.ebi.ac.uk/bii/isatab_configuration#">
+
+    <isatab-configuration table-name="foo_table" isatab-assay-type="transcriptomics_assay">
+        <measurement term-label="transcription profiling"/>
+        <technology term-label="DNA microarray"/>
+
+        <field header="Sample Name" data-type="string">
+            <description>The name identifying the sample</description>
+            <default-value>Sample123</default-value>
+
+
+            <!-- A regular expression to define valid values, can be given in the usual PERL form /RE/options, only
+                  i=case insensitive is currently supported
+         -->
+            <value-format>/[a-z,_]+[a-z,_,0-9, ]*/i</value-format>
+
+            <generated-value-template>[INSTITUTION].Group-[GROUP_NO].Subject-[SUBJECT_NO].[SAMPLE_EXTRACT]
+            </generated-value-template>
+        </field>
+
+        <!-- Possible attributes is-multiple-value, is-required is-editable, is-file-field -->
+        <field header="Characteristics[Organism]"
+               is-multiple-value="false" data-type="ontology-term">
+            <recommended-ontologies>
+                <ontology id="1106" abbreviation="NCBItax" name="NCBI Taxonomy" version="39416">
+                    <branch id="0000001" name="Organism"/>
+                </ontology>
+            </recommended-ontologies>
+        </field>
+
+
+        <structured-field name="Characteristics"/>
+
+    </isatab-configuration>
+
+</isatab-config-file>

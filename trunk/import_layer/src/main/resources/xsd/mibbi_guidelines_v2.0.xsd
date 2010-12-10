@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" version="5" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://mibbi.sourceforge.net/misc/mimi_v2.0.xsd">
+	<xs:element name="MIBBI_Portal_Registrants">
+		<xs:annotation>
+			<xs:documentation>List of MI projects registered at the MIBBI Portal (http://www.mibbi.org/index.php/MIBBI_portal)</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="MIMI" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>The Minimum Information about a Minimum Information checklist.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MI_Checklist_Acronym" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>The checklist's acronymn.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="General_Features">
+								<xs:annotation>
+									<xs:documentation>Basic administrative information.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Domain" type="xs:string">
+											<xs:annotation>
+												<xs:documentation>Short phrase describing the scope of the MIxxx checklist (e.g. transcriptomics, environmental metabolomics, phylogenetics).</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="Document_Type" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Short phrase describing the nature of the specification (e.g. primary checklist, extension of a checklist. [CV]</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="Group" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>The full name of the project or consortium responsible for developing or maintaining the checklist.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="Main_Website" type="xs:anyURI" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Full URL of project website, if available.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="MI_Checklist_Name" type="xs:string">
+											<xs:annotation>
+												<xs:documentation>The full name of the checklist (no abbreviations).</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="Current_Version_Designation" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>The version deignation (usually a number) of the most current available version of checklist document.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="Release_Date_for_Current_Version" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>The date of release of the most current available version of checklist document.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="General_Comments" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Any relevant comments about the status or content or future of the checklist.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Contact_Person" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Primary and additional contact persons either from within MICheck, or from the originating community, for this checklist.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Full_Name" type="xs:string">
+											<xs:annotation>
+												<xs:documentation>Full name of contact person (title, given name[s], family name).</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="Email" type="xs:string">
+											<xs:annotation>
+												<xs:documentation>Preferred email address for Primary contact person.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Key_Concepts" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>High-level categories of information captured in the checklist (e.g. phenotype, mass spectrometry, viruses, statistics). [CV]</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Concept" type="xs:string" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>High-level categories of information captured in the checklist (e.g. phenotype, mass spectrometry, viruses, statistics). [CV]</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Bibliography" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Details of relevant publications.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="PMID" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>PubMed ID.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="DOI" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Digital Object Identifier.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="URL" type="xs:anyURI">
+											<xs:annotation>
+												<xs:documentation>URL for publication.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Location_of_Documents" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>A direct link and/or embedded copy of the specification document or other documents (e.g. graphical depiction of schema etc.).</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Description" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Description of what document this is.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="URL" type="xs:anyURI">
+											<xs:annotation>
+												<xs:documentation>An individual URL link to a document.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="Embedded_Document_File" type="xs:base64Binary" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>If feasible/desirable, registrants can embed an instance document or other supporting information. N.B. only one document can be added to this element; to add further documents, use an additional parent element. Note that in the Excel registration form, registrants can 'include' files directly.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<format-set id="biomaptab">
+
+
+    <format id="study_samples">
+
+        <section id="study_samples" type='many-in-rows' header="Samples">
+            <field id="Source Name"/>
+
+            <field id="Characteristics" type="typed(string)"/>
+            <field id="Term Source REF"/>
+
+            <field id="Protocol REF"/>
+
+            <field id="Parameter Value" type="typed(string)"/>
+
+            <field id="Sample Name"/>
+        </section>
+
+    </format>
+
+
+</format-set>

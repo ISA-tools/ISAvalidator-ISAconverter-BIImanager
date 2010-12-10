@@ -1,0 +1,68 @@
+<format-set id="sampleTabFormat">
+    <format id="idf_sdrf">
+        <section id="experiment" type="one-in-col" header="Experiment">
+            <field id="Experiment Name"/>
+            <field id="Experiment Title"/>
+            <field id="Experiment Description"/>
+            <field id="Experiment Date" type="date"/>
+        </section>
+
+        <section id="expAuthor" type="many-in-cols" header="Experiment Authors">
+            <field id="Experiment Author"/>
+        </section>
+
+        <section id="expFactor" type="many-in-cols" header="Experimental Factors">
+            <field id="Experimental Factor Name"/>
+            <field id="Experimental Factor Type"/>
+            <field id="Experimental Factor Type Source REF">
+                <!-- This refers to the TAB worksheet, NEVER to the storage target -->
+                <!-- For the moment every node has an ID, even in cases like hereby, where it is not much useful -->
+                <!-- TODO: move at the level of section, use multi-field keys -->
+                <!-- Not supported in this version
+            <foreign-key id = "ftref" references = 'Term Source Name' section = 'ontoSourceRef' />
+            -->
+            </field>
+        </section>
+
+
+        <!-- A blank line is expected when the header is not specified. TODO: support for this -->
+        <section id='protocol' type='many-in-cols' header="Protocols">
+            <field id='Protocol Name'/>
+            <field id='Protocol Title'/>
+            <field id='Protocol Description'/>
+            <field id='Protocol Type'/>
+            <field id='Protocol Type Source REF'/>
+            <field id='Protocol Parameters' type='string[]'/>
+            <!--  a list of semicolon-separated-values -->
+            <field id="Protocol Parameters Type Term Accession Number"/>
+            <field id='Protocol Parameters Source REF'/>
+        </section>
+
+        <section id='ontoSourceRef' type='many-in-cols' header="Ontology Sources">
+            <field id='Term Source Name'/>
+            <field id='Term Source URI'/>
+        </section>
+
+
+        <section id='sdrf' type='many-in-rows' header="SDRF">
+            <field id="Source"/>
+            <!-- TODO: repeated columns and column sets -->
+            <!-- Means that the term is in the form Characteristics[X], X is a string
+                             and the content is a string too -->
+            <field id="Characteristics" type="typed(string,string)"/>
+            <field id='Characteristics Source REF'/>
+            <field id="FactorValue" type="typed(string,string)"/>
+            <field id='Unit'/>
+            <field id="Unit Source REF"/>
+            <field id="Protocol REF"/>
+            <field id="Parameter Value" type="typed(string,string)"/>
+            <field id="Sample"/>
+            <field id="Extract"/>
+            <field id="LabelExtr"/>
+            <field id="Hybridization"/>
+            <field id="File"/>
+        </section>
+
+    </format>
+    <!-- idf_sdrf -->
+</format-set>

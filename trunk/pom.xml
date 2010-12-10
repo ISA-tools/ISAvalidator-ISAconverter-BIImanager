@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.isatools</groupId>
+    <artifactId>val_conv_manager</artifactId>
+    <packaging>pom</packaging>
+    <version>1.2</version>
+
+    <name>ISAvalidator, ISAconverter and BII Data Management tool</name>
+    <url>http://isatab.sf.net/</url>
+    <description>ISAvalidator, ISAconverter and BII Data Management tools</description>
+
+    <properties>
+        <isatools.version>1.2</isatools.version>
+    </properties>
+
+    <modules>
+        <module>import_layer</module>
+        <module>val_conv_manager_gui</module>
+        <module>graph2tab</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>bii-index</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>bii-db</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>target-eclipse</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>${basedir}</directory>
+                            <includes>
+                                <include>unloader.log</include>
+                                <include>isatools.log</include>
+                                <include>spy.log</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

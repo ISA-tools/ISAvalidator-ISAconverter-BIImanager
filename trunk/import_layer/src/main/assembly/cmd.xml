@@ -1,0 +1,76 @@
+<assembly>
+    <id>cmd</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+
+        <fileSet>
+            <directory>src/main/bin</directory>
+            <excludes>
+                <!-- Defined below, with x permissions, non-executables only here -->
+                <exclude>**/*.sh</exclude>
+            </excludes>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+            <outputDirectory>bin</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>src/main/bin</directory>
+            <includes>
+                <include>**/*.sh</include>
+            </includes>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+            <outputDirectory>bin</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>src/main</directory>
+            <includes>
+                <include>README*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>src/main/doc</directory>
+            <outputDirectory>doc</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
+        <fileSet>
+            <includes>
+                <include>LICENSE*</include>
+                <include>NOTICE*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>../config</directory>
+            <outputDirectory>config</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>target</directory>
+            <includes>
+                <include>import_layer_deps.jar</include>
+            </includes>
+            <outputDirectory></outputDirectory>
+            <fileMode>0644</fileMode>
+        </fileSet>
+
+
+    </fileSets>
+
+</assembly>

@@ -1,0 +1,25 @@
+<!-- 
+  Prepares the jar that is used by all the ISA TOOLS packages
+  More details about how the different assembly flavours are used can be found in the POM file.  
+-->
+<assembly>
+    <id>deps</id>
+
+    <formats>
+        <format>jar</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <dependencySets>
+        <dependencySet>
+            <!-- Enable only if non-empty <outputFileNameMapping></outputFileNameMapping> -->
+            <unpack>true</unpack>
+            <scope>runtime</scope>
+            <!--			<excludes>-->
+            <!--				<exclude>%regex[\*\.class]</exclude>-->
+            <!--			</excludes>-->
+        </dependencySet>
+    </dependencySets>
+
+</assembly>

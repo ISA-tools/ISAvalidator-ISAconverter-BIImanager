@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<format-set id="biomaptab">
+    <format id="investigation">
+
+        <section id="ontoSources" type="many-in-cols" header="Ontology Source References">
+            <field id="Term Source Name"/>
+            <field id="Term Source File"/>
+            <field id="Term Source Version"/>
+            <field id="Term Source Description"/>
+        </section>
+
+        <section id="investigation" type="one-in-col" header="Investigation">
+            <field id="Investigation Identifier"/>
+            <field id="Investigation Title"/>
+            <field id="Investigation Description"/>
+            <field id="Investigation Submission Date"/>
+            <field id="Investigation Public Release Date"/>
+            <field id="Contact"/>
+            <field id="PubMed ID REF"/>
+            <field id="Publication DOI REF"/>
+        </section>
+
+
+        <!--  __________________________ BEGIN: repeatable Study block ______________________________________ -->
+
+        <section id="study" type="one-in-col" header="Studies">
+            <field id="Study Identifier"/>
+            <field id="Study Title"/>
+            <field id="Study Description"/>
+            <field id="Study Design Type"/>
+            <field id="Study Design Type Term Source REF"/>
+            <field id="Contact"/>
+            <field id="PubMed ID REF"/>
+            <field id="Publication DOI REF"/>
+            <field id="Date of Study Submission"/>
+            <field id="Study Public Release Date"/>
+            <field id="Study File Name"/>
+        </section>
+
+        <section id="factors" type="many-in-cols" header="Study Factors">
+            <field id="Factor Name"/>
+            <field id="Factor Type"/>
+            <field id="Factor Type Term Source REF"/>
+        </section>
+
+        <section id="assays" type="many-in-cols" header="Study Assays">
+            <field id="Measurements/Endpoints Name"/>
+            <field id="Measurements/Endpoints Term Source REF"/>
+            <field id="Technology Type"/>
+            <field id="Technology Type Term Source REF"/>
+            <field id="Assay File Name"/>
+        </section>
+
+        <section id="publications" type="many-in-cols" header="Study Publications">
+            <field id="PubMed ID"/>
+            <field id="Publication DOI"/>
+            <field id="Publication Author List"/>
+            <field id="Publication Title"/>
+            <field id="Publication Status"/>
+        </section>
+
+        <section id="protocols" type="many-in-cols" header="Study Protocols">
+            <field id="Protocol Name"/>
+            <field id="Protocol Type"/>
+            <field id="Protocol Type Term Source REF"/>
+            <field id="Protocol Description"/>
+            <field id="Protocol Contact"/>
+            <field id="Protocol Parameters"/>
+            <field id="Protocol Parameters Type Term Accession Number"/>
+            <field id="Protocol Parameters Type Term Source REF"/>
+        </section>
+
+        <section id="contacts" type="many-in-cols" header="Study Contacts">
+            <field id="Person Last Name"/>
+            <field id="Person First Name"/>
+            <field id="Person Mid Initials"/>
+            <field id="Person Email"/>
+            <field id="Person Phone"/>
+            <field id="Person Fax"/>
+            <field id="Person Address"/>
+            <field id="Person Affiliation"/>
+            <field id="Person Roles"/>
+            <field id="Person Roles Term Source REF"/>
+        </section>
+
+        <!--  __________________________ END: repeatable Study block ______________________________________ -->
+
+    </format>
+
+
+    <format id="transcriptomics_assay">
+
+        <section id="transcriptomics_pipeline" type='many-in-rows' header="Assays">
+            <field id="Sample Name"/>
+
+            <field id="Description"/>
+            <field id="Characteristics" type="typed(string)"/>
+            <field id="Factor Value" type="typed(string)"/>
+            <field id="Unit"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+
+            <field id="Protocol REF"/>
+            <field id="Parameter Value" type="typed(string)"/>
+
+            <field id="Extract Name"/>
+
+            <field id="Labeled Extract Name"/>
+            <field id="Label"/>
+
+            <field id="Hybridization Name"/>
+
+            <field id="Scan Name"/>
+            <field id="Array Data File"/>
+            <field id="Array Data Matrix File"/>
+
+            <field id="Normalization Name"/>
+            <field id="Derived Array Data File"/>
+            <field id="Derived Array Data Matrix File"/>
+
+        </section>
+
+    </format>
+
+
+</format-set>

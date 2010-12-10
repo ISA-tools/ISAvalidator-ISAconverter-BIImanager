@@ -1,0 +1,63 @@
+<isatab-config-file xmlns="http://www.ebi.ac.uk/bii/isatab_configuration#">
+
+    <isatab-configuration table-name="foo_table">
+        <measurement term-label="[sample]"/>
+        <technology term-label=""/>
+
+        <field header="Source Name"/>
+
+        <protocol-field protocol-type="Sample Collection Protocol" is-required="true"/>
+        <protocol-field protocol-type="Growth Protocol Type" is-required="false"/>
+
+        <field header="Performer"/>
+        <field header="Date" data-type="Date"/>
+
+        <field header="Parameter Value [Concentration]" data-type="double">
+            <!-- Options for type are:  'less-than', 'greater-than', 'less-equal-than', 'greater-equal-than',
+                                 or combinations, e.g.: 'greater-equal-than less-than' -->
+            <value-range type="between" min="0" max="10"/>
+        </field>
+
+        <!-- TODO: What is to be checked? The unit type, like in ml/l, or the type, like in "Concentration" -->
+        <unit-field is-required="true">
+            <recommended-ontologies>
+                <ontology id="9393" abbreviation="UO" name="Unit Ontology" version="2.0">
+                    <branch id="00000102" name="Concentration Unit"/>
+                </ontology>
+            </recommended-ontologies>
+        </unit-field>
+
+
+        <field header="Sample Name" data-type="string" is-file-field="true">
+            <description>The name identifying the sample</description>
+            <default-value>Sample123</default-value>
+
+
+            <!-- A regular expression to define valid values, can be given in the usual PERL form /RE/options, only
+                     i=case insensitive is currently supported
+            -->
+            <value-format>/[a-z,_]+[a-z,_,0-9, ]*/i</value-format>
+
+            <generated-value-template>[INSTITUTION].Group-[GROUP_NO].Subject-[SUBJECT_NO].[SAMPLE_EXTRACT]
+            </generated-value-template>
+        </field>
+
+        <!-- Possible attributes is-multiple-value, is-required is-editable, is-file-field -->
+        <field header="Characteristics[Organism]"
+               is-multiple-value="false" data-type="ontology-term" is-required="false">
+            <recommended-ontologies>
+                <ontology id="1106" abbreviation="NCBItax" name="NCBI Taxonomy" version="39416">
+                    <branch id="0000001" name="Organism"/>
+                </ontology>
+            </recommended-ontologies>
+        </field>
+
+        <field header="Characteristics[Foo Characteristic]" is-required="false">
+        </field>
+
+
+        <structured-field name="Characteristics"/>
+
+    </isatab-configuration>
+
+</isatab-config-file>

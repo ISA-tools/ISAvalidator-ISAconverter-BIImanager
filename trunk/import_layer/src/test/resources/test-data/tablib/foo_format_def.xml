@@ -1,0 +1,20 @@
+<format-set id="fooSchema">
+    <format id="fooFormat">
+
+        <section id="news" type="many-in-rows" header="News Items">
+            <!--  TODO: is type already used for [] ? -->
+            <field id="Date" type="date"/>
+            <field id="News Title"/>
+            <field id="News Abstract"/>
+        </section>
+
+        <section id="pubs" type="many-in-rows" header="Publications">
+            <field id="id" type="integer"/>
+            <field id="Author"/>
+            <field id="Publication Title"/>
+            <field id="Journal"/>
+            <field id="Keywords"/>
+        </section>
+
+    </format>
+</format-set>

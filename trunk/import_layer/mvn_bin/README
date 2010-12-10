@@ -1,0 +1,11 @@
+
+
+== The MAVEN commands for the BIOMAP submission tool ==
+
+The commands in this directory do the import tasks by using Maven, so you need 
+to have the latter installed.
+
+THIS FILES ARE OUTDATED AND WILL PROBABLY BE REMOVED IN FUTURE. 
+Please use instead the package that is built by <home>/package.sh 
+
+ 

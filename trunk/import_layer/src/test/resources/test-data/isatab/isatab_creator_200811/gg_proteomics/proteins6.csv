@@ -1,0 +1,32 @@
+"Protein Unique ID"	"Peptide Count"	"Type"	"Protein Accession"	"Accession Version"	"Splice Isoform"	"Search Database"	"Search DB Version"	"Spectrum Reference"	"Score"	"Threshold"	"Search Engine"	"Sequence Coverage"	"Gel Link"	"X-Coord"	"Y-Coord"	"Mol. Wt."	"pI"	"CV Name"	"CV Accession"	"Term Name"	"Value"	"pepsmade"
+1	5	"2D-GE Based"	"Q12341"		"Isoform1"	"UniProt"	2005	500	12	23	"Mascot"	0.01	"http://myGelLink.html"	77	87	196	7					
+2	6	"2D-GE Based"	"Q12342"		"Isoform2"	"UniProt"	2006	501	12.2	23	"Mascot"	0.02	"http://myGelLink.html"	84	99	199	7.2					
+3	2	"2D-GE Based"	"Q12343"		"Isoform3"	"UniProt"	2006	502	12.4	23	"Mascot"	0.03	"http://myGelLink.html"	91	111	202	7.4					
+4	3	"2D-GE Based"	"Q12344"		"Isoform4"	"UniProt"	2006	503	12.6	23	"Mascot"	0.04	"http://myGelLink.html"	98	123	205	7.6					
+5	8	"2D-GE Based"	"Q12345"		"Isoform5"	"UniProt"	2006	504	12.8	23	"Mascot"	0.05	"http://myGelLink.html"	105	135	208	7.8					
+6	10	"2D-GE Based"	"Q12346"		"Isoform6"	"UniProt"	2006	505	13	23	"Mascot"	0.06	"http://myGelLink.html"	112	147	211	8					
+7	8	"2D-GE Based"	"Q12347"		"Isoform7"	"UniProt"	2006	506	13.2	23	"Mascot"	0.07	"http://myGelLink.html"	119	159	214	8.2					
+8	7	"2D-GE Based"	"Q12348"		"Isoform8"	"UniProt"	2006	507	13.4	23	"Mascot"	0.08	"http://myGelLink.html"	126	171	217	8.4					
+9	7	"Gel Free"	"Q12349"		"Isoform9"	"UniProt"	2006	508	13.6	23	"Mascot"	0.09						"NEWT"	9606	"Homo sapiens (Human)"		
+10	7	"Gel Free"	"Q12350"		"Isoform10"	"UniProt"	2006	509	13.8	23	"Mascot"	0.1										
+11	6	"Gel Free"	"Q12351"		"Isoform11"	"UniProt"	2006	510	14	23	"Mascot"	0.11										
+12	7	"Gel Free"	"Q12352"		"Isoform12"	"UniProt"	2006	511	14.2	23	"Mascot"	0.12										
+13	5	"Gel Free"	"Q12353"		"Isoform13"	"UniProt"	2006	512	14.4	23	"Mascot"	0.13										
+14	7	"Gel Free"	"Q12354"		"Isoform14"	"UniProt"	2006	513	14.6	23	"Mascot"	0.14										
+15	7	"Gel Free"	"Q12355"		"Isoform15"	"UniProt"	2006	514	14.8	23	"Mascot"	0.15										
+16	7	"Gel Free"	"Q12356"		"Isoform16"	"UniProt"	2006	515	15	23	"Mascot"	0.16										
+17	5	"Gel Free"	"Q12357"		"Isoform17"	"UniProt"	2006	516	15.2	23	"Mascot"	0.17										
+18	7	"Gel Free"	"Q12358"		"Isoform18"	"UniProt"	2006	517	15.4	23	"Mascot"	0.18						"MeSH"	"D039642"	"eukaryotic_initiation_factor"		
+19	7	"Gel Free"	"Q12359"		"Isoform19"	"UniProt"	2006	519	16	23	"Mascot"	0.19						"GO"	"GO:0019896"	"axon transport of mitochondrion"		
+20	3	"Gel Free"	"Q12360"		"Isoform20"	"UniProt"	2006	520	16.2	23	"Mascot"	0.2										
+21	7	"Gel Free"	"Q12361"		"Isoform21"	"UniProt"	2006	521	16.4	23	"Mascot"	0.21										
+22	7	"Gel Free"	"Q12362"		"Isoform22"	"UniProt"	2006	522	16.6	23	"Mascot"	0.22						"CL"	"CL:0000451"	"dendritic cell"		
+																				"Another Foo Term"	"Foo Value"	
+																		"MeSH"	"D039642"	"eukaryotic_initiation_factor"		
+23	7	"Gel Free"	"Q12363"		"Isoform23"	"UniProt"	2006	523	16.8	23	"Mascot"	0.23										
+24	18	"Gel Free"	"Q12364"		"Isoform24"	"UniProt"	2006	524	17	23	"Mascot"	0.24										
+25	7	"Gel Free"	"Q12365"		"Isoform25"	"UniProt"	2006	525	17.2	23	"Mascot"	0.25										
+26	7	"Gel Free"	"Q12366"		"Isoform26"	"UniProt"	2006	526	17.4	23	"Mascot"	0.26										
+27	7	"Gel Free"	"Q12367"		"Isoform27"	"UniProt"	2006	527	17.6	23	"Mascot"	0										
+28	7	"Gel Free"	"Q12368"		"Isoform28"	"UniProt"	2006	528	17.8	23	"Mascot"	1						"PSI"	"PSI:1000213"	"Electron Affinity"		
+																		"MeSH"	"D039642"	"eukaryotic_initiation_factor"		

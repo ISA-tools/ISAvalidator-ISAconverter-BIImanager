@@ -1,0 +1,39 @@
+# H2
+hibernate.connection.username=sa
+hibernate.connection.password=
+hibernate.connection.url=jdbc:h2:/Users/brandizi/Documents/Work/ebi/biomap/svn/isatools/target/testdb/bioinvindex
+hibernate.connection.driver_class=org.h2.Driver
+hibernate.dialect=uk.ac.ebi.bioinvindex.utils.H2FixedDialect
+hibernate.search.default.indexBase=/Users/brandizi/Documents/Work/ebi/biomap/svn/isatools/target/testdb/lucene
+
+# MYSQL
+#hibernate.connection.username=bioinvindex
+#hibernate.connection.password=bioinvindex
+#hibernate.connection.url=jdbc:mysql://localhost:3306/bioinvindex
+#hibernate.connection.driver_class=com.mysql.jdbc.Driver
+#hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+
+# ORACLE 
+#hibernate.connection.username=bii_tst
+#hibernate.connection.password=bii_tst
+#hibernate.connection.url=jdbc:oracle:thin:@apu.ebi.ac.uk:1521:AETST
+#hibernate.connection.url=jdbc:oracle:thin:@localhost:1521:AETST
+#hibernate.connection.driver_class=oracle.jdbc.driver.OracleDriver
+#hibernate.dialect=org.hibernate.dialect.Oracle10gDialect
+#hibernate.search.default.indexBase=/Users/brandizi/Documents/Work/ebi/biomap/isatab_data_sets/oracle_bii_tst-index
+
+
+# Change this to get some debug info
+hibernate.show_sql=false
+
+# Set to 0 if you have problems with the Oracle Driver
+# (See http://forum.hibernate.org/viewtopic.php?t=82)
+hibernate.max_fetch_depth=0
+hibernate.jdbc.batch_size=0
+
+
+# This shouldn't need to be changed
+hibernate.search.default.directory_provider=org.hibernate.search.store.FSDirectoryProvider
+hibernate.hbm2ddl.auto=update
+hibernate.search.indexing_strategy=manual
+hibernate.mapping.precedence=hbm,class

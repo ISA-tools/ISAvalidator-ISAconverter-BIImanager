@@ -1,0 +1,7 @@
+"Sample Name"	"Protocol REF"	"Labeled Sample Name"	"Label"	"Term Source REF"	"Term Accession Number"	"Protocol REF"	"Parameter Value[instrument]"	"Term Source REF"	"Term Accession Number"	"Parameter Value[optical path]"	"Parameter Value[detector voltage]"	"Unit"	"Term Source REF"	"Term Accession Number"	"Assay Name"	"Raw Data File"
+"LM-Mel-14-pos"	"labeling"	"LM-Mel-14-1"	"AC133 antibody;rat-antimouse beads"			"data collection"	"FACSCalibur"			"unknown"	0	"volt"			"LM-Mel-14-1"	"LM-Mel-14-1.fcs"
+"LM-Mel-15-pos"	"labeling"	"LM-Mel-15-1"	"AC133 antibody;rat-antimouse beads"			"data collection"	"FACSCalibur"			"unknown"	0	"volt"			"LM-Mel-15-1"	"LM-Mel-15-1.fcs"
+"LM-Mel-34-pos"	"labeling"	"LM-Mel-34-1"	"AC133 antibody;rat-antimouse beads"			"data collection"	"FACSCalibur"			"unknown"	0	"volt"			"LM-Mel-34-1"	"LM-Mel-34-1.fcs"
+"LM-Mel-42-pos"	"labeling"	"LM-Mel-42-1"	"AC133 antibody;rat-antimouse beads"			"data collection"	"FACSCalibur"			"unknown"	0	"volt"			"LM-Mel-42-1"	"LM-Mel-42-1.fcs"
+"LM-Mel-47-pos"	"labeling"	"LM-Mel-47-1"	"AC133 antibody;rat-antimouse beads"			"data collection"	"FACSCalibur"			"unknown"	0	"volt"			"LM-Mel-47-1"	"LM-Mel-47-1.fcs"
+"LM-Mel-62-pos"	"labeling"	"LM-Mel-62-1"	"AC133 antibody;rat-antimouse beads"			"data collection"	"FACSCalibur"			"unknown"	0	"volt"			"LM-Mel-62-1"	"LM-Mel-62-1.fcs"

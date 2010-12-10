@@ -1,0 +1,11 @@
+<format-set id="fooSchema">
+    <format id="fooFormat">
+        <section id="pubs" type="many-in-cols" header="Publications">
+            <field id="id" type="integer"/>
+            <field id="Author"/>
+            <field id="Publication Title"/>
+            <field id="Journal"/>
+            <field id="Keywords"/>
+        </section>
+    </format>
+</format-set>

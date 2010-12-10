@@ -1,0 +1,53 @@
+<!-- 
+  More details about how the different assembly flavours are used can be found in the POM file.  
+-->
+<assembly>
+    <id>validator</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+
+        <fileSet>
+            <directory>src/main/bin/validator</directory>
+            <excludes>
+                <!-- Defined below -->
+                <exclude>**/*.sh</exclude>
+            </excludes>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>src/main/bin/validator</directory>
+            <includes>
+                <include>**/*.sh</include>
+            </includes>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+
+
+        <fileSet>
+            <directory>../config</directory>
+            <outputDirectory>config</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>target</directory>
+            <includes>
+                <include>isatools_deps.jar</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+
+    </fileSets>
+
+</assembly>

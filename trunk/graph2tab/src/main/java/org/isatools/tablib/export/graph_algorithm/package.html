@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Insert title here</title>
+</head>
+<body>
+<h1>The graph-to-spreadsheet conversion algorithm</h1>
+
+<p>This package is a generic implementation of a method for producing spreadsheets out of pipeline graph.
+    It is based on the node splitting approach: all the nodes in the input pipeline are reduced to "chain nodes", i.e.:
+    nodes that have at most one input and at most one output. This is done by taking those nodes having splittings
+    or pooling, creating copies of them and distributing the excessive inputs or outputs over the copies.
+    See the class {@link ChainsBuilder} for details about such procedure.</p>
+
+<p>The package is designed in a way that allows to adapt a particular object model (eg.: ISATAB or MAGETAB) and to
+    reuse classes like {@link TableBuilder} to produce spreadsheets describing a particular experimental pipeline (ie.:
+    CSV/TSV files). This is done by means of the {@link Node} interface.</p>
+</body>
+</html>

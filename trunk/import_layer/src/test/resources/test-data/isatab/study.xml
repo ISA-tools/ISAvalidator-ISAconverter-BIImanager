@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<format-set id="biomaptab">
+    <format id="study">
+
+        <section id="study" type="one-in-col" header="Study">
+            <field id="Study Identifier"/>
+            <field id="Study Title"/>
+            <field id="Study Description"/>
+            <field id="Study Design Type"/>
+            <field id="Study Design Type Term Source REF"/>
+            <field id="Contact"/>
+            <field id="PubMed ID REF"/>
+            <field id="Publication DOI REF"/>
+            <field id="Date of Study Submission"/>
+            <field id="Study Public Release Date"/>
+        </section>
+
+    </format>
+</format-set>

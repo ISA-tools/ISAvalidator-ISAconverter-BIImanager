@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Insert title here</title>
+</head>
+<body>
+<h1>The Simple Biomodel Example</h1>
+
+<p>Here we use a simple, but realistic, model of an experimental graph. The model is similar to what is found
+    in the formats MAGETAB or ISATAB. We show how a model like that can be adapted to the Node interface, required
+    by the library and, from that, how to generate the table representing the graph.</p>
+
+<p>
+    As you'll see in the code, this is the typical approach to adapt your model:
+<ol>
+    <li>Define node wrappers for your object model (see node_wrappers package). Leave getInputs()/getOutputs()
+        temporarily
+        unimplemented.
+    </li>
+    <li>Define a Node Wrapper Factory (see node_wrappers/NodeFactory). Complete getInputs()/getOutputs() by using your
+        factory
+    </li>
+    <li>Define a custom implementation of TableBuilder, so that you can instantiate it with the initial nodes that allow
+        to
+        reach of your experimental graph (See SimpleModelTableBuilder).
+    </li>
+    <li>Use the table builder and get the result from getTable() (See SimpleBioModelTest).</li>
+</ol>
+</p>
+
+</body>
+</html>

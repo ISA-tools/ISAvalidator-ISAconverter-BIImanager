@@ -1,0 +1,48 @@
+<!-- 
+  More details about how the different assembly flavours are used can be found in the POM file.  
+-->
+
+<assembly>
+    <id>converter</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+
+        <fileSet>
+            <directory>src/main/bin/converter</directory>
+            <excludes>
+                <!-- Defined below -->
+                <exclude>**/*.sh</exclude>
+            </excludes>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>src/main/bin/converter</directory>
+            <includes>
+                <include>**/*.sh</include>
+            </includes>
+            <fileMode>0755</fileMode>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+
+
+        <fileSet>
+            <directory>../config</directory>
+            <outputDirectory>config</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>target</directory>
+            <includes>
+                <include>isatools_deps.jar</include>
+            </includes>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+
+    </fileSets>
+
+</assembly>

@@ -1,0 +1,38 @@
+"Experiment"
+"Experiment Name"	"foo0"																		
+"Experiment Title"	"Sample for explaining TAB formalization"																		
+"Experiment Description"																			
+"Experiment Date"	30/03/07																		
+
+"Experiment Authors"
+"Experiment Author"	"Marco Brandizi"	"Mr. Foo"	"Forrest Gump"
+
+"Experimental Factors"
+"Experimental Factor Name"	"time"	"Tested Organism"																	
+"Experimental Factor Type"	"Time "	"Organism"																	
+"Experimental Factor Type Source REF"	"mo"	"mo"																	
+
+"Protocols"
+"Protocol Name"	"PT0"	"PE0"	"PL0"	"PH0"	"PH1"														
+"Protocol Title"	"Foo Treat Proto"	"Foo Extr Proto"	"Foo Label Proto"	"Old Hyb Proto "	"New Hyb Proto"														
+"Protocol Description"	"Put the cells in the oven, together with some pizza..."	"Use a straw to suck the cells"	"Use a Dymo"	"Put chips+DNA in a dishwasher"	"Put chips+DNA in a dishwasher"														
+"Protocol Type"	"treatement"	"extraction"	"labelling"	"hybridization"	"hybridization"														
+"Protocol Type Source REF"	"mo"	"mo"	"mo"	"mo"	"mo"														
+"Protocol Parameters"	"grow condition;grow media"			"software;software version"	"software;software version"														
+"Protocol Parameters Source REF"	"mo"			"mo"	"mo"														
+
+"Ontology Sources"
+"Term Source Name"	"ncbi"	"mo"																	
+"Term Source URI"	"http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/"	"http://to/mged/onto"																	
+
+"SDRF"
+"Source"	"Characteristics[Organism]"	"Characteristics Source REF"	"FactorValue[Organism]"	"FactorValue[Time]"	"Unit"	"Unit Source REF"	"Protocol REF"	"Parameter Value [grow condition]"	"Parameter Value [grow media]"	"Sample"	"Protocol REF"	"Extract"	"Protocol REF"	"LabelExtr"	"Protocol REF"	"Parameter Value [software]"	"Parameter Value [software version]"	"Hybridization"	"File"
+"SRC0"	"mus"	"ncbi"	"mus"	0	"h"	"mo"	"PT0"	"incubation"	"water solution"	"SMP0.0"	"PE0"	"EXTR0.0"	"PL0"	"LEXTR0.0"	"PH0"	"MAS"	5	"HYB0.0"	"scan0.0.cel"
+"SRC0"	"mus"	"ncbi"	"mus"	0	"h"	"mo"	"PT0"	"incubation"	"water solution"	"SMP0.1"	"PE0"	"EXTR0.1"	"PL0"	"LEXTR0.1"	"PH1"	"GCOS"	1	"HYB0.1"	"scan0.1.cel"
+"SRC0"	"mus"	"ncbi"	"mus"	2	"h"	"mo"	"PT0"	"incubation"	"water solution"	"SMP1.0"	"PE0"	"EXTR1.0"	"PL0"	"LEXTR1.0"	"PH0"	"MAS"	5	"HYB1.0"	"scan1.0.cel"
+"SRC0"	"mus"	"ncbi"	"mus"	2	"h"	"mo"	"PT0"	"incubation"	"water solution"	"SMP1.1"	"PE0"	"EXTR1.1"	"PL0"	"LEXTR1.1"	"PH1"	"GCOS"	1	"HYB1.1"	"scan1.1.cel"
+"SRC1"	"Homo Sapiens"	"ncbi"	"Homo Sapiens"	0	"h"	"mo"	"PT0"	"incubation"	"water solution"	"SMP2.0"	"PE0"	"EXTR2.0"	"PL0"	"LEXTR2.0"	"PH0"	"MAS"	5	"HYB0.0"	"scan2.0.cel"
+"SRC1"	"Homo Sapiens"	"ncbi"	"Homo Sapiens"	0	"h"	"mo"	"PT0"	"incubation"	"water solution"	"SMP2.1"	"PE0"	"EXTR2.1"	"PL0"	"LEXTR2.1"	"PH1"	"GCOS"	1	"HYB0.1"	"scan2.1.cel"
+"SRC1"	"Homo Sapiens"	"ncbi"	"Homo Sapiens"	2	"h"	"mo"	"PT0"	"incubation"	"water solution"	"SMP3.0"	"PE0"	"EXTR3.0"	"PL0"	"LEXTR3.0"	"PH0"	"MAS"	5	"HYB1.0"	"scan3.0.cel"
+"SRC1"	"Homo Sapiens"	"ncbi"	"Homo Sapiens"	2	"h"	"mo"	"PT0"	"incubation"	"water solution"	"SMP3.1"	"PE0"	"EXTR3.1"	"PL0"	"LEXTR3.1"	"PH1"	"GCOS"	1	"HYB1.1"	"scan3.1.cel"
+

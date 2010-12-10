@@ -1,0 +1,6 @@
+<!-- The XML configuration used to read the MIBBI checklist file from http://mibbi.sourceforge.net/misc/MIBBI_Portal_Projects_2010-06-11.xml-->
+<xb:config xmlns:xb="http://www.bea.com/2002/09/xbean/config">
+    <xb:namespace uri="http://mibbi.sourceforge.net/misc/mimi_v2.0.xsd">
+        <xb:package>org.mibbi.xml</xb:package>
+    </xb:namespace>
+</xb:config>

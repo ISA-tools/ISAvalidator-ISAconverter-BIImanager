@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+	
+	The MAGETAB v1.0 Spreadsheet format
+	TODO: replace empty header with omission flag (is-header-omitted)
+	TODO: complete the XML with missing items (which are exported anyway) 
+
+-->
+<format-set id="magetab">
+
+    <format id="idf">
+
+        <section id="experiment" type="one-in-col" header="">
+            <field id="Investigation Title"/>
+            <field id="Experiment Description"/>
+
+            <field id="Date of Experiment "/>
+            <field id="Public Release Date"/>
+
+            <field id="Comment" type="typed(string)"/>
+
+        </section>
+
+        <section id="designs" type="many-in-cols" header="">
+            <field id="Experimental Design"/>
+            <field id="Experimental Design Term Accession Number"/>
+            <field id="Experimental Design Term Source REF"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <!-- TODO: contact -->
+
+        <section id="factors" type="many-in-cols" header="">
+            <field id="Experimental Factor Name"/>
+            <field id="Experimental Factor Type"/>
+            <field id="Experimental Factor Term Accession Number"/>
+            <field id="Experimental Factor Term Source REF"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="contacts" type="many-in-cols" header="">
+            <field id="Person Last Name"/>
+            <field id="Person First Name"/>
+            <field id="Person Mid Initials"/>
+            <field id="Person Email"/>
+            <field id="Person Phone"/>
+            <field id="Person Fax"/>
+            <field id="Person Address"/>
+            <field id="Person Affiliation"/>
+            <field id="Person Roles"/>
+            <field id="Person Roles Term Accession Number"/>
+            <field id="Person Roles Term Source REF"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="publication" type="one-in-col" header="">
+            <field id="PubMed ID"/>
+            <field id="Publication DOI"/>
+            <field id="Publication Author List"/>
+            <field id="Publication Title"/>
+            <field id="Publication Status"/>
+            <field id="Publication Status Term Accession Number"/>
+            <field id="Publication Status Term Source REF"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="protocols" type="many-in-cols" header="">
+            <field id="Protocol Name"/>
+            <field id="Protocol Description"/>
+
+            <!--   TODO: is this really accepted by MAGETAB? -->
+            <field id="Protocol Parameters"/>
+            <field id="Protocol Parameters Term Accession Number"/>
+            <field id="Protocol Parameters Term Source REF"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="ontoSources" type="many-in-cols" header="">
+            <field id="Term Source Name"/>
+            <field id="Term Source File"/>
+            <field id="Term Source Version"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="sdrfFile" type="one-in-col" header="">
+            <field id="SDRF File"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+    </format>
+
+
+    <format id="sdrf">
+
+        <section id="sdrf_section" type='many-in-rows' header="">
+            <field id="Source Name"/>
+            <field id="Description"/>
+
+            <field id="Characteristics" type="typed(string)"/>
+            <field id="Unit"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+
+            <field id="Protocol REF"/>
+
+            <field id="Parameter Value" type="typed(string)"/>
+
+            <field id="Sample Name"/>
+
+            <field id="Characteristics" type="typed(string)"/>
+            <field id="Factor Value" type="typed(string)"/>
+            <field id="Unit" type="typed(string)"/>
+            <field id="Term Source REF"/>
+            <field id="Term Accession Number"/>
+
+            <field id="Protocol REF"/>
+            <field id="Parameter Value" type="typed(string)"/>
+
+            <field id="Extract Name"/>
+
+            <field id="Labeled Extract Name"/>
+            <field id="Label"/>
+
+            <field id="Hybridization Name"/>
+
+            <field id="Scan Name"/>
+            <field id="Array Data File"/>
+            <field id="Array Data Matrix File"/>
+
+            <field id="Normalization Name"/>
+            <field id="Derived Array Data File"/>
+            <field id="Derived Array Data Matrix File"/>
+
+        </section>
+
+    </format>
+
+
+</format-set>

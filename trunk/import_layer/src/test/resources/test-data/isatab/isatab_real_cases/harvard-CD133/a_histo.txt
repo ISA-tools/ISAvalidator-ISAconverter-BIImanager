@@ -1,0 +1,7 @@
+"Sample Name"	"Characteristics[NY-ESO-1 antigen expression by IHC]"	"Term Source REF"	"Term Accession Number"	"Characteristics[MAGE-A1 antigen expression by IHC]"	"Term Source REF"	"Term Accession Number"	"Characteristics[57B antigen expression by IHC]"	"Term Source REF"	"Term Accession Number"	"Assay Name"	"Raw Data File"
+"LM-Mel-14-neg"	"not determined"			"not determined"			"not determined"			"LM-Mel-14"	"LM-Mel-14.TIFF"
+"LM-Mel-15-neg"	"not determined"			"not determined"			"not determined"			"LM-Mel-15"	"LM-Mel-15.TIFF"
+"LM-Mel-34-neg"	"less than 5% expression"			"less than 25% expression"			"less than 25% expression"			"LM-Mel-34"	"LM-Mel-34.TIFF"
+"LM-Mel-42-neg"	"less than 25% expression"			"25 to 50% expression"			"less than 25% expression"			"LM-Mel-42"	"LM-Mel-42.TIFF"
+"LM-Mel-47-neg"	"not known"			"not known"			"not determined"			"LM-Mel-47"	"LM-Mel-47.TIFF"
+"LM-Mel-62-neg"	"no expression"			"not known"			"not known"			"LM-Mel-62"	"LM-Mel-62.TIFF"

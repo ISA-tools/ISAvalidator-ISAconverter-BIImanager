@@ -1,0 +1,354 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.isatools</groupId>
+    <artifactId>val_conv_manager_gui</artifactId>
+    <packaging>jar</packaging>
+    <version>1.2</version>
+    <name>ISAvalidator, ISAconverter and BII Data Management tool GUI code</name>
+    <url>http://maven.apache.org</url>
+
+    <parent>
+        <groupId>org.isatools</groupId>
+        <artifactId>val_conv_manager</artifactId>
+        <version>1.2</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <developers>
+        <developer>
+            <id>maguire</id>
+            <name>Eamonn Maguire</name>
+            <email>eamonnmag@gmail.com</email>
+            <organization>ISAtools Team</organization>
+            <organizationUrl>http://isa-tools.orgt</organizationUrl>
+        </developer>
+
+        <developer>
+            <id>brandizi</id>
+            <name>Marco Brandizi</name>
+            <email>marco.brandizi@gmail.com</email>
+        </developer>
+    </developers>
+
+    <repositories>
+        <repository>
+            <id>java.net</id>
+            <url>http://download.java.net/maven/2/</url>
+        </repository>
+    </repositories>
+
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <executable>apt</executable>
+                    <fork>true</fork>
+                    <debug>true</debug>
+                    <compilerArguments>
+                        <s>${project.build.directory}</s>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>bii-index</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>bii-db</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>target-eclipse</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>${basedir}</directory>
+                            <includes>
+                                <include>unloader.log</include>
+                                <include>isatools.log</include>
+                                <include>spy.log</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>net.java.dev.fuse</groupId>
+            <artifactId>fuse-swing</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.isatools</groupId>
+            <artifactId>import_layer</artifactId>
+            <type>jar</type>
+            <version>${isatools.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.2.132</version>
+        </dependency>
+
+        <!-- TODO: This must not be included in the binary packages (legal reasons)! -->
+        <!--        <dependency>-->
+        <!--            <groupId>com.oracle</groupId>-->
+        <!--            <artifactId>ojdbc5</artifactId>-->
+        <!--            <version>11.1.0.7.0</version>-->
+        <!--        </dependency>-->
+
+        <dependency>
+            <groupId>net.sourceforge.collections</groupId>
+            <artifactId>collections-generic</artifactId>
+            <version>4.01</version>
+        </dependency>
+
+    </dependencies>
+
+
+    <profiles>
+
+        <!--
+            ISA-Tools are built by first creating isatools_deps.jar (build_base) profile and then
+            calling all the other build_*** profiles, every profile spawns the ZIP package for a
+            particular tool.
+            All the procedure is available in package_isatools.sh
+        -->
+
+        <profile>
+            <id>build_base</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+
+                        <configuration>
+                            <finalName>isatools_deps</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/deps.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>build_validator</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+
+                        <configuration>
+                            <finalName>ISA-validator-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/validator.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>build_data_mgr</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+
+                        <configuration>
+                            <finalName>BII-data-mgr-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/data_manager.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>build_converter</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+
+                        <configuration>
+                            <finalName>ISA-converter-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/converter.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
+        <!--
+	          Using the profies below, you can run the ISA Tools from the exec plugin, which is faster than
+	          having to rebuild all the binaries. Do it like this:
+	
+	            mvn install if necessary
+	            mvn -Pexec_validator exec:java
+	              for running the validator (use _datamgr, _converter for the other tools)
+	
+	            The profiles get the default configuration (${basedir}/../config)
+	       -->
+
+        <profile>
+            <id>exec_validator</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>org.isatools.gui.validator.ValidatorInvoker</mainClass>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>bioinvindex.config-path</key>
+                                    <value>${basedir}/../config</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>exec_converter</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>org.isatools.gui.converter.ConverterInvoker</mainClass>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>bioinvindex.config-path</key>
+                                    <value>${basedir}/../config</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
+        <profile>
+            <id>exec_datamgr</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>org.isatools.gui.datamanager.DataManagerInvoker</mainClass>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>bioinvindex.config-path</key>
+                                    <value>${basedir}/../config</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
+
+</project>

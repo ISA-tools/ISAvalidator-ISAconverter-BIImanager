@@ -1,0 +1,598 @@
+<dataset>
+
+    <REFERENCE_SOURCE
+            id="-100"
+            acc="OBI"
+            NAME="Ontology for BioInvestigation"
+            submission_ts="[null]"
+            />
+
+    <REFERENCE_SOURCE
+            id="-101"
+            acc="BII-101"
+            NAME="101 Ontology"
+            />
+
+    <ONTOLOGY_ENTRY
+            id="-201"
+            obj_type="MaterialRole"
+            ACC="OBI-1"
+            name="source"
+            source="-100"
+            submission_ts="[null]"
+            />
+
+    <ONTOLOGY_ENTRY
+            id="-202"
+            obj_type="MaterialRole"
+            ACC="OBI-2"
+            name="sample"
+            source="-100"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-203"
+            ACC="OBI-AT1"
+            NAME="Gene Expression"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-301"
+            ACC="OBI-AP1"
+            NAME="DNA microarray"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-206"
+            ACC="OBI-AT2"
+            NAME="Metabolite Characterization"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-302"
+            ACC="OBI-AP2"
+            NAME="1H NMR spectrometry"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-304"
+            ACC="OBI-AP4"
+            NAME="NMR spectrometry"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-207"
+            ACC="OBI-AT3"
+            NAME="Plasmatic lipids"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-303"
+            ACC="OBI-AP3"
+            NAME="Conventional clinical chemistry"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-501"
+            ACC="OBI-EO1"
+            NAME="organism"
+            source="-100"/>
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-502"
+            ACC="OBI-EO2"
+            NAME="test 2"
+            source="-100"/>
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-503"
+            ACC="OBI-EO3"
+            NAME="test 3"
+            source="-100"/>
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-504"
+            ACC="OBI-EO4"
+            NAME="test 4"
+            source="-100"/>
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-505"
+            ACC="OBI-EO5"
+            NAME="test 5"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="ProtocolType"
+            id="-506"
+            ACC="proto:type:fancy"
+            NAME="My Fancy Protocol Type"
+            source="-101"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-507"
+            ACC="test:101"
+            NAME="Time"
+            source="-101"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-2"
+            ACC="biionto:M2"
+            NAME="test OE"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-3"
+            ACC="biionto:OperatorPerturbationDesign"
+            NAME="Operator Perturbation Design"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-4"
+            ACC="biionto:Transcriptomics"
+            NAME="Microarrays"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-5"
+            ACC="biionto:LengthUnit"
+            NAME="Length"
+            source="-100"/>
+
+
+    <REFERENCE_SOURCE
+            id="-999"
+            acc="FOO-999"
+            NAME="Ontology for Testing -999"
+            submission_ts="2008-08-25 17:21:20.200000000"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-99"
+            ACC="biionto:Design-99"
+            NAME="Test Design -99"
+            source="-999"
+            submission_ts="2008-08-25 17:21:20.200000000"
+            />
+
+
+    <DESIGN
+            id="-9"
+            value="test design"
+            submission_ts="2008-08-25 17:21:20.200000000"
+            study_id="[null]"
+            />
+
+    <Design2OT DESIGN_ID="-9" OT_ID="-99"/>
+
+
+    <REFERENCE_SOURCE
+            id="-200"
+            acc="FOO"
+            NAME="Ontology for Testing"
+            submission_ts="2008-08-18 14:21:20.200000000"
+            />
+
+    <REFERENCE_SOURCE
+            id="-201"
+            acc="FOO1"
+            NAME="Ontology for Testing 1"
+            submission_ts="2008-08-18 15:21:20.200000000"
+            />
+
+    <REFERENCE_SOURCE
+            id="-202"
+            acc="FOO2"
+            NAME="Ontology for Testing 2"
+            submission_ts="2008-08-18 15:21:20.200000000"
+            />
+
+    <REFERENCE_SOURCE
+            id="-210"
+            acc="FOO210"
+            NAME="Ontology for Testing 210"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            />
+
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-6"
+            ACC="biionto:TestDesign"
+            NAME="Design"
+            source="-200"
+            submission_ts="2008-08-18 14:21:20.200000000"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-7"
+            ACC="biionto:TestDesign1"
+            NAME="Design 1"
+            source="-201"
+            submission_ts="2008-08-18 15:21:20.200000000"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-8"
+            ACC="biionto:TestDesign2"
+            NAME="Design 2"
+            source="-202"
+            submission_ts="2008-08-18 15:21:20.200000000"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-9"
+            ACC="biionto:TestDesign3"
+            NAME="Design 2"
+            source="-202"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-10"
+            ACC="biionto:TestDesign 10"
+            NAME="Design 10"
+            source="-210"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            />
+
+
+    <INVESTIGATION
+            id="-1"
+            acc="bii:test:inv:01"
+            title="Investigation 01 (test data set)"
+            description="bla bla bla..."
+            SUBMISSION_TS="[null]"
+            />
+
+    <INVESTIGATION
+            id="-10"
+            acc="inv:test:00"
+            title="Investigation 00 (test data set)"
+            description="A Test Investigation made by the test suite"
+            submissionDate="2007-10-1"
+            releaseDate="1007-10-2"
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            />
+
+    <INVESTIGATION
+            id="-11"
+            acc="inv:test:02"
+            title="Investigation 02 (test data set)"
+            description="But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, ..."
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            />
+
+
+    <STUDY
+            id="-1"
+            acc="bii:-1"
+            title="Study -1"
+            description="1, A foo study made by the test suite"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            submission_ts="[null]"
+            />
+
+    <STUDY
+            id="-2"
+            acc="bii:-2"
+            title="DC study"
+            description="2, A study about DC cells"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            />
+
+    <STUDY
+            id="-3"
+            acc="bii:-3"
+            title="NormX Study -3"
+            description="3, A study about our wonderful normalization protocol"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            />
+
+    <STUDY
+            id="-4"
+            acc="bii:-4"
+            title="Study -4"
+            description="4, A foo study made by the test suite"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            />
+
+    <STUDY
+            id="-5"
+            acc="bii:-5"
+            title="Study -5"
+            description="5, A foo study made by the test suite"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            />
+
+    <STUDY
+            id="-6"
+            acc="bii:-6"
+            title="Study -6"
+            description="6, A foo study made by the test suite"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            />
+
+
+    <STUDY
+            id="-7"
+            acc="bii:-7"
+            title="Study -7"
+            description="7, A foo study made by the test suite"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            submission_ts="2008-08-18 17:21:20.200000000"
+            />
+
+
+    <DESIGN
+            id="-1"
+            value="test design"
+            study_id="-1"
+            submission_ts="[null]"
+            />
+
+    <DESIGN
+            id="-2"
+            value="test design"
+            study_id="-2"
+            />
+
+    <DESIGN
+            id="-3"
+            value="test design"
+            study_id="-3"
+            />
+
+    <DESIGN
+            id="-4"
+            value="test design"
+            study_id="-4"
+            />
+
+    <DESIGN
+            id="-5"
+            value="1st test design"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            study_id="-5"
+            />
+
+    <DESIGN
+            id="-11"
+            value="2nd test design"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            study_id="-5"
+            />
+
+    <DESIGN
+            id="-6"
+            value="test design"
+            submission_ts="2008-08-18 14:21:20.200000000"
+            study_id="-6"
+            />
+
+    <DESIGN
+            id="-7"
+            value="test design"
+            submission_ts="2008-08-18 15:21:20.200000000"
+            />
+
+    <DESIGN
+            id="-8"
+            value="test design"
+            submission_ts="2008-08-18 17:21:20.200000000"
+            study_id="-7"
+            />
+
+    <Design2OT DESIGN_ID="-5" OT_ID="-10"/>
+    <Design2OT DESIGN_ID="-6" OT_ID="-6"/>
+    <Design2OT DESIGN_ID="-7" OT_ID="-7"/>
+    <Design2OT DESIGN_ID="-7" OT_ID="-8"/>
+
+
+    <STUDY2INVESTIGATION STUDY_ID="-1" investigation_id="-10"/>
+    <STUDY2INVESTIGATION STUDY_ID="-2" investigation_id="-10"/>
+    <STUDY2INVESTIGATION STUDY_ID="-5" investigation_id="-10"/>
+
+    <STUDY2INVESTIGATION STUDY_ID="-7" investigation_id="-10"/>
+    <STUDY2INVESTIGATION STUDY_ID="-7" investigation_id="-11"/>
+
+
+    <ONTOLOGY_ENTRY
+            obj_type="ProtocolType"
+            id="-11"
+            ACC="biionto:TestProtoType:11"
+            NAME="Protocol Type 11"
+            source="-202"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            />
+
+
+    <PROTOCOL
+            id="-1"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            ACC="proto:test:-1"
+            description="A Test Protocol"
+            name="Test Protocol -1"
+            type="-11"
+            />
+
+    <REFERENCE_SOURCE
+            id="-1012"
+            acc="FOO1012"
+            NAME="Ontology for Testing 1012"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-12"
+            ACC="biionto:proto:component:12"
+            NAME="Scanner OE"
+            source="-1012"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            />
+
+    <protocol_component
+            id="-12"
+            value="Scanner"
+            protocol_id="-1"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            />
+    <protocol_component_2_term component_id="-12" ontology_term_id="-12"/>
+
+
+    <Study2Protocol
+            PROTOCOL_ID="-1"
+            STUDY_ID="-6"
+            />
+
+    <!-- TODO: Another Proto -->
+    <!--   Study2Protocol
+            PROTOCOL_ID = "-1"
+            STUDY_ID = "-7"
+        / -->
+
+
+    <PROPERTY
+            obj_type="Parameter"
+            id="-1"
+            submission_ts="2008-08-18 16:21:20.200000000"
+            value="A Test Parameter"
+            position="0"
+            PROTOCOL_ID="-1"
+            />
+
+
+    <!--  Assay  -->
+    <REFERENCE_SOURCE
+            id="-211"
+            acc="FOO-211"
+            NAME="Ontology for Testing 211"
+            submission_ts="2008-08-18 17:21:20.200000000"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-20"
+            ACC="biionto:TestTech:-20"
+            NAME="Technology 20"
+            source="-211"
+            submission_ts="2008-08-18 17:21:20.200000000"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-21"
+            ACC="biionto:TestEP:-21"
+            NAME="EndPoint 21"
+            source="-211"
+            submission_ts="2008-08-18 17:21:20.200000000"
+            />
+
+    <PROPERTY
+            obj_type="Characteristic"
+            id="-2"
+            submission_ts="2008-08-18 17:21:20.200000000"
+            value="A Test Property"
+            position="0"
+            />
+
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-22"
+            ACC="biionto:-22:cm"
+            NAME="Unit Value 22 (cm)"
+            source="-211"
+            submission_ts="2008-08-18 17:21:20.200000000"
+            />
+
+    <UNIT
+            id="-1"
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            VALUE="Length"
+            />
+
+    <UNIT_VALUE
+            id="-1"
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            UNIT_ID="-1"
+            VALUE="cm"
+            />
+
+    <UnitValue2OT UV_ID="-1" OT_ID="-22"/>
+
+    <ASSAY
+            id="-1"
+            ACC="ASSAY-1"
+            TECHNOLOGY="-20"
+            ENDPOINT="-21"
+            STUDY_ID="-7"
+            platform="Test Assay Tech Platform"
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            />
+
+    <ASSAY
+            id="-2"
+            ACC="ASSAY-2"
+            TECHNOLOGY="-20"
+            ENDPOINT="-21"
+            STUDY_ID="-7"
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            />
+
+    <ASSAYRESULT
+            id="-1"
+            STUDY_ID="-7"
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            />
+
+
+    <PROPERTY_VALUE
+            id="-1"
+            OBJ_TYPE="CharacteristicValue"
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            PROPERTY_ID="-2"
+            UNIT="-1"
+            VALUE="1233.34"
+            />
+
+    <PROPERTY_VALUE
+            id="-2"
+            OBJ_TYPE="CharacteristicValue"
+            SUBMISSION_TS="2008-08-18 17:21:20.200000000"
+            PROPERTY_ID="-2"
+            UNIT="-1"
+            VALUE="999,2223"
+            />
+
+    <AssayResult2PropertyValue AR_ID="-1" PV_ID="-1"/>
+    <AssayResult2PropertyValue AR_ID="-1" PV_ID="-2"/>
+
+</dataset>

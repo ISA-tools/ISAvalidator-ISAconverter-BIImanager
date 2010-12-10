@@ -1,0 +1,21 @@
+<!-- 
+  Prepares the jar that is used by all the ISA TOOLS packages
+-->
+<assembly>
+    <id>deps</id>
+
+    <formats>
+        <format>jar</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <dependencySets>
+        <dependencySet>
+            <!-- Enable only if non-empty <outputFileNameMapping></outputFileNameMapping> -->
+            <unpack>true</unpack>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
+
+</assembly>

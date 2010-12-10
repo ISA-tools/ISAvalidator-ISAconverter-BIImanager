@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+
+    <persistence-unit name="BIIEntityManager" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+        <properties>
+            <property name="hibernate.mapping.precedence" value="class, hbm"/>
+            <property name="hibernate.search.default.directory_provider"
+                      value="org.hibernate.search.store.FSDirectoryProvider"/>
+            <property name="jboss.entity.manager.factory.jndi.name" value="java:/BIIEntityManagerFactory"/>
+        </properties>
+
+
+        <!-- TODO: Is there a way to have it seeing the classes in the model package? -->
+
+        <class>uk.ac.ebi.bioinvindex.model.Annotation</class>
+        <class>uk.ac.ebi.bioinvindex.model.AssayResult</class>
+        <class>uk.ac.ebi.bioinvindex.model.Contact</class>
+        <class>uk.ac.ebi.bioinvindex.model.Data</class>
+        <class>uk.ac.ebi.bioinvindex.model.Investigation</class>
+        <class>uk.ac.ebi.bioinvindex.model.Material</class>
+        <class>uk.ac.ebi.bioinvindex.model.Protocol</class>
+        <class>uk.ac.ebi.bioinvindex.model.Publication</class>
+        <class>uk.ac.ebi.bioinvindex.model.Study</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.Assay</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.DataAcquisition</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.DataNode</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.DataProcessing</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.MaterialNode</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.MaterialProcessing</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.Node</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.Processing</class>
+        <class>uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.AnnotationType</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.AssayTechnology</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.Characteristic</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.CharacteristicValue</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.ContactRole</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.DataType</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.Design</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.Measurement</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.Factor</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.FactorValue</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.MaterialRole</class>
+        <class>uk.ac.ebi.bioinvindex.mibbi.MIProject</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.OntologyEntry</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.OntologyTerm</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.Parameter</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.ParameterValue</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.Property</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.PropertyValue</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.ProtocolComponent</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.ProtocolType</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.PublicationStatus</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.Unit</class>
+        <class>uk.ac.ebi.bioinvindex.model.term.UnitValue</class>
+        <class>uk.ac.ebi.bioinvindex.model.security.User</class>
+        <class>uk.ac.ebi.bioinvindex.model.security.Person</class>
+        <class>uk.ac.ebi.bioinvindex.model.xref.AssayTypeDataLocation</class>
+        <class>uk.ac.ebi.bioinvindex.model.xref.ReferenceSource</class>
+        <class>uk.ac.ebi.bioinvindex.model.xref.Xref</class>
+
+    </persistence-unit>
+
+</persistence>
+

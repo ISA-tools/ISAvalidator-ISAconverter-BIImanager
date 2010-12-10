@@ -1,0 +1,269 @@
+<dataset>
+
+    <REFERENCE_SOURCE
+            id="-100"
+            acc="OBI"
+            NAME="Ontology for BioInvestigation"
+            />
+
+    <REFERENCE_SOURCE
+            id="-101"
+            acc="BII-101"
+            NAME="101 Ontology"
+            />
+
+    <ONTOLOGY_ENTRY
+            id="-201"
+            obj_type="MaterialRole"
+            ACC="OBI-1"
+            name="source"
+            source="-100"
+            />
+
+    <ONTOLOGY_ENTRY
+            id="-202"
+            obj_type="MaterialRole"
+            ACC="OBI-2"
+            name="sample"
+            source="-100"
+            />
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-203"
+            ACC="OBI-AT1"
+            NAME="Gene Expression"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-301"
+            ACC="OBI-AP1"
+            NAME="DNA microarray"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-206"
+            ACC="OBI-AT2"
+            NAME="Metabolite Characterization"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-302"
+            ACC="OBI-AP2"
+            NAME="1H NMR spectrometry"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-304"
+            ACC="OBI-AP4"
+            NAME="NMR spectrometry"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-207"
+            ACC="OBI-AT3"
+            NAME="Plasmatic lipids"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="AssayTechnology"
+            id="-303"
+            ACC="OBI-AP3"
+            NAME="Conventional clinical chemistry"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-501"
+            ACC="OBI-EO1"
+            NAME="organism"
+            source="-100"/>
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-502"
+            ACC="OBI-EO2"
+            NAME="test 2"
+            source="-100"/>
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-503"
+            ACC="OBI-EO3"
+            NAME="test 3"
+            source="-100"/>
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-504"
+            ACC="OBI-EO4"
+            NAME="test 4"
+            source="-100"/>
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-505"
+            ACC="OBI-EO5"
+            NAME="test 5"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="ProtocolType"
+            id="-506"
+            ACC="proto:type:fancy"
+            NAME="My Fancy Protocol Type"
+            source="-101"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-507"
+            ACC="test:101"
+            NAME="Time"
+            source="-101"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-2"
+            ACC="biionto:M2"
+            NAME="test OE"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-3"
+            ACC="biionto:OperatorPerturbationDesign"
+            NAME="Operator Perturbation Design"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="EndPoint"
+            id="-4"
+            ACC="biionto:Transcriptomics"
+            NAME="Microarrays"
+            source="-100"/>
+
+    <ONTOLOGY_ENTRY
+            obj_type="OntologyTerm"
+            id="-5"
+            ACC="biionto:LengthUnit"
+            NAME="Length"
+            source="-100"/>
+
+
+    <INVESTIGATION
+            id="-1"
+            acc="bii:test:inv:01"
+            title="Investigation 01 (test data set)"
+            description="bla bla bla..."
+            />
+
+    <INVESTIGATION
+            id="-10"
+            acc="inv:test:00"
+            title="Investigation 00 (test data set)"
+            description="A Test Investigation made by the test suite"
+            submissionDate="2007-10-1"
+            releaseDate="1007-10-2"
+            />
+
+    <INVESTIGATION
+            id="-11"
+            acc="inv:test:02"
+            title="Investigation 02 (test data set)"
+            description="But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, ..."
+            />
+
+
+    <STUDY
+            id="-1"
+            acc="bii:-1"
+            title="Study -1"
+            description="1, A foo study made by the test suite"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            />
+
+    <STUDY
+            id="-2"
+            acc="bii:-2"
+            title="DC study"
+            description="2, A study about DC cells"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            />
+
+    <STUDY
+            id="-3"
+            acc="bii:-3"
+            title="NormX Study -3"
+            description="3, A study about our wonderful normalization protocol"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            />
+
+    <STUDY
+            id="-4"
+            acc="bii:-4"
+            title="Study -4"
+            description="4, A foo study made by the test suite"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            />
+
+    <STUDY
+            id="-5"
+            acc="bii:-5"
+            title="Study -5"
+            description="5, A foo study made by the test suite"
+            objective="Testing this study"
+            submissionDate="2007-08-30"
+            />
+
+    <DESIGN
+            id="-1"
+            value="test design"
+            study_id="-1"
+            />
+
+    <DESIGN
+            id="-2"
+            value="test design"
+            study_id="-2"
+            />
+
+    <DESIGN
+            id="-3"
+            value="test design"
+            study_id="-3"
+            />
+
+    <DESIGN
+            id="-4"
+            value="test design"
+            study_id="-4"
+            />
+
+    <DESIGN
+            id="-5"
+            value="test design"
+            study_id="-5"
+            />
+
+
+    <STUDY2INVESTIGATION
+            STUDY_ID="-1"
+            investigation_id="-10"
+            />
+
+    <STUDY2INVESTIGATION
+            STUDY_ID="-2"
+            investigation_id="-10"
+            />
+
+    <STUDY2INVESTIGATION
+            STUDY_ID="-5"
+            investigation_id="-10"
+            />
+
+</dataset>
