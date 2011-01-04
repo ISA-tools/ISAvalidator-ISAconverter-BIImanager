@@ -39,4 +39,5 @@ For a list of contributors, please see <http://github.com/ISA-tools/ISAvalidator
 
 ## License
 
-MPL/GPL/LGPL License, available at <http://isatab.sourceforge.net/licenses/ISAconfigurator-license.html>
+The ISAconverter, ISAvalidator & BII Management Tool are licensed under the Mozilla Public License (MPL) version
+ 1.1/GPL version 2.0/LGPL version 2.1
