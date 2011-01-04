@@ -1,6 +1,5 @@
 # ISAvalidator, ISAconverter and BII Data Management tool
 
-
 - General info: <http://isa-tools.org>
 - Issue tracking and bug reporting: <https://github.com/ISA-tools/ISAvalidator-ISAconverter-BIImanager/issues>
 - Mainline source code: <https://github.com/ISA-tools/ISAvalidator-ISAconverter-BIImanager>
@@ -14,7 +13,7 @@
     git clone --recursive https://github.com/ISA-tools/ISAvalidator-ISAconverter-BIImanager.git
 
 **Build dependencies:**
-    These are all managed by Maven <http://maven.apache.org/>. 
+
 
 
 ### Refreshing your clone
