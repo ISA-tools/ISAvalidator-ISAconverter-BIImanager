@@ -14,7 +14,7 @@
 
 **Build dependencies:**
 
-
+    Dependencies are managed by Apache Maven. You do not need to download anything other than Maven itself. Please use version 2.1.
 
 ### Refreshing your clone
 
