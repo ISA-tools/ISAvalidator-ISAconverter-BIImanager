@@ -67,11 +67,9 @@ import uk.ac.ebi.bioinvindex.model.term.Design;
 import uk.ac.ebi.bioinvindex.model.term.PublicationStatus;
 import uk.ac.ebi.bioinvindex.utils.datasourceload.DataLocationManager;
 import uk.ac.ebi.embl.era.sra.xml.*;
-import uk.ac.ebi.embl.era.sra.xml.EXPERIMENTSETDocument.EXPERIMENTSET;
+import uk.ac.ebi.embl.era.sra.xml.EXPERIMENTSETDocument;
 import uk.ac.ebi.embl.era.sra.xml.LinkType.ENTREZLINK;
 import uk.ac.ebi.embl.era.sra.xml.LinkType.URLLINK;
-import uk.ac.ebi.embl.era.sra.xml.RUNSETDocument.RUNSET;
-import uk.ac.ebi.embl.era.sra.xml.SAMPLESETDocument.SAMPLESET;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.DESCRIPTOR.STUDYTYPE;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.DESCRIPTOR.STUDYTYPE.ExistingStudyType;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.STUDYATTRIBUTES;
@@ -198,9 +196,9 @@ public class SraExporter extends SraExportPipelineComponent {
 
 
             FILES xsubFiles = FILES.Factory.newInstance();
-            RUNSET runSet = RUNSET.Factory.newInstance();
-            EXPERIMENTSET expSet = EXPERIMENTSET.Factory.newInstance();
-            SAMPLESET sampleSet = SAMPLESET.Factory.newInstance();
+            RunSetType runSet = RunSetType.Factory.newInstance();
+            ExperimentSetType expSet = ExperimentSetType.Factory.newInstance();
+            SampleSetType sampleSet = SampleSetType.Factory.newInstance();
 
             final int minFiles = xsubFiles.sizeOfFILEArray();
 
