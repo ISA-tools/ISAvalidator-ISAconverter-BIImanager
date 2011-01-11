@@ -66,6 +66,7 @@ import uk.ac.ebi.embl.era.sra.xml.AttributeType;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -105,6 +106,8 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
         Collection<ProtocolApplication> protoApps = ProcessingUtils.findBackwardProtocolApplications(
                 dataNode, typeStr, null, false
         );
+
+
         if (protoApps.size() == 0) {
             String msg = MessageFormat.format(
                     "The assay file of type ''{0}''/''{1}'' for study ''{2}'' has no ''{3}'' protocol, ignoring the assay",
@@ -127,10 +130,8 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
             if (ptype == null) {
                 continue;
             }
-            String ptypeName = ptype.getName();
-            if (StringUtils.containsIgnoreCase(ptypeName, typeStr)) {
-                return papp;
-            }
+
+            return papp;
         }
         return null;
     }
