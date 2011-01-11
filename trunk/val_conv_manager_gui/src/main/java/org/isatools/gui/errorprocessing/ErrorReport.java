@@ -96,13 +96,15 @@ public class ErrorReport {
                 String message = le.getMessage().toString();
                 String errorType;
 
-
+                 System.out.println("Message: " + message);
+                if (!message.contains(ErrorFilter.LUCENE_DOCUMENT_ID.getFilter())) {
                 if (eventLevel.equals(Level.ERROR)) {
                     errorType = ValidationError.ERROR;
                     report.add(new ValidationError(errorType, message, lastFile));
                 } else {
                     errorType = ValidationError.WARNING;
                     report.add(new ValidationError(errorType, message, lastFile));
+                }
                 }
             }
         }
