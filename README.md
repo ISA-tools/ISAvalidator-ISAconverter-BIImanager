@@ -5,12 +5,13 @@
 - Mainline source code: <https://github.com/ISA-tools/ISAvalidator-ISAconverter-BIImanager>
 - Twitter: [@isatools](http://twitter.com/isatools)
 - IRC: [irc://irc.freenode.net/#isatab](irc://irc.freenode.net/#isatab)
+- Development blog: [http://isatools.wordpress.com]
 
 ## Development
 
 **Get the source:**
 
-    git clone --recursive https://github.com/ISA-tools/ISAvalidator-ISAconverter-BIImanager.git
+    You should ***fork*** the ISAvalidator, ISAconverter and BII Data Management tool project to your own GitHub "repository". Then clone this forked repository and start developing. When you make changes to the ISAvalidator, ISAconverter and BII Data Management tool code, we can see the changes you made, review the code and merge with the main repository code base.
 
 **Build dependencies:**
 
