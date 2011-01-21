@@ -62,7 +62,7 @@ import uk.ac.ebi.embl.era.sra.xml.AttributeType;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.SAMPLEDESCRIPTOR;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.SAMPLEDESCRIPTOR.POOL;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.SAMPLEDESCRIPTOR.POOL.MEMBER;
-import uk.ac.ebi.embl.era.sra.xml.SAMPLESETDocument.SAMPLESET;
+import uk.ac.ebi.embl.era.sra.xml.SampleSetType;
 import uk.ac.ebi.embl.era.sra.xml.SampleType;
 import uk.ac.ebi.embl.era.sra.xml.SampleType.SAMPLEATTRIBUTES;
 import uk.ac.ebi.embl.era.sra.xml.SampleType.SAMPLENAME;
@@ -148,7 +148,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
      * merged with the latter and a unique SRA sample is built this way. This solution is one of the most compatible with
      * SRA.</p>
      */
-    protected SAMPLEDESCRIPTOR buildExportedAssaySample(Assay assay, SAMPLESET sampleSet) {
+    protected SAMPLEDESCRIPTOR buildExportedAssaySample(Assay assay, SampleSetType sampleSet) {
         Material material = assay.getMaterial();
         MaterialNode materialNode = material.getMaterialNode();
 
@@ -273,7 +273,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
     /**
      * Builds a single SRA sample, working only on the sample description and attributes. This is used by
-     * {@link #buildExportedSample(MaterialNode, SAMPLESET)}.
+     * {@link #buildSingleExportedSample(MaterialNode)}.
      *
      * @param sampleNode the ISATAB node about the input material. All the ISATAB material types are considered SRA samples
      *                   (there is a tag "Material Role" that have values like bio-source,sample, extract, etc.)

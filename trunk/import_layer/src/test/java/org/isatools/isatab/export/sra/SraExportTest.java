@@ -25,7 +25,7 @@
  * To contact the developers: isatools@googlegroups.com
  *
  * To report bugs: http://sourceforge.net/tracker/?group_id=215183&atid=1032649
- * To request enhancements: Êhttp://sourceforge.net/tracker/?group_id=215183&atid=1032652
+ * To request enhancements: ï¿½http://sourceforge.net/tracker/?group_id=215183&atid=1032652
  *
  *
  * __________
@@ -63,6 +63,7 @@ import org.junit.Test;
 import uk.ac.ebi.embl.era.sra.xml.*;
 
 import java.io.File;
+import java.io.IOException;
 
 import static java.lang.System.out;
 import static junit.framework.Assert.assertTrue;
@@ -70,7 +71,7 @@ import static junit.framework.Assert.assertTrue;
 public class SraExportTest {
 
 	@Test
-	public void testBasicExport() throws Exception {
+	public void testBasicExport() throws XmlException{
 		out.println("\n\n" + StringUtils.center("Testing the SRA exporter with BII-S-4", 120, "-") + "\n");
 
 		System.setProperty(
@@ -81,10 +82,17 @@ public class SraExportTest {
 		String baseDir = System.getProperty("basedir");
 		String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/BII-S-4-NEW";
 
-		ISATABLoader loader = new ISATABLoader(filesPath);
-		FormatSetInstance isatabInstance = loader.load();
+        System.out.println("filesPath = " + filesPath);
 
-		BIIObjectStore store = new BIIObjectStore();
+		ISATABLoader loader = new ISATABLoader(filesPath);
+        FormatSetInstance isatabInstance = null;
+        try {
+            isatabInstance = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        BIIObjectStore store = new BIIObjectStore();
 		ISATABMapper mapper = new ISATABMapper(store, isatabInstance);
 		mapper.map();
 
@@ -110,10 +118,12 @@ public class SraExportTest {
 		}
 		catch (XmlException ex) {
 			throw new XmlException("Argh! Validation of resulting SRA/XML failed!: " + ex.getMessage(), ex);
-		}
+		} catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
-		// TODO: search (XPath) some items that must be there
+        // TODO: search (XPath) some items that must be there
 
 	}
 }
