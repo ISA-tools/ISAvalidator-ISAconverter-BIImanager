@@ -1,4 +1,4 @@
-/**
+/*
 
  The ISAconverter, ISAvalidator & BII Management Tool are components of the ISA software suite (http://www.isa-tools.org)
 
@@ -227,7 +227,7 @@ public class DraftPrideExporter implements ProcessingVisitAction {
     /**
      * Processes a BII property and computes the corresponding set of {@link Param} which represents the property in PRIDE-XML
      */
-    private static <PV extends PropertyValue<PT>, PT extends Property<PV>> List<Param> exportPropertyValue(PV value, int initialOrder) {
+    private static <PT extends Property<?>> List<Param> exportPropertyValue(PropertyValue<PT> value, int initialOrder) {
         Collection<OntologyTerm> valoes = value.getOntologyTerms();
         OntologyTerm valoe = null;
         if (valoes != null && !valoes.isEmpty()) {
