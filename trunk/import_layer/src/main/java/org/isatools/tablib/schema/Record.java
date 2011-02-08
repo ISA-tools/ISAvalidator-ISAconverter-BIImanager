@@ -199,7 +199,7 @@ public class Record implements TabInstanceEntity {
         List<Field> fields = parent.getFields();
 
         if (parent == null) {
-            throw new TabInternalErrorException("Cannot set/add fileds to null records");
+            throw new TabInternalErrorException("Cannot set/add fields to null records");
         }
 
         Section section = parent.getSection();

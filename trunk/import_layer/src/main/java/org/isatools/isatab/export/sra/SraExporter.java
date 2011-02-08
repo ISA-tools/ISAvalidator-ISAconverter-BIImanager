@@ -57,15 +57,14 @@ import org.isatools.tablib.exceptions.TabIOException;
 import org.isatools.tablib.exceptions.TabInvalidValueException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.utils.BIIObjectStore;
-import uk.ac.ebi.bioinvindex.model.Contact;
-import uk.ac.ebi.bioinvindex.model.Investigation;
-import uk.ac.ebi.bioinvindex.model.Publication;
-import uk.ac.ebi.bioinvindex.model.Study;
+import uk.ac.ebi.bioinvindex.model.*;
 import uk.ac.ebi.bioinvindex.model.processing.Assay;
+import uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication;
 import uk.ac.ebi.bioinvindex.model.term.ContactRole;
 import uk.ac.ebi.bioinvindex.model.term.Design;
 import uk.ac.ebi.bioinvindex.model.term.PublicationStatus;
 import uk.ac.ebi.bioinvindex.utils.datasourceload.DataLocationManager;
+import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
 import uk.ac.ebi.embl.era.sra.xml.*;
 import uk.ac.ebi.embl.era.sra.xml.EXPERIMENTSETDocument;
 import uk.ac.ebi.embl.era.sra.xml.LinkType.ENTREZLINK;
@@ -86,9 +85,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 
 /**
@@ -206,13 +203,25 @@ public class SraExporter extends SraExportPipelineComponent {
 
             boolean isAssayOk = true;
 
+//            Map<String, Set<String>> assayToBarcodes = getBarcodesByAssay(study);
+//
+//            for (String materialName : assayToBarcodes.keySet()) {
+//                System.out.println(materialName);
+//                for (String barcode : assayToBarcodes.get(materialName)) {
+//                    System.out.println("\t" + barcode);
+//                }
+//            }
+
             for (Assay assay : study.getAssays()) {
+                // todo investigate
+
                 if ("sra".equals(AssayTypeEntries.getDispatchTargetIdFromLabels(assay))) {
                     // Prepare the study
                     xstudyDoc = buildExportedStudy(study);
 
                     ndc.pushObject(assay);
                     log.trace("SraExporter, Working on assay " + assay.getAcc());
+
 
                     // Adds up the information built with the assay
                     if (!buildExportedAssay(assay, xsubFiles, runSet, expSet, sampleSet)) {
@@ -290,8 +299,7 @@ public class SraExporter extends SraExportPipelineComponent {
                             targetFile.setLastModified(srcFile.lastModified());
                             log.trace("...done");
                         }
-                    }
-                    catch (IOException ex) {
+                    } catch (IOException ex) {
                         throw new TabIOException(MessageFormat.format("Error during SRA export of study {0}: {1}", studyAcc, ex.getMessage()), ex);
                     }
                 }
@@ -312,6 +320,49 @@ public class SraExporter extends SraExportPipelineComponent {
         }
     }
 
+//    private Map<String, Set<String>> getBarcodesByAssay(Study study) {
+//        Map<String, Set<String>> assayToBarcode = new HashMap<String, Set<String>>();
+//
+//        for (Assay assay : study.getAssays()) {
+//
+//            for (AssayResult ar : ProcessingUtils.findAssayResultsFromAssay(assay)) {
+//
+//                if ("sra".equals(AssayTypeEntries.getDispatchTargetIdFromLabels(assay))) {
+//
+//                    String barcode = getBarcodeForAssays(assay);
+//
+//                    Data data = ar.getData();
+//                    String url = StringUtils.trimToNull(data.getUrl());
+//
+//                    if (!StringUtils.isEmpty(barcode)) {
+//
+//                        System.out.println("MATERIAL: " + assay.getMaterial().getName());
+//                        System.out.println("ACCESSION: " + assay.getAcc());
+//
+//                        if (!assayToBarcode.containsKey(assay.getMaterial().getName())) {
+//                            assayToBarcode.put(url, new HashSet<String>());
+//                        }
+//
+//                        assayToBarcode.get(url).add(barcode);
+//                    }
+//                }
+//            }
+//
+//        }
+//
+//        return assayToBarcode;
+//    }
+//
+//    private String getBarcodeForAssays(Assay assay) {
+//
+//        ProtocolApplication libConstructionPApp = getProtocol(assay, "library construction");
+//        if (libConstructionPApp == null) {
+//            return null;
+//        }
+//
+//        return getParameterValue(assay, libConstructionPApp, "mid", true);
+//    }
+
 
     /**
      * Builds the SRA study from the ISATAB study, assuming this has some ENA assays.
@@ -328,16 +379,19 @@ public class SraExporter extends SraExportPipelineComponent {
 
         StudyType.DESCRIPTOR xdescriptor = StudyType.DESCRIPTOR.Factory.newInstance();
         String description = StringUtils.trimToNull(study.getDescription());
+
         // TODO: constant class
-        String backLink = StringUtils.trimToNull(System.getProperty("bioinvindex.converters.sra.backlink", null));
-        if (backLink != null) {
-            backLink = backLink.replaceAll("\\$\\{study-acc\\}", studyAcc);
-            description = backLink + (description == null ? "" : " ") + description;
-        }
+        // Commented out, need to add a test checking if there is a BII accession number
+        //String backLink = StringUtils.trimToNull(System.getProperty("bioinvindex.converters.sra.backlink", null));
+        //if (backLink != null) {
+        //    backLink = backLink.replaceAll("\\$\\{study-acc\\}", studyAcc);
+        //    description = backLink + (description == null ? "" : " ") + description;
+        //}
 
         xdescriptor.setCENTERNAME(centerName);
         xstudy.setCenterName(centerName);
         xstudy.setBrokerName(brokerName);
+
 
         String centerPrjName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Center Project Name"));
         if (centerPrjName == null) {
@@ -409,7 +463,9 @@ public class SraExporter extends SraExportPipelineComponent {
 
         // Try to see if the ISATAB study type is listed in the SRA schema, use 'other' otherwise.
         // TODO: ontology term
-        //
+        // TODO: check on the assay type to determine nature of the study design. for example,
+        // TODO: if measurement type = environmental gene survey, study design = METAGENOMICS
+
         STUDYTYPE xstudyType = STUDYTYPE.Factory.newInstance();
         String designStr = design.getValue();
         ExistingStudyType.Enum xdesign = ExistingStudyType.Enum.forString(designStr);
@@ -512,7 +568,7 @@ public class SraExporter extends SraExportPipelineComponent {
     /**
      * Export an ISATAB Investigation/Study publication as a SRA study attribute.
      *
-     * @param contact         the ISATAB contact
+     * @param         the ISATAB contact
      * @param xattrs          the study attributes, to which new entries about this publication are added.
      * @param isInvestigation use an appropriate tag depending on the fact this contact is for the study or
      *                        its investigation.
@@ -548,8 +604,7 @@ public class SraExporter extends SraExportPipelineComponent {
                 xlink.setENTREZLINK(pmedLink);
                 xlinks.addNewSTUDYLINK();
                 xlinks.setSTUDYLINKArray(xlinks.sizeOfSTUDYLINKArray() - 1, xlink);
-            }
-            catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 log.warn("The PUBMED ID '" + pmid + "' for '" + title + "' is not valid, not exporting this publication");
             }
         }
@@ -579,7 +634,7 @@ public class SraExporter extends SraExportPipelineComponent {
 
 
     /**
-     * Builds an SRA {@link STUDYATTRIBUTE} from a tag/value/unit triple.
+     * Builds an SRA {@link } from a tag/value/unit triple.
      */
     private AttributeType buildStudyAttribute(String tag, String value, String unit) {
         if (tag == null || value == null) {
