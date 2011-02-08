@@ -119,7 +119,7 @@ public class TaskResultPanel extends JPanel {
 
 
         // add buttons here to switch between summary and error report if error report isn't null
-        if (report != null) {
+        if (report != null && report.getReport().size() > 0) {
             swappableUIContainer = new JPanel();
             swappableUIContainer.setOpaque(false);
             // create a tabbed form of view between summary and warnings log.

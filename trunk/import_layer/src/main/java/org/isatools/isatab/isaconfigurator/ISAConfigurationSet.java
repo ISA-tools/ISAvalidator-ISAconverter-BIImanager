@@ -97,6 +97,28 @@ public class ISAConfigurationSet {
         try {
             IsatabConfigFileDocument configFileDoc = IsatabConfigFileDocument.Factory.parse(input);
             IsaTabConfigFileType configFile = configFileDoc.getIsatabConfigFile();
+
+            // BEGIN: ADDITION
+
+            // Pre-process headers in the form X[Y] and normalise them into the "X [Y]" form
+            //
+            for (int i = 0; i < configFile.sizeOfIsatabConfigurationArray(); i++) {
+                IsaTabConfigurationType cfg = configFile.getIsatabConfigurationArray(i);
+                for (XmlObject xfieldObj : getAllConfigurationFields(cfg)) {
+                    FieldType xfield = (FieldType) xfieldObj;
+                    String xheader = xfield.getHeader();
+                    if (xheader.contains("[")) {
+                        int iFirstBracket = xheader.indexOf('[');
+                        if (iFirstBracket > 0) {
+                            String newHeader = xheader.substring(0, iFirstBracket) + " " + xheader.substring(iFirstBracket + 1);
+                            xfield.setHeader(newHeader);
+                        }
+                    }
+                }
+            }
+
+            // END: ADDITION
+
             _isaConfigFiles.put(path, configFile);
         }
         catch (XmlException e) {

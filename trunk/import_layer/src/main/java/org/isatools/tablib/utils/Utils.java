@@ -1,4 +1,4 @@
-/**
+/*
 
  The ISAconverter, ISAvalidator & BII Management Tool are components of the ISA software suite (http://www.isa-tools.org)
 
@@ -60,8 +60,10 @@ public class Utils {
     /**
      * Tells whether two property values are to be considered the same or not. This will possibly be removed
      * when proper equivalence criteria are implemented in the model.
+     * @param <PT>
+     * @param <PT>
      */
-    public static <PV extends PropertyValue<PT>, PT extends Property<PV>> boolean equal(PV pv1, PV pv2) {
+    public static <PV extends PropertyValue<?>> boolean equal(PV pv1, PV pv2) {
         if (pv1 == null) {
             return pv2 == null;
         }
@@ -69,7 +71,7 @@ public class Utils {
             return pv1 == null;
         }
 
-        PT pt1 = pv1.getType(), pt2 = pv2.getType();
+        Property<?> pt1 = pv1.getType(), pt2 = pv2.getType();
         if (pt1 == null) {
             if (pt2 != null) {
                 return false;
@@ -131,8 +133,7 @@ public class Utils {
      * Tells if a property value is inside a collection, by using {@link #equal(PropertyValue, PropertyValue)}.
      * This will possibly be removed when proper equivalence criteria are implemented in the model.
      */
-    public static <PV extends PropertyValue<PT>, PT extends Property<PV>> boolean
-    contains(Collection<PV> pvals, PV pv) {
+    public static <PV extends PropertyValue<?>> boolean contains(Collection<PV> pvals, PV pv) {
         for (PV pvi : pvals) {
             if (equal(pv, pvi)) {
                 return true;

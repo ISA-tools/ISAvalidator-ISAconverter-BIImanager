@@ -9,7 +9,7 @@
     <version>1.2</version>
 
     <name>ISAvalidator, ISAconverter and BII Data Management tool</name>
-    <url>http://isatab.sf.net/</url>
+    <url>http://isa-tools.org/</url>
     <description>ISAvalidator, ISAconverter and BII Data Management tools</description>
 
     <properties>
