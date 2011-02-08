@@ -146,6 +146,7 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
         return pvalues == null || pvalues.length == 0 ? null : pvalues[0];
     }
 
+
     /**
      * Gets the parameter values of a particular parameter type that have been used for a particular protocol application.
      * <p/>
@@ -253,6 +254,9 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
     /**
      * A facility to build a SAMPLE_ATTRIBUTE from a tag/value/unit triple. Returns null if either tag or value are null.
      */
+
+    // TODO: add a lookup to rely on insdc codes instead of migs/miens labels for SRA export
+    // use
     protected AttributeType buildSampleAttribute(String tag, String value, String unit) {
         if (tag == null || value == null) {
             return null;

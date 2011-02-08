@@ -71,6 +71,8 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SRA-exporter, functions related to the building of SRA samples. See {@link SraExportComponent} for further
@@ -302,47 +304,11 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 // TODO: Common name is a GeneBank identifier and not supported for the moment
                 // xsampleName.setCOMMONNAME ( sampleName );
                 xsample.setTITLE(sampleName);
+
             }
         }
 
-// It seems there are only samples in SRA, no other roles    
-//    sampleAttrs.addNewSAMPLEATTRIBUTE ();
-//    sampleAttrs.setSAMPLEATTRIBUTEArray ( sampleAttrs.sizeOfSAMPLEATTRIBUTEArray () - 1, 
-//    	buildSampleAttribute ( "Material Experimental Role", sampleType.getName (), null )
-//    );
-
-
-        // Adds up the sample characteristics
-        for (CharacteristicValue cvalue : sample.getCharacteristicValues()) {
-            AttributeType xattr = characteristicValue2SampleAttr(cvalue);
-            if (xattr != null) {
-                sampleAttrs.addNewSAMPLEATTRIBUTE();
-                sampleAttrs.setSAMPLEATTRIBUTEArray(sampleAttrs.sizeOfSAMPLEATTRIBUTEArray() - 1, xattr);
-            }
-
-            // Set the NCBI term if found. TODO: factorize
-            for (OntologyTerm oe : cvalue.getOntologyTerms()) {
-                ReferenceSource src = oe.getSource();
-                if (src == null) {
-                    break;
-                }
-                if (!StringUtils.containsIgnoreCase(src.getDescription(), "NCBI Taxonomy")) {
-                    break;
-                }
-                String taxon = oe.getAcc();
-                if (taxon == null) {
-                    break;
-                }
-                try {
-                    xsampleName.setTAXONID(Integer.parseInt(taxon));
-                }
-                catch (NumberFormatException ex) {
-                    nonRepeatedMessages.add("Invalid NCBI ID '" + taxon + "', ignoring it");
-                }
-                break; // Only the first one
-            }
-
-        }
+        extractNCBITaxonomyInformation(sample, sampleAttrs, xsampleName);
 
         // Lookup the sample this sample derives from and and collect all their characteristics. We think it makes sense to
         // do that cause we're not sure the sample members (in a pool) will be taken into account
@@ -370,36 +336,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
             }
 
 
-            for (CharacteristicValue cvalue : backwardMaterial.getCharacteristicValues()) {
-                AttributeType xattr = characteristicValue2SampleAttr(cvalue);
-                if (xattr != null) {
-                    sampleAttrs.addNewSAMPLEATTRIBUTE();
-                    sampleAttrs.setSAMPLEATTRIBUTEArray(sampleAttrs.sizeOfSAMPLEATTRIBUTEArray() - 1, xattr);
-                }
-
-                // Set the NCBI term if found. TODO: factorize
-                for (OntologyTerm oe : cvalue.getOntologyTerms()) {
-                    ReferenceSource src = oe.getSource();
-                    if (src == null) {
-                        break;
-                    }
-                    if (!StringUtils.containsIgnoreCase(src.getDescription(), "NCBI Taxonomy")) {
-                        break;
-                    }
-                    String taxon = oe.getAcc();
-                    if (taxon == null) {
-                        break;
-                    }
-                    try {
-                        xsampleName.setTAXONID(Integer.parseInt(taxon));
-                    }
-                    catch (NumberFormatException ex) {
-                        nonRepeatedMessages.add("Invalid NCBI ID '" + taxon + "', ignoring it");
-                    }
-                    break; // Only the first one
-                }
-
-            } // for ( cvalue )
+            extractNCBITaxonomyInformation(backwardMaterial, sampleAttrs, xsampleName);
         }
 
         // TODO: should we check that xsample.getAlias () is not null?
@@ -415,6 +352,57 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         }
 
         return xsample;
+    }
+
+    private void extractNCBITaxonomyInformation(Material material, SAMPLEATTRIBUTES sampleAttrs, SAMPLENAME xsampleName) {
+        for (CharacteristicValue cvalue : material.getCharacteristicValues()) {
+            AttributeType xattr = characteristicValue2SampleAttr(cvalue);
+
+            boolean isOrganismTag = checkCharacteristicValue(cvalue, "(?i)tax|(?i)organism");
+
+            if (xattr != null) {
+                if (!isOrganismTag) {
+                    sampleAttrs.addNewSAMPLEATTRIBUTE();
+                    sampleAttrs.setSAMPLEATTRIBUTEArray(sampleAttrs.sizeOfSAMPLEATTRIBUTEArray() - 1, xattr);
+                }
+            }
+
+            // Set the NCBI term if found. TODO: factorize
+            for (OntologyTerm oe : cvalue.getOntologyTerms()) {
+                ReferenceSource src = oe.getSource();
+                if (src == null) {
+                    break;
+                }
+                if ((!StringUtils.containsIgnoreCase(src.getDescription(), "NCBI")) || (!StringUtils.containsIgnoreCase(src.getDescription(), "Taxonomy"))) {
+                    break;
+                }
+                String taxon = oe.getAcc();
+                if (taxon == null) {
+                    break;
+                }
+                try {
+
+                    log.info("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+
+                    if (isOrganismTag) {
+                        xsampleName.setTAXONID(Integer.parseInt(taxon));
+                        xsampleName.setSCIENTIFICNAME(oe.getName());
+                    }
+
+                } catch (NumberFormatException ex) {
+                    nonRepeatedMessages.add("Invalid NCBI ID '" + taxon + "', ignoring it");
+                }
+                break; // Only the first one
+            }
+
+        } // for ( cvalue )
+    }
+
+    private boolean checkCharacteristicValue(CharacteristicValue cValue, String regex) {
+
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(cValue.getType().getValue());
+        return m.find();
     }
 
     /**

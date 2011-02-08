@@ -172,7 +172,7 @@ public abstract class ProcessingNodeTabMapper<NT extends Identifiable>
 
         // After having done the annotations, set the AE/PRIDE Xrefs from them
         for (Annotation ann : assay.getAnnotations()) {
-            for (Xref xref : getExternalRepoXrefs(ann)) {
+            for (Xref xref : getXrefs(ann)) {
                 assay.addXref(xref);
             }
         }
@@ -187,10 +187,11 @@ public abstract class ProcessingNodeTabMapper<NT extends Identifiable>
     }
 
 
+
     /**
      * Creates proper {@link Xref X-refs} corresponding to those comments about external web links and files.
      */
-    private Xref[] getExternalRepoXrefs(Annotation ann) {
+    private Xref[] getXrefs(Annotation ann) {
         AnnotationType annType = ann.getType();
         String annTypeS = annType.getValue();
         ReferenceSource source = null;
@@ -259,6 +260,10 @@ public abstract class ProcessingNodeTabMapper<NT extends Identifiable>
             source = new ReferenceSource("GEO Experiment Web Page");
             source.setDescription("GEO Experiment Web Page");
             source.setAcc("GEO:WEB");
+        } else if(annTypeS.equals("comment:Export")) {
+            source = new ReferenceSource("Export to SRA");
+            source.setDescription("To be used in SRA export");
+            source.setAcc("EXPORT");
         }
 
         if (source == null)
@@ -278,6 +283,7 @@ public abstract class ProcessingNodeTabMapper<NT extends Identifiable>
         for (int i = 0; i < annVals.length; i++) {
             xrefs[i] = new Xref(annVals[i]);
             xrefs[i].setSource(source);
+
         }
 
         return xrefs;

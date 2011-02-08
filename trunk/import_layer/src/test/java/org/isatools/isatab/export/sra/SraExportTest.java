@@ -64,66 +64,84 @@ import uk.ac.ebi.embl.era.sra.xml.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.System.out;
 import static junit.framework.Assert.assertTrue;
 
+
 public class SraExportTest {
 
-	@Test
-	public void testBasicExport() throws XmlException{
-		out.println("\n\n" + StringUtils.center("Testing the SRA exporter with BII-S-4", 120, "-") + "\n");
 
-		System.setProperty(
-				"bioinvindex.converters.sra.backlink",
-				"(This study is linked to the BII project, see http://www.ebi.ac.uk/bioinvindex/study.seam?studyId=${study-acc}) "
-		);
+    @Test
+    public void testBasicExport() throws XmlException {
+        Map<String, String> testData = getTestData();
+        for (String directory : testData.keySet()) {
 
-		String baseDir = System.getProperty("basedir");
-		String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/BII-S-4-NEW";
+            out.println("\n\n" + StringUtils.center("Testing the SRA exporter with " + directory, 120, "-") + "\n");
 
-        System.out.println("filesPath = " + filesPath);
+            System.setProperty(
+                    "bioinvindex.converters.sra.backlink",
+                    "(This study is linked to the BII project, see http://www.ebi.ac.uk/bioinvindex/study.seam?studyId=${study-acc})");
 
-		ISATABLoader loader = new ISATABLoader(filesPath);
-        FormatSetInstance isatabInstance = null;
-        try {
-            isatabInstance = loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
+            String baseDir = System.getProperty("basedir");
+
+            System.out.println("basedir = " + baseDir);
+
+            String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/" + directory;
+
+            System.out.println("filesPath = " + filesPath);
+
+            ISATABLoader loader = new ISATABLoader(filesPath);
+            FormatSetInstance isatabInstance = null;
+            try {
+                isatabInstance = loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            BIIObjectStore store = new BIIObjectStore();
+            ISATABMapper mapper = new ISATABMapper(store, isatabInstance);
+            mapper.map();
+
+            String studyExportPath = baseDir + "/target/export/";
+
+            SraExporter sraExporter = new SraExporter(store, filesPath, studyExportPath);
+            sraExporter.export();
+
+            System.out.println("exportPath = " + studyExportPath);
+
+            assertTrue("Ouch! No SRA export directory created for " + directory + ": " + studyExportPath, new File(studyExportPath).exists());
+            assertTrue("Ouch! No SRA study.xml created", new File(studyExportPath + "/sra/" + testData.get(directory) + "/study.xml").exists());
+
+            // Validate the generated XML files
+            try {
+                XmlOptions xopts = new XmlOptions();
+                xopts.setValidateOnSet();
+                SubmissionType xsub = SubmissionType.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/submission.xml"), xopts);
+                StudyType xstudy = StudyType.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/study.xml"), xopts);
+                SAMPLESETDocument xsamples = SAMPLESETDocument.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/sample_set.xml"), xopts);
+                EXPERIMENTSETDocument xexps = EXPERIMENTSETDocument.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/experiment_set.xml"), xopts);
+                RUNSETDocument xruns = RUNSETDocument.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/run_set.xml"), xopts);
+            } catch (XmlException ex) {
+                throw new XmlException("Argh! Validation of resulting SRA/XML failed!: " + ex.getMessage(), ex);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
-        BIIObjectStore store = new BIIObjectStore();
-		ISATABMapper mapper = new ISATABMapper(store, isatabInstance);
-		mapper.map();
-
-		SraExporter sraExporter = new SraExporter(store, filesPath, baseDir + "/target/export");
-		sraExporter.export();
-
-		String studyExportPath = baseDir + "/target/export/sra/BII-S-4";
-
-		assertTrue("Ouch! No SRA export directory created for BII-S-4: " + studyExportPath,
-				new File(studyExportPath).exists()
-		);
-		assertTrue("Ouch! No SRA study.xml created", new File(studyExportPath + "/study.xml").exists());
-
-		// Validate the generated XML files
-		try {
-			XmlOptions xopts = new XmlOptions();
-			xopts.setValidateOnSet();
-			SubmissionType xsub = SubmissionType.Factory.parse(new File(studyExportPath + "/submission.xml"), xopts);
-			StudyType xstudy = StudyType.Factory.parse(new File(studyExportPath + "/study.xml"), xopts);
-			SAMPLESETDocument xsamples = SAMPLESETDocument.Factory.parse(new File(studyExportPath + "/sample_set.xml"), xopts);
-			EXPERIMENTSETDocument xexps = EXPERIMENTSETDocument.Factory.parse(new File(studyExportPath + "/experiment_set.xml"), xopts);
-			RUNSETDocument xruns = RUNSETDocument.Factory.parse(new File(studyExportPath + "/run_set.xml"), xopts);
-		}
-		catch (XmlException ex) {
-			throw new XmlException("Argh! Validation of resulting SRA/XML failed!: " + ex.getMessage(), ex);
-		} catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
         // TODO: search (XPath) some items that must be there
 
-	}
+    }
+
+    private Map<String, String> getTestData() {
+        Map<String, String> testData = new HashMap<String, String>();
+
+        testData.put("LTR_Moorea_Coral_Reef_2008", "LTR_MRC_2008_Bacteria_16SRNA_gene_survey");
+        testData.put("BII-S-4-NEW", "BII-S-4");
+
+        return testData;
+
+    }
 }

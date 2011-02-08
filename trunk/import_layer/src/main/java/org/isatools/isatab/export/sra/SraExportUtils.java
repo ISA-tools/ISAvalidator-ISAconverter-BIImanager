@@ -85,26 +85,6 @@ abstract class SraExportUtils extends SraExportComponent {
         FILE xfile = FILE.Factory.newInstance();
         xfile.setFilename(fileName);
 
-        String submissionPath = this.sourcePath + "/" + fileName;
-
-        String md5 = null;
-
-        try {
-            md5 = IOUtils.getMD5(new File(submissionPath));
-        }
-        catch (NoSuchAlgorithmException e) {
-            throw new TabInternalErrorException(
-                    "Problem while triying to compute the MD5 for '" + submissionPath + "': " + e.getMessage(), e
-            );
-        }
-        catch (IOException e) {
-            throw new TabIOException(
-                    "I/O problem while trying to compute the MD5 for '" + submissionPath + "': " + e.getMessage(), e
-            );
-        }
-        xfile.setChecksumMethod(ChecksumMethod.MD_5);
-        xfile.setChecksum(md5);
-
         xsubFiles.addNewFILE();
         xsubFiles.setFILEArray(xsubFiles.sizeOfFILEArray() - 1, xfile);
         return xfile;

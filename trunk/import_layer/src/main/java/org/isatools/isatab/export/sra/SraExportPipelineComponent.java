@@ -13,7 +13,7 @@
  Software distributed under the License is distributed on an "AS IS"
  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
  License for the specific language governing rights and limitations
- under the License.
+ under the License.                                    5
 
  The Original Code is the ISAconverter, ISAvalidator & BII Management Tool.
 
@@ -53,6 +53,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
+//testing to see whether it pulls md5
+import org.isatools.isatab.export.sra.SraExportUtils;
 import org.isatools.isatab.export.sra.templateutil.*;
 import org.isatools.tablib.exceptions.TabInvalidValueException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
@@ -62,6 +64,7 @@ import uk.ac.ebi.bioinvindex.model.processing.Assay;
 import uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication;
 import uk.ac.ebi.bioinvindex.model.term.OntologyTerm;
 import uk.ac.ebi.bioinvindex.model.term.ProtocolComponent;
+import uk.ac.ebi.bioinvindex.model.xref.Xref;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
 
@@ -69,28 +72,33 @@ import uk.ac.ebi.embl.era.sra.xml.*;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.LIBRARYDESCRIPTOR;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.LIBRARYDESCRIPTOR.LIBRARYLAYOUT;
-import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.LIBRARYDESCRIPTOR.LIBRARYLAYOUT.PAIRED;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.LIBRARYDESCRIPTOR.LIBRARYSELECTION;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.LIBRARYDESCRIPTOR.LIBRARYSOURCE;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.LIBRARYDESCRIPTOR.LIBRARYSTRATEGY;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.SAMPLEDESCRIPTOR;
-import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.PROCESSING;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.STUDYREF;
 
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK;
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK.FILES;
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK.FILES.FILE;
+import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK.FILES.FILE.ChecksumMethod;
 import uk.ac.ebi.embl.era.sra.xml.RunType.EXPERIMENTREF;
 
-import java.awt.*;
+import java.io.File;
+
+import uk.ac.ebi.utils.io.IOUtils;
+import org.isatools.tablib.exceptions.TabIOException;
+import org.isatools.tablib.exceptions.TabInternalErrorException;
+
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.security.NoSuchAlgorithmException;
+
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * SRA-exporter, functions related to the ISATAB experimental pipeline. See {@link SraExportComponent} for further
@@ -107,6 +115,20 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         super(store, sourcePath, exportPath);
     }
 
+    private boolean containsAnnotation(Assay assay, String annotation) {
+        Collection<Xref> crossReferences = assay.getXrefs();
+
+        for (Xref xref : crossReferences) {
+            log.info("Found XREF for " + xref.getAcc());
+            if (xref.getSource().getAcc().contains(annotation)) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * Builds the SRA elements that are related to this ISATAB assay. It adds runs and an experiment to the respective
@@ -115,157 +137,214 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      * @return true if it could successfully build the exported items.
      */
     protected boolean buildExportedAssay(
-            Assay assay, SubmissionType.FILES xsubFiles, RunSetType xrunSet, ExperimentSetType xexperimentSet, SampleSetType xsampleSet
-    ) {
+            Assay assay, SubmissionType.FILES xsubFiles, RunSetType xrunSet, ExperimentSetType xexperimentSet, SampleSetType xsampleSet) {
+
+
         String assayAcc = assay.getAcc();
 
-        // Now create an experiment for the input material and link it to the run
+        boolean doExport = true;
+//
+        if (containsAnnotation(assay, "EXPORT")) {
 
-        // get Material associated to the assay and get its identifier
-        Material material = assay.getMaterial();
-        String materialAcc = material.getAcc();
+            log.info("HAS EXPORT COMMENT IN ASSAY");
 
-        //create a new SRA Experiment and assign ISA Material name as SRA Experiment Title
-        ExperimentType xexp = ExperimentType.Factory.newInstance();
-        xexp.setAlias(materialAcc);
-        xexp.setTITLE("experiment made with the sample " + material.getName());
+            String export = assay.getSingleAnnotationValue("comment:Export");
 
-        xexp.setCenterName(centerName);
-        xexp.setBrokerName(brokerName);
+            log.info("export is " + export);
+            if (export.equalsIgnoreCase("no")) {
+                doExport = false;
+            } else {
+                doExport = true;
+            }
+//            doExport = !(export != null && export.toLowerCase().contains("yes"));
 
-        PlatformType xplatform = buildExportedPlatform(assay);
-        if (xplatform == null) {
-            return false;
-        }
-        xexp.setPLATFORM(xplatform);
-
-        xexp.setPROCESSING(buildExportedProcessing(assay));
-
-
-        STUDYREF xstudyRef = STUDYREF.Factory.newInstance();
-        xstudyRef.setRefname(assay.getStudy().getAcc());
-        xexp.setSTUDYREF(xstudyRef);
-        EXPERIMENTREF xexpRef = EXPERIMENTREF.Factory.newInstance();
-        xexpRef.setRefname(materialAcc);
-
-        DESIGN xdesign = DESIGN.Factory.newInstance();
-        xdesign.setDESIGNDESCRIPTION("See study and sample descriptions for details");
-
-        SAMPLEDESCRIPTOR xsampleRef = buildExportedAssaySample(assay, xsampleSet);
-        if (xsampleRef == null) {
-            return false;
+        } else {
+            log.info("NO EXPORT COMMENT FOUND");
         }
 
-        xdesign.setSAMPLEDESCRIPTOR(xsampleRef);
+        log.info("Perform export? " + doExport);
 
-        LIBRARYDESCRIPTOR xlib = buildExportedLibraryDescriptor(assay);
-        if (xlib == null) {
-            return false;
-        }
-        xdesign.setLIBRARYDESCRIPTOR(xlib);
+        if (doExport) {
 
-        SpotDescriptorType xspotd = buildExportedSpotDescriptor(assay);
-        if (xspotd == null) {
-            return false;
-        }
+            // Now create an experiment for the input material and link it to the run
 
-        xdesign.setSPOTDESCRIPTOR(xspotd);
+            // get Material associated to the assay and get its identifier
+            Material material = assay.getMaterial();
+            String materialAcc = material.getAcc();
 
-        xexp.setDESIGN(xdesign);
+            //create a new SRA Experiment and assign ISA Material name as SRA Experiment Title
+            ExperimentType xexp = ExperimentType.Factory.newInstance();
+            xexp.setAlias(materialAcc);
+            xexp.setTITLE("Sequencing library derived from sample " + material.getName());
+
+            xexp.setCenterName(centerName);
+            xexp.setBrokerName(brokerName);
+
+            PlatformType xplatform = buildExportedPlatform(assay);
+            if (xplatform == null) {
+                return false;
+            }
+            xexp.setPLATFORM(xplatform);
+
+            Map<SequencingProperties, String> sequencingProperties = getSequencingInstrumentAndLayout(assay);
+
+            xexp.setPROCESSING(buildExportedProcessing(assay, sequencingProperties));
 
 
-        // For each file, builds one run, with one data block and one file
-        // TODO: We should introduce something like "Run Name", so that multiple files associated to a single run can be
-        // specified
-        //
-        for (AssayResult ar : ProcessingUtils.findAssayResultsFromAssay(assay)) {
-            Data data = ar.getData();
-            String url = StringUtils.trimToNull(data.getUrl());
-            Study study = ar.getStudy();
+            STUDYREF xstudyRef = STUDYREF.Factory.newInstance();
+            xstudyRef.setRefname(assay.getStudy().getAcc());
+            xexp.setSTUDYREF(xstudyRef);
+            EXPERIMENTREF xexpRef = EXPERIMENTREF.Factory.newInstance();
+            xexpRef.setRefname(materialAcc);
 
-            if (url == null) {
-                String msg = MessageFormat.format(
-                        "The assay file of type {0} / {1} for study {2} has a data file node without file name, ignoring",
-                        assay.getMeasurement().getName(),
-                        assay.getTechnologyName(),
-                        assay.getStudy().getAcc()
-                );
-                nonRepeatedMessages.add(msg + ". Data node is " + data.getName());
-                log.trace(msg);
+            DESIGN xdesign = DESIGN.Factory.newInstance();
+            xdesign.setDESIGNDESCRIPTION("See study and sample descriptions for details");
+
+            SAMPLEDESCRIPTOR xsampleRef = buildExportedAssaySample(assay, xsampleSet);
+            if (xsampleRef == null) {
                 return false;
             }
 
-            FILE.Filetype.Enum xfileType = null;
-            String fileType = StringUtils.trimToNull(data.getSingleAnnotationValue("comment:SRA File Type"));
-            if (fileType == null) {
-                // Let's try to get it from the file extension
-                //
-                fileType = StringUtils.trimToNull(FilenameUtils.getExtension(url));
-                if (fileType != null) {
+            xdesign.setSAMPLEDESCRIPTOR(xsampleRef);
+
+            LIBRARYDESCRIPTOR xlib = buildExportedLibraryDescriptor(assay);
+            if (xlib == null) {
+                return false;
+            }
+            xdesign.setLIBRARYDESCRIPTOR(xlib);
+
+            SpotDescriptorType xspotd = buildExportedSpotDescriptor(assay, sequencingProperties);
+            if (xspotd == null) {
+                return false;
+            }
+
+            xdesign.setSPOTDESCRIPTOR(xspotd);
+
+            xexp.setDESIGN(xdesign);
+
+            Map<String, String> fileToMD5 = new HashMap<String, String>();
+
+            // For each file, builds one run, with one data block and one file
+            // TODO: We should introduce something like "Run Name", so that multiple files associated to a single run can be
+            // specified
+            //
+            for (AssayResult ar : ProcessingUtils.findAssayResultsFromAssay(assay)) {
+                Data data = ar.getData();
+                String url = StringUtils.trimToNull(data.getUrl());
+
+                Study study = ar.getStudy();
+
+                if (url == null) {
+                    String msg = MessageFormat.format(
+                            "The assay file of type {0} / {1} for study {2} has a data file node without file name, ignoring",
+                            assay.getMeasurement().getName(),
+                            assay.getTechnologyName(),
+                            assay.getStudy().getAcc()
+                    );
+                    nonRepeatedMessages.add(msg + ". Data node is " + data.getName());
+                    log.trace(msg);
+                    return false;
+                }
+
+                FILE.Filetype.Enum xfileType = null;
+                String fileType = StringUtils.trimToNull(data.getSingleAnnotationValue("comment:SRA File Type"));
+                if (fileType == null) {
+                    // Let's try to get it from the file extension
+                    //
+                    fileType = StringUtils.trimToNull(FilenameUtils.getExtension(url));
+                    if (fileType != null) {
+                        xfileType = FILE.Filetype.Enum.forString(fileType.toLowerCase());
+                    }
+
+                    if (xfileType == null) {
+                        String msg = MessageFormat.format(
+                                "The assay file of type {0} / {1} for study {2} has a data file node without the annotation " +
+                                        "'SRA file type' and I cannot compute the file type from the file name, ignoring the assay",
+                                assay.getMeasurement().getName(),
+                                assay.getTechnologyName(),
+                                assay.getStudy().getAcc()
+                        );
+                        nonRepeatedMessages.add(msg);
+                        log.trace(msg + ". Data node is " + data.getName());
+                        return false;
+                    }
+                }
+
+                if (xfileType == null) {
+                    // fileType is certainly non null at this point, cause it was explicitly provided and so we
+                    // have to process it
+                    //
                     xfileType = FILE.Filetype.Enum.forString(fileType.toLowerCase());
+
+                    if (xfileType == null) {
+                        String msg = MessageFormat.format(
+                                "The assay file of type {0} / {1} for study {2} has a bad 'SRA File Type' annotation: '" + fileType + "'" +
+                                        ", ignoring the assay",
+                                assay.getMeasurement().getName(),
+                                assay.getTechnologyName(),
+                                assay.getStudy().getAcc()
+                        );
+                        nonRepeatedMessages.add(msg);
+                        log.trace(msg + ". Data node is " + data.getName());
+                        return false;
+                    }
                 }
 
-                if (xfileType == null) {
-                    String msg = MessageFormat.format(
-                            "The assay file of type {0} / {1} for study {2} has a data file node without the annotation " +
-                                    "'SRA file type' and I cannot compute the file type from the file name, ignoring the assay",
-                            assay.getMeasurement().getName(),
-                            assay.getTechnologyName(),
-                            assay.getStudy().getAcc()
-                    );
-                    nonRepeatedMessages.add(msg);
-                    log.trace(msg + ". Data node is " + data.getName());
-                    return false;
+
+                RunType xrun = RunType.Factory.newInstance();
+                xrun.setAlias(assayAcc);
+                xrun.setCenterName(centerName);
+                xrun.setBrokerName(brokerName);
+
+
+                DATABLOCK dataBlock = DATABLOCK.Factory.newInstance();
+                FILES xfiles = FILES.Factory.newInstance();
+                FILE xfile = FILE.Factory.newInstance();
+                xfile.setFiletype(xfileType);
+                xfile.setFilename(url);
+
+                xfile.setChecksumMethod(ChecksumMethod.MD_5);
+
+
+                String md5;
+
+                if (!fileToMD5.containsKey(url)) {
+
+                    try {
+                        md5 = IOUtils.getMD5(new File(this.sourcePath + "/" + url));
+                        fileToMD5.put(url, md5);
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new TabInternalErrorException(
+                                "Problem while trying to compute the MD5 for '" + url + "': " + e.getMessage(), e
+                        );
+                    } catch (IOException e) {
+                        throw new TabIOException(
+                                "I/O problem while trying to compute the MD5 for '" + url + "': " + e.getMessage(), e
+                        );
+
+                    }
                 }
+
+                xfile.setChecksum(fileToMD5.get(url));
+
+                xfiles.addNewFILE();
+                xfiles.setFILEArray(0, xfile);
+                dataBlock.setFILES(xfiles);
+                xrun.addNewDATABLOCK();
+                xrun.setDATABLOCKArray(xrun.sizeOfDATABLOCKArray() - 1, dataBlock);
+
+                addExportedSubmissionFile(xsubFiles, url);
+                // TODO: remove, it's deprecated now xrun.setTotalDataBlocks ( BigInteger.ONE );
+                xrun.setEXPERIMENTREF(xexpRef);
+
+                xrunSet.addNewRUN();
+                xrunSet.setRUNArray(xrunSet.sizeOfRUNArray() - 1, xrun);
             }
 
-            if (xfileType == null) {
-                // fileType is certainly non null at this point, cause it was explicitly provided and so we
-                // have to process it
-                //
-                xfileType = FILE.Filetype.Enum.forString(fileType.toLowerCase());
-
-                if (xfileType == null) {
-                    String msg = MessageFormat.format(
-                            "The assay file of type {0} / {1} for study {2} has a bad 'SRA File Type' annotation: '" + fileType + "'" +
-                                    ", ignoring the assy",
-                            assay.getMeasurement().getName(),
-                            assay.getTechnologyName(),
-                            assay.getStudy().getAcc()
-                    );
-                    nonRepeatedMessages.add(msg);
-                    log.trace(msg + ". Data node is " + data.getName());
-                    return false;
-                }
-            }
-
-
-            RunType xrun = RunType.Factory.newInstance();
-            xrun.setAlias(assayAcc);
-            xrun.setCenterName(centerName);
-            xrun.setBrokerName(brokerName);
-
-            DATABLOCK dataBlock = DATABLOCK.Factory.newInstance();
-            FILES xfiles = FILES.Factory.newInstance();
-            FILE xfile = FILE.Factory.newInstance();
-            xfile.setFiletype(xfileType);
-            xfile.setFilename(url);
-            xfiles.addNewFILE();
-            xfiles.setFILEArray(0, xfile);
-            dataBlock.setFILES(xfiles);
-            xrun.addNewDATABLOCK();
-            xrun.setDATABLOCKArray(xrun.sizeOfDATABLOCKArray() - 1, dataBlock);
-
-            addExportedSubmissionFile(xsubFiles, url);
-            // TODO: remove, it's deprecated now xrun.setTotalDataBlocks ( BigInteger.ONE );
-            xrun.setEXPERIMENTREF(xexpRef);
-
-            xrunSet.addNewRUN();
-            xrunSet.setRUNArray(xrunSet.sizeOfRUNArray() - 1, xrun);
+            xexperimentSet.addNewEXPERIMENT();
+            xexperimentSet.setEXPERIMENTArray(xexperimentSet.sizeOfEXPERIMENTArray() - 1, xexp);
         }
 
-        xexperimentSet.addNewEXPERIMENT();
-        xexperimentSet.setEXPERIMENTArray(xexperimentSet.sizeOfEXPERIMENTArray() - 1, xexp);
         return true;
     }
 
@@ -284,24 +363,75 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         }
 
         LIBRARYDESCRIPTOR xlib = LIBRARYDESCRIPTOR.Factory.newInstance();
-        xlib.setLIBRARYNAME(getParameterValue(assay, papp, "Library Name", true));
+        // xlib.setLIBRARYNAME(getParameterValue(assay, papp, "library name", true));
         // TODO check it is one of the Enum types
+
         xlib.setLIBRARYSTRATEGY(LIBRARYSTRATEGY.Enum.forString(
-                getParameterValue(assay, papp, "Library Strategy", true
+                getParameterValue(assay, papp, "library strategy", true
                 )));
         xlib.setLIBRARYSOURCE(LIBRARYSOURCE.Enum.forString(
-                getParameterValue(assay, papp, "Library Source", true
+                getParameterValue(assay, papp, "library source", true
                 )));
         xlib.setLIBRARYSELECTION(LIBRARYSELECTION.Enum.forString(
-                getParameterValue(assay, papp, "Library Selection", true
+                getParameterValue(assay, papp, "library selection", true
                 )));
 
-        String pdescription = StringUtils.trimToNull(papp.getProtocol().getDescription());
-        if (pdescription != null) {
-            xlib.setLIBRARYCONSTRUCTIONPROTOCOL(pdescription);
+        StringBuffer protocol = new StringBuffer();
+
+        String pDescription = StringUtils.trimToNull(papp.getProtocol().getDescription());
+        if (pDescription != null) {
+            protocol.append("\n protocol_description: " + pDescription);
         }
 
-        String libLayout = getParameterValue(assay, papp, "Library Layout", true);
+
+        String pBibRef = getParameterValue(assay, papp, "nucl_acid_amp", false);
+        if (pBibRef != null) {
+            protocol.append("\n nucl_acid_amp: ").append(pBibRef);
+        }
+
+        String pUrl = getParameterValue(assay, papp, "url", false);
+        if (pUrl != null) {
+            protocol.append("\n url: ").append(pUrl);
+        }
+
+        String targetTaxon = getParameterValue(assay, papp, "target taxon", false);
+        if (targetTaxon != null) {
+            protocol.append("\n target_taxon: ").append(targetTaxon);
+        }
+
+        String targetGene = getParameterValue(assay, papp, "target_gene", false);
+        if (targetGene != null) {
+            protocol.append("\n target_gene: ").append(targetGene);
+        }
+
+        String targetSubfrag = getParameterValue(assay, papp, "target_subfragment", false);
+        if (targetSubfrag != null) {
+            protocol.append("\n target_subfragment: ").append(targetSubfrag);
+        }
+
+        String mid = getParameterValue(assay, papp, "mid", false);
+        if (mid != null) {
+            protocol.append("\n mid: ").append(mid);
+
+        }
+
+
+        String pcrPrimers = getParameterValue(assay, papp, "pcr_primers", false);
+        if (pcrPrimers != null) {
+            protocol.append("\n pcr_primers: ").append(pcrPrimers.replaceAll("=", ":"));
+
+        }
+
+        String pcrConditions = getParameterValue(assay, papp, "pcr_cond", false);
+        if (pcrConditions != null) {
+            protocol.append("\n pcr_cond: ").append(pcrConditions.replaceAll("=", ":"));
+
+        }
+
+
+        xlib.setLIBRARYCONSTRUCTIONPROTOCOL(protocol.toString());
+
+        String libLayout = getParameterValue(assay, papp, "library layout", true);
 
         LIBRARYLAYOUT xlibLayout = LIBRARYLAYOUT.Factory.newInstance();
         if ("single".equalsIgnoreCase(libLayout)) {
@@ -327,7 +457,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
         LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS xlocus = LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS.Factory.newInstance();
 
-        String locus = getParameterValue(assay, papp, "target_gene", true);
+        String locus = getParameterValue(assay, papp, "target_gene", false);
 
         if (locus != null) {
             if (locus.toLowerCase().contains("16s")) {
@@ -342,7 +472,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
         xlib.setTARGETEDLOCI(xtargetedloci);
 
-        String pooling = getParameterValue(assay, papp, "mid", true);
+        String pooling = getParameterValue(assay, papp, "mid", false);
         if (pooling != null) {
             LIBRARYDESCRIPTOR.POOLINGSTRATEGY xpoolingstrategy = LIBRARYDESCRIPTOR.POOLINGSTRATEGY.Factory.newInstance();
             xlib.setPOOLINGSTRATEGY(LIBRARYDESCRIPTOR.POOLINGSTRATEGY.MULTIPLEXED_LIBRARIES);
@@ -353,15 +483,34 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         return xlib;
     }
 
-    private SRATemplate getSRATemplateToInject(SRASection sraSection, Assay assay, ProtocolApplication pApp, boolean isBarcoded) {
-        String sequencingPlatform = getParameterValue(assay, pApp, "platform", true);
-        String sequencingLibrary = getParameterValue(assay, pApp, "library layout", true);
 
-        return SRAUtils.getTemplate(sraSection, sequencingPlatform, sequencingLibrary, isBarcoded);
+    private Map<SequencingProperties, String> getSequencingInstrumentAndLayout(Assay assay) {
+        ProtocolApplication sequencingPApp = getProtocol(assay, "DNA sequencing");
+
+        String sequencingPlatform = getParameterValue(assay, sequencingPApp, SequencingProperties.SEQUENCING_PLATFORM.toString(), true);
+
+        // the Library layout requirement is placed on library creation not sequencing step, hence removed
+        ProtocolApplication libConstructionPApp = getProtocol(assay, "library construction");
+
+        String sequencingLibrary = getParameterValue(assay, libConstructionPApp, SequencingProperties.LIBRARY_LAYOUT.toString(), true);
+
+        Map<SequencingProperties, String> properties = new HashMap<SequencingProperties, String>();
+
+        properties.put(SequencingProperties.LIBRARY_LAYOUT, sequencingLibrary);
+        properties.put(SequencingProperties.SEQUENCING_PLATFORM, sequencingPlatform);
+
+        return properties;
     }
 
-    private SRATemplate getSRATemplateToInject(SRASection sraSection, Assay assay, ProtocolApplication pApp) {
-        return getSRATemplateToInject(sraSection, assay, pApp, false);
+
+    private SRATemplate getSRATemplateToInject(SRASection sraSection, Map<SequencingProperties, String> sequencingProperties, boolean isBarcoded) {
+
+        return SRAUtils.getTemplate(sraSection, sequencingProperties.get(SequencingProperties.SEQUENCING_PLATFORM),
+                sequencingProperties.get(SequencingProperties.LIBRARY_LAYOUT), isBarcoded);
+    }
+
+    private SRATemplate getSRATemplateToInject(SRASection sraSection, Map<SequencingProperties, String> sequencingProperties) {
+        return getSRATemplateToInject(sraSection, sequencingProperties, false);
     }
 
     /**
@@ -371,22 +520,21 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      * Some of these parameters are mandatory in SRA, and/or constrained to certain values, so the method raises an
      * exception in case they're not defined.
      */
-    protected SpotDescriptorType buildExportedSpotDescriptor(Assay assay) {
-        ProtocolApplication pApp = getProtocol(assay, "sequencing");
+    protected SpotDescriptorType buildExportedSpotDescriptor(Assay assay, Map<SequencingProperties, String> sequencingProperties) {
+
+        String[] barcodes = getBarcodesForAssays(assay);
+
+        ProtocolApplication pApp = getProtocol(assay, "DNA sequencing");
         if (pApp == null) {
             return null;
         }
 
-        String barcode = getParameterValue(assay, pApp, "barcode", false);
-
-        System.out.println("barcode: " + barcode);
-
         String adapterSpec = getParameterValue(assay, pApp, "Adapter Spec", false);
         String numOfSpotReads = getParameterValue(assay, pApp, "Number of reads per spot", false);
 
-        boolean usesBarcode = (barcode != null);
+        boolean usesBarcode = (barcodes.length > 0);
 
-        SRATemplate sraTemplateToInject = getSRATemplateToInject(SRASection.SPOT_DESCRIPTOR, assay, pApp, usesBarcode);
+        SRATemplate sraTemplateToInject = getSRATemplateToInject(SRASection.SPOT_DESCRIPTOR, sequencingProperties, usesBarcode);
 
         SpotDescriptorType xspotd = SpotDescriptorType.Factory.newInstance();
 
@@ -400,14 +548,12 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             userDefinedAttributes.put(SRAAttributes.NUMBER_OF_READS_PER_SPOT, numOfSpotReads);
         }
 
-        if (!StringUtils.isEmpty(barcode)) {
-            userDefinedAttributes.put(SRAAttributes.READ_GROUP_TAG, barcode);
+        if (barcodes.length > 0 && !StringUtils.isEmpty(barcodes[0])) {
+            userDefinedAttributes.put(SRAAttributes.READ_GROUP_TAG, barcodes[0]);
         }
 
         try {
             String sraTemplate = sraTemplateLoader.getSRAProcessingTemplate(sraTemplateToInject, userDefinedAttributes);
-
-            System.out.println(sraTemplate);
 
             XmlOptions xmlOptions = new XmlOptions();
             xmlOptions.setDocumentType(SpotDescriptorType.Factory.newInstance().schemaType());
@@ -416,6 +562,35 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                     XmlObject.Factory.parse(sraTemplate, xmlOptions);
 
             xspotd.set(parsedAttr);
+
+            // now output rest of the barcodes (if there is more than one :) )
+
+            if (barcodes.length > 1) {
+                // output the barcode
+
+                SpotDescriptorType.SPOTDECODESPEC.READSPEC readSpec = getReadSpecWithBaseCalls(xspotd.getSPOTDECODESPEC());
+
+                // create new array of base calls and place the already added base call item into the array
+
+                SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL[] baseCallArray = new SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL[barcodes.length];
+
+                SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE table = readSpec.getEXPECTEDBASECALLTABLE();
+
+
+                for (int barcodeIndex = 0; barcodeIndex < barcodes.length; barcodeIndex++) {
+
+                    SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL baseCall = SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL.Factory.newInstance();
+                    baseCall.setReadGroupTag(barcodes[barcodeIndex]);
+                    baseCall.setStringValue(barcodes[barcodeIndex]);
+
+                    baseCallArray[barcodeIndex] = baseCall;
+                }
+
+                System.out.println("BASE CALL TABLE: " + readSpec.getEXPECTEDBASECALLTABLE());
+                System.out.println("MY BASE CALL ARRAY: \n"  + baseCallArray[0].toString());
+                readSpec.getEXPECTEDBASECALLTABLE().setBASECALLArray(baseCallArray);
+            }
+
 
             return xspotd;
 
@@ -429,6 +604,32 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
     }
 
 
+
+    private SpotDescriptorType.SPOTDECODESPEC.READSPEC getReadSpecWithBaseCalls(SpotDescriptorType.SPOTDECODESPEC spotDecodeSpec) {
+        if(spotDecodeSpec.getREADSPECArray().length > 0) {
+            for(SpotDescriptorType.SPOTDECODESPEC.READSPEC readSpec : spotDecodeSpec.getREADSPECArray()) {
+                if(readSpec.getEXPECTEDBASECALLTABLE() != null) {
+                    return readSpec;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String[] getBarcodesForAssays(Assay assay) {
+
+        ProtocolApplication libConstructionPApp = getProtocol(assay, "library construction");
+        if (libConstructionPApp == null) {
+            return null;
+        }
+
+        String[] barcodes = getParameterValues(assay, libConstructionPApp, "mid", false);
+
+        return (barcodes == null) ? new String[0] : barcodes;
+    }
+
+
     /**
      * Builds the SRA {@link PROCESSING}, this is taken from the ISATAB "sequencing" protocol that has
      * been used for this assay.
@@ -436,10 +637,10 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      * Some of these parameters are mandatory in SRA, and/or constrained to certain values, so the method raises an
      * exception in case they're not defined.
      */
-    protected PROCESSING buildExportedProcessing(final Assay assay) {
-        ProtocolApplication pApp = getProtocol(assay, "sequencing");
+    protected PROCESSING buildExportedProcessing(final Assay assay, Map<SequencingProperties, String> sequencingProperties) {
+        ProtocolApplication pApp = getProtocol(assay, "DNA sequencing");
 
-        SRATemplate sraTemplateToInject = getSRATemplateToInject(SRASection.PROCESSING, assay, pApp);
+        SRATemplate sraTemplateToInject = getSRATemplateToInject(SRASection.PROCESSING, sequencingProperties);
 
         String seqSpaceStr = getParameterValue(assay, pApp, "Sequence space", false);
 
@@ -514,7 +715,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      * TODO: this could be replaced by relying on the ISA Parameter Value[sequencing instrument] available from latest configuration
      */
     protected PlatformType buildExportedPlatform(final Assay assay) {
-        ProtocolApplication pApp = getProtocol(assay, "sequencing");
+        ProtocolApplication pApp = getProtocol(assay, "DNA sequencing");
         if (pApp == null) {
             return null;
         }
@@ -576,11 +777,21 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
             PlatformType.LS454 ls454 = PlatformType.LS454.Factory.newInstance();
             ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString(xinstrument));
-            ls454.setKEYSEQUENCE(getParameterValue(assay, pApp, "Key Sequence", false));
-            ls454.setFLOWSEQUENCE(getParameterValue(assay, pApp, "Flow Sequence", false));
 
-            String flowCountStr = getParameterValue(assay, pApp, "Flow Count", false);
-            ls454.setFLOWCOUNT(new BigInteger(checkNumericParameter(flowCountStr)));
+            //String keyseqStr = "TACG";
+
+
+            //ls454.setKEYSEQUENCE(keyseqStr);
+
+            String flowSeqstr = "TACG";
+
+            ls454.setFLOWSEQUENCE(flowSeqstr);
+
+            int flowCount = 800;
+
+            //String flowCountStr = getParameterValue(assay, pApp, "Flow Count", false);
+            //ls454.setFLOWCOUNT(new BigInteger(checkNumericParameter(flowCountStr)));
+            ls454.setFLOWCOUNT(BigInteger.valueOf(flowCount));
             xplatform.setLS454(ls454);
 
         } else if (platform.toLowerCase().contains("illumina")) {
