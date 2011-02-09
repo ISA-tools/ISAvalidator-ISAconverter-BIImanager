@@ -105,13 +105,15 @@ public class ISAConfigurationSet {
             for (int i = 0; i < configFile.sizeOfIsatabConfigurationArray(); i++) {
                 IsaTabConfigurationType cfg = configFile.getIsatabConfigurationArray(i);
                 for (XmlObject xfieldObj : getAllConfigurationFields(cfg)) {
-                    FieldType xfield = (FieldType) xfieldObj;
-                    String xheader = xfield.getHeader();
-                    if (xheader.contains("[")) {
-                        int iFirstBracket = xheader.indexOf('[');
-                        if (iFirstBracket > 0) {
-                            String newHeader = xheader.substring(0, iFirstBracket) + " " + xheader.substring(iFirstBracket + 1);
-                            xfield.setHeader(newHeader);
+                    if (xfieldObj instanceof FieldType) {
+                        FieldType xfield = (FieldType) xfieldObj;
+                        String xheader = xfield.getHeader();
+                        if (xheader.contains("[")) {
+                            int iFirstBracket = xheader.indexOf('[');
+                            if (iFirstBracket > 0) {
+                                String newHeader = xheader.substring(0, iFirstBracket) + " [" + xheader.substring(iFirstBracket + 1);
+                                xfield.setHeader(newHeader);
+                            }
                         }
                     }
                 }
@@ -120,12 +122,9 @@ public class ISAConfigurationSet {
             // END: ADDITION
 
             _isaConfigFiles.put(path, configFile);
-        }
-        catch (XmlException e) {
-            // TODO: we need a configerrorex
+        } catch (XmlException e) {
             throw new TabInternalErrorException(i18n.msg("isaconfig_loading_error", path, e.getMessage()), e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new TabIOException(i18n.msg("isaconfig_loading_error", path, e.getMessage()), e);
         }
     }
@@ -413,8 +412,7 @@ public class ISAConfigurationSet {
                 cfgDoc.setIsatabConfigFile(cfg);
                 cfgDoc.save(new File(path));
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             throw new TabIOException("Error while saving the ISATAB configuration: " + ex.getMessage(), ex);
         }
     }
