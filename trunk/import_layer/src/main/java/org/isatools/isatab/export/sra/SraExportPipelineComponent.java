@@ -410,8 +410,22 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         }
 
         String mid = getParameterValue(assay, papp, "mid", false);
+
+        String[] barcodes = getBarcodesForAssays(assay);
+
+        if (barcodes.length > 0 && !StringUtils.isEmpty(barcodes[0])) {
+            for (int barcodeIndex = 0; barcodeIndex < barcodes.length; barcodeIndex++) {
+
+                protocol.append("\n mid: ").append(barcodes[barcodeIndex]);
+                }
+        }
+
+
+
+
+
         if (mid != null) {
-            protocol.append("\n mid: ").append(mid);
+
 
         }
 
