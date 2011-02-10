@@ -68,8 +68,7 @@ import java.util.*;
  * Manages a set of files that describe ISAConfigurator's configuration.
  *
  * @author brandizi
- *         <b>date</b>: Oct 9, 2009
- * @see the XSD file that defines the latter.
+ * see XSD file that defines the latter.
  */
 public class ISAConfigurationSet {
     public final static String
@@ -98,10 +97,6 @@ public class ISAConfigurationSet {
             IsatabConfigFileDocument configFileDoc = IsatabConfigFileDocument.Factory.parse(input);
             IsaTabConfigFileType configFile = configFileDoc.getIsatabConfigFile();
 
-            // BEGIN: ADDITION
-
-            // Pre-process headers in the form X[Y] and normalise them into the "X [Y]" form
-            //
             for (int i = 0; i < configFile.sizeOfIsatabConfigurationArray(); i++) {
                 IsaTabConfigurationType cfg = configFile.getIsatabConfigurationArray(i);
                 for (XmlObject xfieldObj : getAllConfigurationFields(cfg)) {
@@ -118,8 +113,6 @@ public class ISAConfigurationSet {
                     }
                 }
             }
-
-            // END: ADDITION
 
             _isaConfigFiles.put(path, configFile);
         } catch (XmlException e) {
@@ -178,7 +171,7 @@ public class ISAConfigurationSet {
     }
 
     /**
-     * All the configurations, every configuration is keyed by measurment type and technology (it uses "//" as separator
+     * All the configurations, every configuration is keyed by measurement type and technology (it uses "//" as separator
      * in the string).
      */
     private Map<String, IsaTabConfigurationType> getIsaTabConfigs() {
@@ -201,7 +194,7 @@ public class ISAConfigurationSet {
     }
 
     /**
-     * Gets a specific configuration for a given measurment and technology
+     * Gets a specific configuration for a given measurement and technology
      */
     public IsaTabConfigurationType getConfig(String measurementType, String technologyType) {
         measurementType = StringUtils.trimToEmpty(measurementType).toLowerCase();
@@ -227,14 +220,14 @@ public class ISAConfigurationSet {
      * @return the ontolgy entry details that correspond to a certain label, by searching them in the block
      *         &lt;isatab-configuration&gt; / &lt;measurement&gt;
      */
-    public OntologyEntryType getMeasurementFromLabel(String measurment) {
-        if (measurment == null) {
+    public OntologyEntryType getMeasurementFromLabel(String measurement) {
+        if (measurement == null) {
             return null;
         }
-        measurment = measurment.trim().toLowerCase();
+        measurement = measurement.trim().toLowerCase();
         for (IsaTabConfigurationType cfg : getAllConfigs()) {
             OntologyEntryType cmeasure = cfg.getMeasurement();
-            if (measurment.equalsIgnoreCase(cmeasure.getTermLabel())) {
+            if (measurement.equalsIgnoreCase(cmeasure.getTermLabel())) {
                 return cmeasure;
             }
         }
@@ -387,8 +380,7 @@ public class ISAConfigurationSet {
             }
 
             for (BranchType branchObj : onto.getBranchArray()) {
-                BranchType branch = (BranchType) branchObj;
-                String termId = StringUtils.trimToNull(branch.getId());
+                String termId = StringUtils.trimToNull(branchObj.getId());
                 if (termId == null) {
                     continue;
                 }

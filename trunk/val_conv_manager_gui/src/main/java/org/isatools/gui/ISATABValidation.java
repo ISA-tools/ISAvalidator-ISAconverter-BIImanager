@@ -57,7 +57,7 @@ import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import java.util.List;
 
 /**
- * @author: Eamonn Maguire
+ * @author Eamonn Maguire
  * @date Mar 31, 2009
  */
 
