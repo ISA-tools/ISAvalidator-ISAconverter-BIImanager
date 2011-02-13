@@ -164,9 +164,9 @@ public abstract class CommonUI extends JLayeredPane {
                     }
                 });
 
-                if (isAnimated()) {
-                    startAnimation();
-                }
+//                if (isAnimated()) {
+//                    startAnimation();
+//                }
             }
         });
     }
@@ -188,15 +188,15 @@ public abstract class CommonUI extends JLayeredPane {
 
     protected abstract void showLoaderMenu();
 
-    private void startAnimation() {
-        Timer timer = new Timer(125, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                generic.animate();
-                generic.repaint();
-            }
-        });
-        timer.start();
-    }
+//    private void startAnimation() {
+//        Timer timer = new Timer(125, new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                generic.animate();
+//                generic.repaint();
+//            }
+//        });
+//        timer.start();
+//    }
 
 
     protected void validateFile(final String[] fileLoc) {

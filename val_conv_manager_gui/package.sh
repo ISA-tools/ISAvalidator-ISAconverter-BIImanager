@@ -25,6 +25,23 @@ zip -d isatools_deps.jar '\*.class'
 
 cd .. 
 
+pwd
+
+cd target
+cp -r ../src/main/assembly/manifests/validator/META-INF .
+zip -r isatools_deps.jar META-INF/
+cd ..
 mvn $MVNOPTS -Pbuild_validator,tools -Dmaven.test.skip=true package
+
+cd target
+cp -r ../src/main/assembly/manifests/data_manager/META-INF .
+zip -r isatools_deps.jar META-INF/
+cd ..
 mvn $MVNOPTS -Pbuild_data_mgr,tools -Dmaven.test.skip=true package
+
+cd target
+cp -r ../src/main/assembly/manifests/converter/META-INF .
+zip -r isatools_deps.jar META-INF/
+cd ..
+zip -r target/isatools_deps.jar src/main/assembly/manifests/converter/META-INF/
 mvn $MVNOPTS -Pbuild_converter,tools -Dmaven.test.skip=true package

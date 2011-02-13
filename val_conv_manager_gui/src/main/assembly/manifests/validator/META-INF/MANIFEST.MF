@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: org.isatools.gui.validator.ValidatorInvoker
+SplashScreen-Image: images/validator/splashscreen.gif
+Created-By: ISA tools team
+Built-By: Eamonn Maguire (eamonnmag@gmail.com)

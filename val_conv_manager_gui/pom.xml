@@ -135,7 +135,7 @@
             ISA-Tools are built by first creating isatools_deps.jar (build_base) profile and then
             calling all the other build_*** profiles, every profile spawns the ZIP package for a
             particular tool.
-            All the procedure is available in package_isatools.sh
+            All the procedure is available in package.sh
         -->
 
         <profile>
@@ -147,7 +147,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
-
+                        <version>2.2-beta-5</version>
                         <configuration>
                             <finalName>isatools_deps</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
@@ -177,7 +177,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
-
+                        <version>2.2-beta-5</version>
                         <configuration>
                             <finalName>ISA-validator-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
@@ -204,7 +204,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
-
+                        <version>2.2-beta-5</version>
                         <configuration>
                             <finalName>BII-data-mgr-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
@@ -231,13 +231,17 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
-
+                        <version>2.2-beta-5</version>
                         <configuration>
                             <finalName>ISA-converter-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
                                 <descriptor>src/main/assembly/converter.xml</descriptor>
                             </descriptors>
+
+                            <archive>
+                                <manifestFile>src/main/assembly/manifests/converter/MANIFEST.MF</manifestFile>
+                            </archive>
                         </configuration>
                         <executions>
                             <execution>
@@ -279,6 +283,7 @@
                                     <value>${basedir}/../config</value>
                                 </systemProperty>
                             </systemProperties>
+
                         </configuration>
                         <executions>
                             <execution>

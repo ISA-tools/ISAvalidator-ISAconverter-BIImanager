@@ -6,7 +6,5 @@ REM
 REM
 SET JDBCPATH=C:\path\to\jdbc\driver.jar
 
-SET CP=%JDBCPATH%;isatools_deps.jar
+java -jar isatools_deps.jar -Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=128m -cp "$JDBCPATH"
 
-java -Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=128m\
-     -cp %CP% org.isatools.gui.datamanager.DataManagerInvoker
