@@ -86,6 +86,7 @@ import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK.FILES.FILE.ChecksumMethod;
 import uk.ac.ebi.embl.era.sra.xml.RunType.EXPERIMENTREF;
 
 import java.io.File;
+import java.lang.String;
 
 import uk.ac.ebi.utils.io.IOUtils;
 import org.isatools.tablib.exceptions.TabIOException;
@@ -357,26 +358,25 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      * exception in case they're not defined.
      */
     protected LIBRARYDESCRIPTOR buildExportedLibraryDescriptor(Assay assay) {
+
         ProtocolApplication papp = getProtocol(assay, "library construction");
         if (papp == null) {
             return null;
         }
 
+        String measurement = assay.getMeasurement().getName();
+        String technology = assay.getTechnologyName();
+
+        System.out.println("Measurement:" + measurement);
+        System.out.println("Technology:" + technology);
+
+
         LIBRARYDESCRIPTOR xlib = LIBRARYDESCRIPTOR.Factory.newInstance();
         // xlib.setLIBRARYNAME(getParameterValue(assay, papp, "library name", true));
         // TODO check it is one of the Enum types
 
-        xlib.setLIBRARYSTRATEGY(LIBRARYSTRATEGY.Enum.forString(
-                getParameterValue(assay, papp, "library strategy", true
-                )));
-        xlib.setLIBRARYSOURCE(LIBRARYSOURCE.Enum.forString(
-                getParameterValue(assay, papp, "library source", true
-                )));
-        xlib.setLIBRARYSELECTION(LIBRARYSELECTION.Enum.forString(
-                getParameterValue(assay, papp, "library selection", true
-                )));
-
         StringBuffer protocol = new StringBuffer();
+
 
         String pDescription = StringUtils.trimToNull(papp.getProtocol().getDescription());
         if (pDescription != null) {
@@ -384,53 +384,181 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         }
 
 
-        String pBibRef = getParameterValue(assay, papp, "nucl_acid_amp", false);
-        if (pBibRef != null) {
-            protocol.append("\n nucl_acid_amp: ").append(pBibRef);
-        }
 
-        String pUrl = getParameterValue(assay, papp, "url", false);
-        if (pUrl != null) {
-            protocol.append("\n url: ").append(pUrl);
-        }
 
-        String targetTaxon = getParameterValue(assay, papp, "target taxon", false);
-        if (targetTaxon != null) {
-            protocol.append("\n target_taxon: ").append(targetTaxon);
-        }
+        //HERE we handle SRA way of coding transcription profiling using sequencing. We can automatically set LIBRARY SOURCE to TRANSCRIPTOMIC
+        //same for Strategy and selection however we check against the user input via the ISA file
+        if (measurement.equalsIgnoreCase("transcription profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
 
-        String targetGene = getParameterValue(assay, papp, "target_gene", false);
-        if (targetGene != null) {
-            protocol.append("\n target_gene: ").append(targetGene);
-        }
-
-        String targetSubfrag = getParameterValue(assay, papp, "target_subfragment", false);
-        if (targetSubfrag != null) {
-            protocol.append("\n target_subfragment: ").append(targetSubfrag);
-        }
-
-        String mid = getParameterValue(assay, papp, "mid", false);
-        if (mid != null) {
-            protocol.append("\n mid: ").append(mid);
+            xlib.setLIBRARYSOURCE(LIBRARYSOURCE.TRANSCRIPTOMIC);
+            xlib.setLIBRARYSTRATEGY(LIBRARYSTRATEGY.RNA_SEQ);
+            xlib.setLIBRARYSELECTION(LIBRARYSELECTION.RT_PCR);
 
         }
 
+        if (measurement.equalsIgnoreCase("DNA methylation profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
 
-        String pcrPrimers = getParameterValue(assay, papp, "pcr_primers", false);
-        if (pcrPrimers != null) {
-            protocol.append("\n pcr_primers: ").append(pcrPrimers.replaceAll("=", ":"));
+            xlib.setLIBRARYSOURCE(LIBRARYSOURCE.GENOMIC);
+
+            String selection = getParameterValue(assay, papp, "library selection", true);
+            String strategy = getParameterValue(assay, papp, "library strategy", true);
+
+            //String strategy = getParameterValue(assay, papp, "library strategy", true);
+
+            //now checking that the input obtained from parsing ISA is compatible with SRA CV
+
+            if (("MRE-Seq".equalsIgnoreCase(strategy)) ||
+                    ("MeDIP-Seq".equalsIgnoreCase(strategy)) ||
+                    ("MBD-Seq".equalsIgnoreCase(strategy)) ||
+                    ("Bisulfite-Seq".equalsIgnoreCase(strategy)) ||
+                    ("OTHER".equalsIgnoreCase(strategy))
+                    ) {
+
+                xlib.setLIBRARYSTRATEGY(LIBRARYSTRATEGY.Enum.forString(strategy));
+            } else {
+                xlib.setLIBRARYSTRATEGY(LIBRARYSTRATEGY.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.2 schema" + strategy);
+            }
+
+
+            //String selection = getParameterValue(assay, papp, "library selection", true);
+
+            if (("MF".equalsIgnoreCase(selection)) ||
+                    ("PCR".equalsIgnoreCase(selection)) ||
+                    ("HMPR".equalsIgnoreCase(selection)) ||
+                    ("MSLL".equalsIgnoreCase(selection)) ||
+                    ("5-methylcytidine antibody".equalsIgnoreCase(selection)) ||
+                    ("MBD2 protein methyl-CpG binding domain".equals(selection)) ||
+                    ("other".equalsIgnoreCase(selection))
+                    ) {
+                xlib.setLIBRARYSELECTION(LIBRARYSELECTION.Enum.forString(selection));
+            } else {
+                xlib.setLIBRARYSELECTION(LIBRARYSELECTION.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.2 schema" + selection);
+            }
 
         }
 
-        String pcrConditions = getParameterValue(assay, papp, "pcr_cond", false);
-        if (pcrConditions != null) {
-            protocol.append("\n pcr_cond: ").append(pcrConditions.replaceAll("=", ":"));
+
+        //Here, we deal with chromatin remodeling use case, user input via ISA is about library strategy, library selection, library layout
+        if (measurement.equalsIgnoreCase("histone modification profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
+
+            xlib.setLIBRARYSOURCE(LIBRARYSOURCE.GENOMIC);
+            xlib.setLIBRARYSTRATEGY(LIBRARYSTRATEGY.CH_IP_SEQ);
+            xlib.setLIBRARYSELECTION(LIBRARYSELECTION.CH_IP);
+
+              ProtocolApplication pappIp = getProtocol(assay, "library construction");
+                if (pappIp == null) {
+                    return null;
+                }
+
+              //dealing with Chromatin immunoprecipitation requirements in ISA_TAB and dumping those in SRA Library Construction Protocol section
+                String crosslink = getParameterValue(assay, pappIp, "cross linking", true);
+                if (crosslink != null) {
+                    protocol.append("\n cross-linking: ").append(crosslink);
+                }
+
+                String fragmentation = getParameterValue(assay, pappIp, "DNA fragmentation", true);
+                if (fragmentation != null) {
+                    protocol.append("\n DNA fragmentation: ").append(fragmentation);
+                }
+
+                String fragsize = getParameterValue(assay, pappIp, "DNA fragment size", true);
+                if (fragsize != null) {
+                    protocol.append("\n DNA fragment size: ").append(fragsize);
+                }
+
+                String ipAntibody = getParameterValue(assay, pappIp, "immunoprecipitation antibody", true);
+                if (ipAntibody != null) {
+
+                    String[] interestingbits=ipAntibody.split(";");
+                    if (interestingbits[0] != null) { protocol.append("\n antibody name: ").append(interestingbits[0]); }
+                    if (interestingbits[1] != null) { protocol.append("\n antibody manufacturer: ").append(interestingbits[1]); }
+                    if (interestingbits[2] != null) { protocol.append("\n antibody reference number: ").append(interestingbits[2]); }
+                    if (interestingbits[3] != null) { protocol.append("\n immunoprecipitation antibody: ").append(interestingbits[3]); }
+
+                }
+        }
+
+
+        //HERE, we handle the MIMARKS annotation for library construction in environmental gene survey and map those to SRA objects
+        //reliance on ISA parameters tagged to INSDC codes 'target taxon,target_gene,target_subfragment, mid,
+
+        if (measurement.equalsIgnoreCase("environmental gene survey") && technology.equalsIgnoreCase("nucleotide sequencing")) {
+
+            //deducing the values for source.strategy.selection from ISA assay
+            xlib.setLIBRARYSOURCE(LIBRARYSOURCE.METAGENOMIC);
+            xlib.setLIBRARYSTRATEGY(LIBRARYSTRATEGY.AMPLICON);
+            xlib.setLIBRARYSELECTION(LIBRARYSELECTION.PCR);
+
+            //dealing with MIMARKS requirements in ISA_TAB and dumping those in SRA Library Construction Protocol section
+            String pBibRef = getParameterValue(assay, papp, "nucl_acid_amp", false);
+            if (pBibRef != null) {
+                protocol.append("\n nucl_acid_amp: ").append(pBibRef);
+            }
+
+            String pUrl = getParameterValue(assay, papp, "url", false);
+            if (pUrl != null) {
+                protocol.append("\n url: ").append(pUrl);
+            }
+
+            String targetTaxon = getParameterValue(assay, papp, "target taxon", true);
+            if (targetTaxon != null) {
+                protocol.append("\n target_taxon: ").append(targetTaxon);
+            }
+
+            String targetGene = getParameterValue(assay, papp, "target_gene", true);
+            if (targetGene != null) {
+                protocol.append("\n target_gene: ").append(targetGene);
+            }
+
+            String targetSubfrag = getParameterValue(assay, papp, "target_subfragment", true);
+            if (targetSubfrag != null) {
+                protocol.append("\n target_subfragment: ").append(targetSubfrag);
+            }
+
+            String pcrPrimers = getParameterValue(assay, papp, "pcr_primers", true);
+            if (pcrPrimers != null) {
+                protocol.append("\n pcr_primers: ").append(pcrPrimers.replaceAll("=", ":"));
+            }
+
+            String pcrConditions = getParameterValue(assay, papp, "pcr_cond", true);
+            if (pcrConditions != null) {
+                protocol.append("\n pcr_cond: ").append(pcrConditions.replaceAll("=", ":"));
+            }
+
+            //Here we rely on SRA targeted loci and specify relevent information
+            //NOTE: as SRA schema only support 16S R RNA as a possible value, all actual targets supplied by users in ISA
+            //are dumped in the protocol and preceded by INSDC code as defined under MIMARKS (MIENS).
+
+            LIBRARYDESCRIPTOR.TARGETEDLOCI xtargetedloci = LIBRARYDESCRIPTOR.TARGETEDLOCI.Factory.newInstance();
+
+            LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS xlocus = LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS.Factory.newInstance();
+
+            String locus = getParameterValue(assay, papp, "target_gene", true);
+
+            if (locus != null) {
+                if (locus.toLowerCase().contains("16s")) {
+                    xlocus.setLocusName(LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS.LocusName.X_16_S_R_RNA);
+                } else {
+                    xlocus.setLocusName(LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS.LocusName.OTHER);
+                }
+            }
+
+            LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS[] xlocusArray = new LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS[]{xlocus};
+            xtargetedloci.setLOCUSArray(xlocusArray);
+
+            xlib.setTARGETEDLOCI(xtargetedloci);
 
         }
 
 
         xlib.setLIBRARYCONSTRUCTIONPROTOCOL(protocol.toString());
 
+
+
+        // Library Layout: This is a core requirements to ensure that ISA provides enough information to support SRA export
+        // The Library layout parameter is common to all ISA assay configurations which are relying on sequencing
         String libLayout = getParameterValue(assay, papp, "library layout", true);
 
         LIBRARYLAYOUT xlibLayout = LIBRARYLAYOUT.Factory.newInstance();
@@ -453,24 +581,16 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         }
         xlib.setLIBRARYLAYOUT(xlibLayout);
 
-        LIBRARYDESCRIPTOR.TARGETEDLOCI xtargetedloci = LIBRARYDESCRIPTOR.TARGETEDLOCI.Factory.newInstance();
 
-        LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS xlocus = LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS.Factory.newInstance();
+        //here we support reporting of multiplex identifiers (mid aka barcodes)
+        String[] barcodes = getBarcodesForAssays(assay);
 
-        String locus = getParameterValue(assay, papp, "target_gene", false);
+        if (barcodes.length > 0 && !StringUtils.isEmpty(barcodes[0])) {
+            for (int barcodeIndex = 0; barcodeIndex < barcodes.length; barcodeIndex++) {
 
-        if (locus != null) {
-            if (locus.toLowerCase().contains("16s")) {
-                xlocus.setLocusName(LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS.LocusName.X_16_S_R_RNA);
-            } else {
-                xlocus.setLocusName(LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS.LocusName.OTHER);
+                protocol.append("\n mid: ").append(barcodes[barcodeIndex]);
             }
         }
-
-        LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS[] xlocusArray = new LIBRARYDESCRIPTOR.TARGETEDLOCI.LOCUS[]{xlocus};
-        xtargetedloci.setLOCUSArray(xlocusArray);
-
-        xlib.setTARGETEDLOCI(xtargetedloci);
 
         String pooling = getParameterValue(assay, papp, "mid", false);
         if (pooling != null) {
@@ -485,11 +605,11 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
 
     private Map<SequencingProperties, String> getSequencingInstrumentAndLayout(Assay assay) {
-        ProtocolApplication sequencingPApp = getProtocol(assay, "DNA sequencing");
+
+        ProtocolApplication sequencingPApp = getProtocol(assay, "nucleic acid sequencing");
 
         String sequencingPlatform = getParameterValue(assay, sequencingPApp, SequencingProperties.SEQUENCING_PLATFORM.toString(), true);
 
-        // the Library layout requirement is placed on library creation not sequencing step, hence removed
         ProtocolApplication libConstructionPApp = getProtocol(assay, "library construction");
 
         String sequencingLibrary = getParameterValue(assay, libConstructionPApp, SequencingProperties.LIBRARY_LAYOUT.toString(), true);
@@ -524,7 +644,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
         String[] barcodes = getBarcodesForAssays(assay);
 
-        ProtocolApplication pApp = getProtocol(assay, "DNA sequencing");
+        ProtocolApplication pApp = getProtocol(assay, "nucleic acid sequencing");
         if (pApp == null) {
             return null;
         }
@@ -587,7 +707,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 }
 
                 System.out.println("BASE CALL TABLE: " + readSpec.getEXPECTEDBASECALLTABLE());
-                System.out.println("MY BASE CALL ARRAY: \n"  + baseCallArray[0].toString());
+                System.out.println("MY BASE CALL ARRAY: \n" + baseCallArray[0].toString());
                 readSpec.getEXPECTEDBASECALLTABLE().setBASECALLArray(baseCallArray);
             }
 
@@ -604,11 +724,10 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
     }
 
 
-
     private SpotDescriptorType.SPOTDECODESPEC.READSPEC getReadSpecWithBaseCalls(SpotDescriptorType.SPOTDECODESPEC spotDecodeSpec) {
-        if(spotDecodeSpec.getREADSPECArray().length > 0) {
-            for(SpotDescriptorType.SPOTDECODESPEC.READSPEC readSpec : spotDecodeSpec.getREADSPECArray()) {
-                if(readSpec.getEXPECTEDBASECALLTABLE() != null) {
+        if (spotDecodeSpec.getREADSPECArray().length > 0) {
+            for (SpotDescriptorType.SPOTDECODESPEC.READSPEC readSpec : spotDecodeSpec.getREADSPECArray()) {
+                if (readSpec.getEXPECTEDBASECALLTABLE() != null) {
                     return readSpec;
                 }
             }
@@ -638,7 +757,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      * exception in case they're not defined.
      */
     protected PROCESSING buildExportedProcessing(final Assay assay, Map<SequencingProperties, String> sequencingProperties) {
-        ProtocolApplication pApp = getProtocol(assay, "DNA sequencing");
+        ProtocolApplication pApp = getProtocol(assay, "nucleic acid sequencing");
 
         SRATemplate sraTemplateToInject = getSRATemplateToInject(SRASection.PROCESSING, sequencingProperties);
 
@@ -715,7 +834,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      * TODO: this could be replaced by relying on the ISA Parameter Value[sequencing instrument] available from latest configuration
      */
     protected PlatformType buildExportedPlatform(final Assay assay) {
-        ProtocolApplication pApp = getProtocol(assay, "DNA sequencing");
+        ProtocolApplication pApp = getProtocol(assay, "nucleic acid sequencing");
         if (pApp == null) {
             return null;
         }
