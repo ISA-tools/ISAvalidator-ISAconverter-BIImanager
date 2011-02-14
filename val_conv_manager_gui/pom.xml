@@ -113,6 +113,12 @@
             <version>1.2.132</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.2.132</version>
+        </dependency>
+
         <!-- TODO: This must not be included in the binary packages (legal reasons)! -->
         <!--        <dependency>-->
         <!--            <groupId>com.oracle</groupId>-->
