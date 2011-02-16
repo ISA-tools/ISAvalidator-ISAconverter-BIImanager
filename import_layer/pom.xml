@@ -231,14 +231,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
-            <version>${dbunit.version}</version>
+            <version>2.4.3</version>
             <scope>test</scope>
         </dependency>
 
