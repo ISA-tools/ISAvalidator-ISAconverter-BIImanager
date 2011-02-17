@@ -8,4 +8,7 @@
 #
 JDBCPATH=/path/to/jdbc_driver.jar
 
-java -jar isatools_deps.jar -Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=128m -cp "$JDBCPATH"
+CP="$JDBCPATH:isatools_deps.jar"
+
+java -Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=128m\
+     -cp "$CP" org.isatools.gui.datamanager.DataManagerInvoker

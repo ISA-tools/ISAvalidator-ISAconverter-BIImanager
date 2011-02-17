@@ -113,6 +113,7 @@
             <version>1.2.132</version>
         </dependency>
 
+
         <!-- TODO: This must not be included in the binary packages (legal reasons)! -->
         <!--        <dependency>-->
         <!--            <groupId>com.oracle</groupId>-->
@@ -352,6 +353,25 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>default-tools.jar</id>
+            <activation>
+                <property>
+                    <name>java.vendor</name>
+                    <value>Sun Microsystems Inc.</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>1.4.2</version>
+                    <scope>system</scope>
+                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                </dependency>
+            </dependencies>
         </profile>
 
     </profiles>
