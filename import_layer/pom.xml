@@ -20,7 +20,7 @@
         <version>1.2</version>
 
         <!-- TODO: will we need to move the import layer under the BII hat? -->
-        <!-- <relativePath>../../bioinvindex/pom.xml</relativePath> -->
+        <relativePath>../../bii/pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -231,14 +231,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <version>${version.junit}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
-            <version>${dbunit.version}</version>
+            <version>${version.dbunit}</version>
             <scope>test</scope>
         </dependency>
 

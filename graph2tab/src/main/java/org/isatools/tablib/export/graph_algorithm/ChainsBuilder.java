@@ -65,7 +65,7 @@ import java.util.*;
  * at any given layer. The latter means eg.: that the sources are all biosources and at distance 1 from them there
  * are always bio-samples. All the nodes involved must be reachable from the parameter passed to the constructor.
  * <p/>
- * <p><b>DEBUGGING NOTE</b>: you can see how the intial graph is transformed by setting the system property
+ * <p><b>DEBUGGING NOTE</b>: you can see how the initial graph is transformed by setting the system property
  * graph2tab.debug_mode=true. This can be done this way in maven:
  * <pre>
  *   mvn -DargLine='-Dgraph2tab.debug_mode=true' -Dtest=[YourTest] test
@@ -225,7 +225,7 @@ class ChainsBuilder {
                 }
             }
         } else if (nins == 1 && nouts == 1) {
-            // Already normalized node, let's gain a bit of performance by cut it short
+            // Already normalized node, let's gain a bit of performance by stopping if we're coming back from the right
             //
             if (isTowardRight) {
                 normalize(outs.get(0), true);

@@ -61,6 +61,7 @@ import java.util.*;
  * type (eg: factor value could fall between two characteristics column blocks). We will implement a solution to that
  * in future. For details about that, see inside {@link #addNode(int, Node)}.
  * <p/>
+ * 
  * <dl><dt>date</dt><dd>May 10, 2010</dd></dl>
  *
  * @author brandizi
@@ -98,13 +99,11 @@ public class TableBuilder {
             int layer = 0;
             while (true) {
                 // Skip processings not having at least a protocol
-                if (!node.getTabValues().isEmpty()) {
+                if (!node.getTabValues().isEmpty())
                     addNode(layer, node);
-                }
                 SortedSet<Node> outs = node.getOutputs();
-                if (outs.isEmpty()) {
+                if (outs.isEmpty())
                     break;
-                }
                 node = outs.first();
                 layer++;
             }

@@ -87,8 +87,8 @@ public interface Node extends Comparable<Node> {
     /**
      * Modifiers <b>must be symmetric</b>, when
      * an input is added/removed, the corresponding output
-     * is added removed on the other side.
-     * <p>As usually, they should return true if they made actual changes.</p>
+     * is added/removed on the other side.
+     * <p>As usually, they should return true if actual changes was actually made.</p>
      */
     public boolean removeInput(Node input);
 
@@ -114,7 +114,7 @@ public interface Node extends Comparable<Node> {
      * Modifiers <b>must be symmetric</b>, when
      * an input is added/removed, the corresponding output
      * is added removed on the other side.
-     * <p>As usually, they should return true if they made actual changes.</p>
+     * <p>As usually, they should return true if actual changes was actually made.</p>
      */
     public boolean removeOutput(Node output);
 
