@@ -54,61 +54,88 @@ import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.Ex
 import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.OntoTerm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * The basic wrapper of the exported object model. Basically we implement {@link #getInputs()}
- * and {@link #getOutputs()}, plus the way the node provides its table cells, ie {@link #getTabValues()}.
+ * The basic wrapper of the exported object model. Basically we implement {@link #getInputs()} and {@link #getOutputs()}
+ * , plus the way the node provides its table cells, ie {@link #getTabValues()}.
  * <p/>
- * <dl><dt>date</dt><dd>Jun 1, 2010</dd></dl>
- *
+ * <dl>
+ * <dt>date</dt>
+ * <dd>Jun 1, 2010</dd>
+ * </dl>
+ * 
  * @author brandizi
  */
-public abstract class ExpNodeWrapper extends DefaultAbstractNode {
+public abstract class ExpNodeWrapper extends DefaultAbstractNode
+{
+	/**
+	 * TODO: comment me!
+	 */
+	@SuppressWarnings ( "serial" )
+	public static final Map<String, Integer> TYPE_ORDER = new HashMap<String, Integer> () 
+	{
+		{
+			put ( "Source Name", 0 );
+			put ( "Sample Name", 1 );
+			put ( "Extract Name", 2 );
+			put ( "Labeled Extract Name", 3 );
+			put ( "Assay Name", 4 );
+			put ( "Data File Name", 5 );
+		}
+	};
+	
 	private ExperimentNode base;
 
 	/**
 	 * This should be used only by your custom factory, {@link NodeFactory} in this example.
 	 */
-	ExpNodeWrapper(ExperimentNode base) {
+	ExpNodeWrapper ( ExperimentNode base )
+	{
 		this.base = base;
 	}
 
 	/**
-	 * This is used by the implementation of {@link Node#createIsolatedClone()}. Essentially, copies
-	 * the wrapped node and makes empty input/output sets.
+	 * This is used by the implementation of {@link Node#createIsolatedClone()}. Essentially, copies the wrapped node and
+	 * makes empty input/output sets.
 	 */
-	protected ExpNodeWrapper(ExpNodeWrapper original) {
+	protected ExpNodeWrapper ( ExpNodeWrapper original )
+	{
 		this.base = original.base;
-		this.inputs = new TreeSet<Node>();
-		this.outputs = new TreeSet<Node>();
+		this.inputs = new TreeSet<Node> ();
+		this.outputs = new TreeSet<Node> ();
 	}
 
 	/**
-	 * In this case we're able to write a generic method that is customised by the descendants.
-	 * The methods shows how to add an ontology term to a free text value. This is done by keeping
-	 * all into the same {@link TabValueGroup}.
-	 *
-	 * @param nameHeader	  eg: "BioMaterial Name", "Protocol REF"
-	 * @param annHeaderPrefix eg: "Characteristic", "Parameter Value", here headers will be built
-	 *                        with the schema annHeaderPrefix [Êtype ], eg: Characteristic [ÊOrganism ]
+	 * In this case we're able to write a generic method that is customised by the descendants. The methods shows how to
+	 * add an ontology term to a free text value. This is done by keeping all into the same {@link TabValueGroup}.
+	 * 
+	 * @param nameHeader
+	 *          eg: "BioMaterial Name", "Protocol REF"
+	 * @param annHeaderPrefix
+	 *          eg: "Characteristic", "Parameter Value", here headers will be built with the schema annHeaderPrefix [Êtype
+	 *          ], eg: Characteristic [ÊOrganism ]
 	 */
-	protected List<TabValueGroup> getTabValues(String nameHeader, String annHeaderPrefix) {
-		List<TabValueGroup> result = new ArrayList<TabValueGroup>();
-		result.add(new DefaultTabValueGroup(nameHeader, base.getName()));
+	protected List<TabValueGroup> getTabValues ( String nameHeader, String annHeaderPrefix )
+	{
+		List<TabValueGroup> result = new ArrayList<TabValueGroup> ();
+		result.add ( new DefaultTabValueGroup ( nameHeader, base.getName () ) );
 
-		for (Annotation annotation : base.getAnnotations()) {
-			DefaultTabValueGroup tbg = new DefaultTabValueGroup(
-					annHeaderPrefix + " [ " + annotation.getType() + " ]", annotation.getValue()
-			);
-			OntoTerm ot = annotation.getOntoTerm();
-			if (ot != null) {
-				tbg.add("Term Accession Number", ot.getAcc());
-				tbg.add("Term Source REF", ot.getSource());
+		for ( Annotation annotation: base.getAnnotations () )
+		{
+			DefaultTabValueGroup tbg = new DefaultTabValueGroup ( annHeaderPrefix + " [ " + annotation.getType () + " ]",
+					annotation.getValue () );
+			OntoTerm ot = annotation.getOntoTerm ();
+			if ( ot != null )
+			{
+				tbg.add ( "Term Accession Number", ot.getAcc () );
+				tbg.add ( "Term Source REF", ot.getSource () );
 			}
-			result.add(tbg);
+			result.add ( tbg );
 		}
 		return result;
 	}
@@ -120,16 +147,19 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode {
 	 * This is the typical way this method is implemented by.
 	 */
 	@Override
-	public SortedSet<Node> getInputs() {
-		if (inputs != null) {
-			return super.getInputs();
+	public SortedSet<Node> getInputs ()
+	{
+		if ( inputs != null )
+		{
+			return super.getInputs ();
 		}
-		inputs = new TreeSet<Node>();
-		NodeFactory nodeFact = NodeFactory.getInstance();
-		for (ExperimentNode in : base.getInputs()) {
-			inputs.add(nodeFact.getNode(in));
+		inputs = new TreeSet<Node> ();
+		NodeFactory nodeFact = NodeFactory.getInstance ();
+		for ( ExperimentNode in: base.getInputs () )
+		{
+			inputs.add ( nodeFact.getNode ( in ) );
 		}
-		return super.getInputs();
+		return super.getInputs ();
 	}
 
 	/**
@@ -139,16 +169,34 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode {
 	 * This is the typical way this method is implemented by.
 	 */
 	@Override
-	public SortedSet<Node> getOutputs() {
-		if (outputs != null) {
-			return super.getOutputs();
+	public SortedSet<Node> getOutputs ()
+	{
+		if ( outputs != null )
+		{
+			return super.getOutputs ();
 		}
-		outputs = new TreeSet<Node>();
-		NodeFactory nodeFact = NodeFactory.getInstance();
-		for (ExperimentNode out : base.getOutputs()) {
-			outputs.add(nodeFact.getNode(out));
+		outputs = new TreeSet<Node> ();
+		NodeFactory nodeFact = NodeFactory.getInstance ();
+		for ( ExperimentNode out: base.getOutputs () )
+		{
+			outputs.add ( nodeFact.getNode ( out ) );
 		}
-		return super.getOutputs();
+		return super.getOutputs ();
+	}
+
+	/**
+	 * This is used for TODO. 
+	 * 
+	 * It uses a typical implementation, consisting in looking at an type order table, like {@link #TYPE_ORDER}, using the
+	 * first header as key. -1 is returned if nothing is found in this table.
+	 *  
+	 */
+	@Override
+	public int getOrder ()
+	{
+		String header = getTabValues ().get ( 0 ).getHeaders ().get ( 0 );
+		Integer order = TYPE_ORDER.get ( header );
+		return order == null ? -1 : order;
 	}
 
 }

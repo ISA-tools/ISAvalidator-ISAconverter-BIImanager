@@ -52,28 +52,36 @@ import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.Bi
 import java.util.List;
 
 /**
- * <dl><dt>date</dt><dd>Jun 1, 2010</dd></dl>
- *
+ * <dl>
+ * <dt>date</dt>
+ * <dd>Jun 1, 2010</dd>
+ * </dl>
+ * 
  * @author brandizi
  */
-public class BioMaterialWrapper extends ExpNodeWrapper {
-	BioMaterialWrapper(BioMaterial base) {
-		super(base);
+public class BioMaterialWrapper extends ExpNodeWrapper
+{
+	public BioMaterialWrapper ( BioMaterial base )
+	{
+		super ( base );
 	}
 
-	private BioMaterialWrapper(ExpNodeWrapper original) {
-		super(original);
+	protected BioMaterialWrapper ( ExpNodeWrapper original )
+	{
+		super ( original );
 	}
 
 	/**
 	 * @return getTabValues ( "Biomaterial Name", "Characteristic" );
 	 */
-	public List<TabValueGroup> getTabValues() {
-		return getTabValues("Biomaterial Name", "Characteristic");
+	public List<TabValueGroup> getTabValues ()
+	{
+		return getTabValues ( "Biomaterial Name", "Characteristic" );
 	}
 
-	public Node createIsolatedClone() {
-		return new BioMaterialWrapper(this);
+	public Node createIsolatedClone ()
+	{
+		return new BioMaterialWrapper ( this );
 	}
 
 }

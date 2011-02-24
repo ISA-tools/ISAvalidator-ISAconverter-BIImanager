@@ -409,6 +409,7 @@
                                 <include>unloader.log</include>
                                 <include>isatools.log</include>
                                 <include>spy.log</include>
+                                <include>isatab_export.log</include>
                             </includes>
                         </fileset>
                     </filesets>

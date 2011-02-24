@@ -53,205 +53,241 @@ import java.util.List;
 import java.util.SortedSet;
 
 /**
- * A default skeleton implementation of {@link Node}. You'll probably want to implement your customized
- * version of the experimental node starting from here, cause we provide a convenient implementation
- * of {@link #equals(Object)} and {@link #hashCode()} that make every new node distinct. For the same reasons,
- * you'll probably want to create nodes via a specific implementation of {@link AbstractNodeFactory}.
+ * A default skeleton implementation of {@link Node}. You'll probably want to implement your customized version of the
+ * experimental node starting from here, cause we provide a convenient implementation of {@link #equals(Object)} and
+ * {@link #hashCode()} that make every new node distinct. For the same reasons, you'll probably want to create nodes via
+ * a specific implementation of {@link AbstractNodeFactory}.
  * <p/>
- * <dl><dt>date</dt><dd>May 10, 2010</dd></dl>
- *
+ * <dl>
+ * <dt>date</dt>
+ * <dd>May 10, 2010</dd>
+ * </dl>
+ * 
  * @author brandizi
  */
-public abstract class DefaultAbstractNode implements Node {
-    private static long size = 0;
+public abstract class DefaultAbstractNode implements Node
+{
+	private static long size = 0;
 
-    /**
-     * Update these for storing this node's links. You should do that only in {@link #getInputs()}
-     * and {@link #getOutputs()}.
-     */
-    protected SortedSet<Node> inputs = null,
-            outputs = null;
+	/**
+	 * Update these for storing this node's links. You should do that only in {@link #getInputs()} and
+	 * {@link #getOutputs()}.
+	 */
+	protected SortedSet<Node> inputs = null, outputs = null;
 
+	/**
+	 * We use this to assign a unique identifier to each node and apply it to compute {@link #compareTo(LabeledNode)}
+	 */
+	private final long id;
 
-    /**
-     * We use this to assign a unique identifier to each node and apply it to compute {@link #compareTo(LabeledNode)}
-     */
-    private final long id;
+	protected DefaultAbstractNode ()
+	{
+		synchronized ( DefaultAbstractNode.class )
+		{
+			if ( size == Long.MAX_VALUE )
+			{
+				throw new RuntimeException ( "No more integers for generating nodes!" );
+			}
+			id = size++;
+		}
+	}
 
+	/**
+	 * By default it returns an unmodifiable version of {@link #inputs}. You should implement something like: if ( ! null
+	 * ) return {@link #inputs} else generate inputs (eg: from wrappers, via your implementation of
+	 * {@link AbstractNodeFactory}).
+	 */
+	public SortedSet<Node> getInputs ()
+	{
+		return Collections.unmodifiableSortedSet ( inputs );
+	}
 
-    protected DefaultAbstractNode() {
-        synchronized (DefaultAbstractNode.class) {
-            if (size == Long.MAX_VALUE) {
-                throw new RuntimeException("No more integers for generating nodes!");
-            }
-            id = size++;
-        }
-    }
+	/**
+	 * By default it returns an unmodifiable version of {@link #inputs}. You should implement something like: if ( ! null
+	 * ) return {@link #outputs} else generate inputs (eg: from wrappers, via your implementation of
+	 * {@link AbstractNodeFactory}).
+	 */
+	public SortedSet<Node> getOutputs ()
+	{
+		return Collections.unmodifiableSortedSet ( outputs );
+	}
 
-    /**
-     * By default it returns an unmodifiable version of {@link #inputs}. You should implement something
-     * like: if ( ! null ) return {@link #inputs} else generate inputs (eg: from wrappers, via your implementation of
-     * {@link AbstractNodeFactory}).
-     */
-    public SortedSet<Node> getInputs() {
-        return Collections.unmodifiableSortedSet(inputs);
-    }
+	/**
+	 * This is the deafult implementation that works with {@link #inputs}. You should not need to touch it.
+	 */
+	public boolean addInput ( Node input )
+	{
+		if ( inputs == null )
+		{
+			getInputs ();
+		}
+		if ( !inputs.add ( input ) )
+		{
+			return false;
+		}
+		input.addOutput ( this );
+		return true;
+	}
 
-    /**
-     * By default it returns an unmodifiable version of {@link #inputs}. You should implement something
-     * like: if ( ! null ) return {@link #outputs} else generate inputs (eg: from wrappers, via your implementation of
-     * {@link AbstractNodeFactory}).
-     */
-    public SortedSet<Node> getOutputs() {
-        return Collections.unmodifiableSortedSet(outputs);
-    }
+	/**
+	 * This is the deafult implementation that works with {@link #inputs}. You should not need to touch it.
+	 */
+	public boolean addOutput ( Node output )
+	{
+		if ( outputs == null )
+		{
+			getOutputs ();
+		}
+		if ( !outputs.add ( output ) )
+		{
+			return false;
+		}
+		output.addInput ( this );
+		return true;
+	}
 
-    /**
-     * This is the deafult implementation that works with {@link #inputs}. You should not need to
-     * touch it.
-     */
-    public boolean addInput(Node input) {
-        if (inputs == null) {
-            getInputs();
-        }
-        if (!inputs.add(input)) {
-            return false;
-        }
-        input.addOutput(this);
-        return true;
-    }
+	/**
+	 * This is the deafult implementation that works with {@link #inputs}. You should not need to touch it.
+	 */
+	public boolean removeInput ( Node input )
+	{
+		if ( inputs == null )
+		{
+			getInputs ();
+		}
+		if ( !inputs.remove ( input ) )
+		{
+			return false;
+		}
+		input.removeOutput ( this );
+		return true;
+	}
 
-    /**
-     * This is the deafult implementation that works with {@link #inputs}. You should not need to
-     * touch it.
-     */
-    public boolean addOutput(Node output) {
-        if (outputs == null) {
-            getOutputs();
-        }
-        if (!outputs.add(output)) {
-            return false;
-        }
-        output.addInput(this);
-        return true;
-    }
+	/**
+	 * This is the deafult implementation that works with {@link #inputs}. You should not need to touch it.
+	 */
+	public boolean removeOutput ( Node output )
+	{
+		if ( outputs == null )
+		{
+			getOutputs ();
+		}
+		if ( !outputs.remove ( output ) )
+		{
+			return false;
+		}
+		output.removeInput ( this );
+		return true;
+	}
 
+	/**
+	 * Compares to another node based on the first header/value pair returned by {@link #getTabValues()}. Note that when
+	 * this returns the same cell value/type, it further checks if o == this, only in that case it returns 0, ie two nodes
+	 * are equivalent only if they're the same. This is needed by the way {@link ChainsBuilder} works.
+	 */
+	public int compareTo ( Node o )
+	{
+		if ( o == null )
+		{
+			return -1;
+		}
+		if ( this == o )
+		{
+			return 0;
+		}
 
-    /**
-     * This is the deafult implementation that works with {@link #inputs}. You should not need to
-     * touch it.
-     */
-    public boolean removeInput(Node input) {
-        if (inputs == null) {
-            getInputs();
-        }
-        if (!inputs.remove(input)) {
-            return false;
-        }
-        input.removeOutput(this);
-        return true;
-    }
+		if ( ! ( o instanceof DefaultAbstractNode ) )
+		{
+			throw new IllegalArgumentException ( "Cannot compare DefaultAbstractNode with" + o.getClass ().getSimpleName () );
+		}
 
-    /**
-     * This is the deafult implementation that works with {@link #inputs}. You should not need to
-     * touch it.
-     */
-    public boolean removeOutput(Node output) {
-        if (outputs == null) {
-            getOutputs();
-        }
-        if (!outputs.remove(output)) {
-            return false;
-        }
-        output.removeInput(this);
-        return true;
-    }
+		String label = null;
+		List<TabValueGroup> tbvs = getTabValues ();
+		if ( !tbvs.isEmpty () )
+		{
+			label = tbvs.get ( 0 ).getValues ().get ( 0 );
+		}
 
+		String olabel = null;
+		List<TabValueGroup> otbvs = o.getTabValues ();
+		if ( !otbvs.isEmpty () )
+		{
+			olabel = otbvs.get ( 0 ).getValues ().get ( 0 );
+		}
 
-    /**
-     * Compares to another node based on the first header/value pair returned by {@link #getTabValues()}. Note that
-     * when this returns the same cell value/type, it further checks if o == this, only in that case it returns 0, ie
-     * two nodes are equivalent only if they're the same. This is needed by the way {@link ChainsBuilder} works.
-     */
-    public int compareTo(Node o) {
-        if (o == null) {
-            return -1;
-        }
-        if (this == o) {
-            return 0;
-        }
+		if ( label != null )
+		{
+			if ( olabel == null )
+			// null labels always before non-nulls
+			{
+				return 1;
+			}
 
-        if (!(o instanceof DefaultAbstractNode)) {
-            throw new IllegalArgumentException("Cannot compare DefaultAbstractNode with" + o.getClass().getSimpleName());
-        }
+			int diff = label.compareToIgnoreCase ( olabel );
 
-        String label = null;
-        List<TabValueGroup> tbvs = getTabValues();
-        if (!tbvs.isEmpty()) {
-            label = tbvs.get(0).getValues().get(0);
-        }
+			if ( diff != 0 )
+			{
+				return diff;
+			}
+			// We already ruled out 0 (when they're the same)
+			return this.id - ( (DefaultAbstractNode) o ).id > 0 ? 1 : -1;
+		} else if ( olabel == null )
+		// We already ruled out 0 (when they're the same)
+		{
+			return this.id - ( (DefaultAbstractNode) o ).id > 0 ? 1 : -1;
+		} else
+		// null labels always before non-nulls
+		{
+			return -1;
+		}
+	}
+	
+	/**
+	 * Default is always -1, ie, there is no particular restriction over the node order in an experimental work-flow.
+	 * This is fine if you don't expect uneven graphs, ie, graphs where all the paths from sources (left) to sinks (right)
+	 * have the same length (which also means the corresponding table has no gap). If that is not the case, you will need
+	 * to override this method and define something for it.
+	 *   
+	 */
+	public int getOrder ()
+	{
+		return -1;
+	}
 
-        String olabel = null;
-        List<TabValueGroup> otbvs = o.getTabValues();
-        if (!otbvs.isEmpty()) {
-            olabel = otbvs.get(0).getValues().get(0);
-        }
+	/**
+	 * Two nodes are equivalent only if o == this. This is so because {@link ChainsBuilder} duplicate nodes in order to
+	 * get a graph of chains that correspond to the rows of the final exported spreadsheet.
+	 */
+	@Override
+	public boolean equals ( Object o )
+	{
+		return this == o;
+	}
 
-        if (label != null) {
-            if (olabel == null)
-            // null labels always before non-nulls
-            {
-                return 1;
-            }
+	/**
+	 * Two nodes are equivalent only if o == this. This is so because {@link ChainsBuilder} duplicate nodes in order to
+	 * get a graph of chains that correspond to the rows of the final exported spreadsheet. This class has an internal
+	 * static integer identifier, which is used for the hash code and in {@link #compareTo(Node)}.
+	 */
+	@Override
+	public int hashCode ()
+	{
+		return (int) id;
+	}
 
-            int diff = label.compareToIgnoreCase(olabel);
-
-            if (diff != 0) {
-                return diff;
-            }
-            // We already ruled out 0 (when they're the same)
-            return this.id - ((DefaultAbstractNode) o).id > 0 ? 1 : -1;
-        } else if (olabel == null)
-        // We already ruled out 0 (when they're the same)
-        {
-            return this.id - ((DefaultAbstractNode) o).id > 0 ? 1 : -1;
-        } else
-        // null labels always before non-nulls
-        {
-            return -1;
-        }
-    }
-
-    /**
-     * Two nodes are equivalent only if o == this. This is so because {@link ChainsBuilder} duplicate nodes in order
-     * to get a graph of chains that correspond to the rows of the final exported spreadsheet.
-     */
-    @Override
-    public boolean equals(Object o) {
-        return this == o;
-    }
-
-    /**
-     * Two nodes are equivalent only if o == this. This is so because {@link ChainsBuilder} duplicate nodes in order
-     * to get a graph of chains that correspond to the rows of the final exported spreadsheet.
-     * This class has an internal static integer identifier, which is used for the hash code and in {@link #compareTo(Node)}.
-     */
-    @Override
-    public int hashCode() {
-        return (int) id;
-    }
-
-    /**
-     * returns the first header/value pair returned by {@link #getTabValues()}. This should be useful for debugging.
-     */
-    @Override
-    public String toString() {
-        List<TabValueGroup> tbvs = getTabValues();
-        if (tbvs.isEmpty()) {
-            return "{Node " + id + "}";
-        }
-        TabValueGroup tbg = tbvs.get(0);
-        return tbg.getHeaders().get(0) + ": " + tbg.getValues().get(0);
-    }
+	/**
+	 * returns the first header/value pair returned by {@link #getTabValues()}. This should be useful for debugging.
+	 */
+	@Override
+	public String toString ()
+	{
+		List<TabValueGroup> tbvs = getTabValues ();
+		if ( tbvs.isEmpty () )
+		{
+			return "{Node " + id + "}";
+		}
+		TabValueGroup tbg = tbvs.get ( 0 );
+		return tbg.getHeaders ().get ( 0 ) + ": " + tbg.getValues ().get ( 0 );
+	}
 
 }

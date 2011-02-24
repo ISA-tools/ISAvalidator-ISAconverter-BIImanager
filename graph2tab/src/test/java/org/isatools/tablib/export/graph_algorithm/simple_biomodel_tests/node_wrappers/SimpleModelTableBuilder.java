@@ -66,12 +66,12 @@ public class SimpleModelTableBuilder extends TableBuilder {
 	 * you cannot choose to exclude sub-graphs that are connected to these nodes. In order to do that
 	 * you should work with the implementation of your {@link Node} interface.
 	 */
-	public SimpleModelTableBuilder(Set<ExperimentNode> nodes) {
-		this.nodes = new HashSet<Node>();
+	public SimpleModelTableBuilder ( Set<ExperimentNode> nodes ) 
+	{
+		super ( new HashSet<Node>(), false );
 		NodeFactory nodeFact = NodeFactory.getInstance();
 		for (ExperimentNode node : nodes) {
 			this.nodes.add(nodeFact.getNode(node));
 		}
 	}
-
 }

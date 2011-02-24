@@ -93,18 +93,6 @@ public abstract class ExperimentNode {
 	}
 
 
-//	public boolean removeInput ( ExperimentNode input ) {
-//		if ( !inputs.remove ( input ) ) return false;
-//		input.outputs.remove ( this );
-//		return true;
-//	}
-//
-//	public boolean removeOutput ( ExperimentNode output ) {
-//		if ( !outputs.remove ( output ) ) return false;
-//		output.inputs.remove ( this );
-//		return true;
-//	}
-
 	/**
 	 * In this simple model, annotations are used for several node property types, eg: biomaterial
 	 * characteristics or protocol parameters.

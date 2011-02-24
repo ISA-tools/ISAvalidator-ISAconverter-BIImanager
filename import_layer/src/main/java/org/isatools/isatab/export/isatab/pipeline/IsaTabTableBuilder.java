@@ -87,7 +87,7 @@ public class IsaTabTableBuilder extends TableBuilder {
      * store is needed to populate it with met ontology sources.
      */
     public IsaTabTableBuilder(BIIObjectStore store, Study study, String assayFileId) {
-        super();
+        super ( null, false );
         this.store = store;
         this.study = study;
         this.assayFileId = assayFileId;

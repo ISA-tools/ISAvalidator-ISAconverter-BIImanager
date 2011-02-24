@@ -71,225 +71,186 @@ import java.util.TreeSet;
 /**
  * The {@link Node} implementation of {@link Node}, that allows to export a BII-based study to ISATAB spreadsheets
  * (sample or assay file).
- *
- * @author brandizi
- *         <b>date</b>: Dec 13, 2009
+ * 
+ * @author brandizi <b>date</b>: Dec 13, 2009
  */
-public abstract class GraphElementWrapperNode extends DefaultAbstractNode {
-    protected final BIIObjectStore store;
-    protected NodeType nodeType = NodeType.REGULAR;
-    protected final String assayFileId;
+public abstract class GraphElementWrapperNode extends DefaultAbstractNode
+{
+	protected final BIIObjectStore store;
+	protected NodeType nodeType = NodeType.REGULAR;
+	protected final String assayFileId;
 
-    protected List<TabValueGroup> tabValues = new ArrayList<TabValueGroup>();
+	protected List<TabValueGroup> tabValues = new ArrayList<TabValueGroup> ();
 
-    protected static final Logger log = Logger.getLogger(GraphElementWrapperNode.class);
+	protected static final Logger log = Logger.getLogger ( GraphElementWrapperNode.class );
 
-    /**
-     * Identifies which kind of node this is.
-     */
-    protected enum NodeType {
-        /**
-         * A regular node, created by {@link WrapperNodesFactory} as a wrapper of some {@link GraphElement}
-         */
-        REGULAR,
+	/**
+	 * Identifies which kind of node this is.
+	 */
+	protected enum NodeType
+	{
+		/**
+		 * A regular node, created by {@link WrapperNodesFactory} as a wrapper of some {@link GraphElement}
+		 */
+		REGULAR,
 
-        /**
-         * The node was duplicated from a regular node by the table builder algorithm, using
-         * {@link Node#createIsolatedClone()}. We need to recognize this case, so that {@link Node#getInputs()} and
-         * {@link Node#getOutputs()} don't generate nodes from the underline BII pipeline, but only those that
-         * are explicitly attached by the table building procedure.
-         */
-        CLONE,
+		/**
+		 * The node was duplicated from a regular node by the table builder algorithm, using
+		 * {@link Node#createIsolatedClone()}. We need to recognise this case, so that {@link Node#getInputs()} and
+		 * {@link Node#getOutputs()} don't generate nodes from the underline BII pipeline, but only those that are
+		 * explicitly attached by the table building procedure.
+		 */
+		CLONE,
 
-        /**
-         * Using the assayFileId and the annotations in the BII model, the node was recognized as a start node
-         */
-        START,
+		/**
+		 * Using the assayFileId and the annotations in the BII model, the node was recognized as a start node
+		 */
+		START,
 
-        /**
-         * Using the assayFileId and the annotations in the BII model, the node was recognized as an end node
-         */
-        END
-    }
+		/**
+		 * Using the assayFileId and the annotations in the BII model, the node was recognized as an end node
+		 */
+		END
+	}
 
-    /**
-     * The store is needed for populating it with ontology sources met over the pipeline.
-     */
-    protected GraphElementWrapperNode(BIIObjectStore store, String assayFileId) {
-        super();
-        this.store = store;
-        this.assayFileId = assayFileId;
-    }
+	/**
+	 * The store is needed for populating it with ontology sources met over the pipeline.
+	 */
+	protected GraphElementWrapperNode ( BIIObjectStore store, String assayFileId )
+	{
+		super ();
+		this.store = store;
+		this.assayFileId = assayFileId;
+	}
 
-    /**
-     * This should be used by the implementation of {@link Node#createIsolatedClone()}, to create a clone from
-     * the original parameter.
-     */
-    protected GraphElementWrapperNode(GraphElementWrapperNode original) {
-        this(original.store, original.assayFileId);
-        this.nodeType = NodeType.CLONE;
-        this.tabValues = original.tabValues;
-        this.inputs = new TreeSet<Node>();
-        this.outputs = new TreeSet<Node>();
-    }
+	/**
+	 * This should be used by the implementation of {@link Node#createIsolatedClone()}, to create a clone from the
+	 * original parameter.
+	 */
+	protected GraphElementWrapperNode ( GraphElementWrapperNode original )
+	{
+		this ( original.store, original.assayFileId );
+		this.nodeType = NodeType.CLONE;
+		this.tabValues = original.tabValues;
+		this.inputs = new TreeSet<Node> ();
+		this.outputs = new TreeSet<Node> ();
+	}
 
+	/**
+	 * Adds an ontology term to the headers/values for this element, the postfix is appended to the header and removed
+	 * later, this is needed to avoid to mix the same headers about distinct elements
+	 */
+	protected void initOntoTerm ( DefaultTabValueGroup tabValueGroup, OntologyTerm ot )
+	{
+		OEString otstr = TabExportUtils.storeSource ( store, ot );
 
-    /**
-     * Adds an ontology term to the headers/values for this element, the postfix is appended to the header
-     * and removed later, this is needed to avoid to mix the same headers about distinct elements
-     */
-    protected void initOntoTerm(DefaultTabValueGroup tabValueGroup, OntologyTerm ot) {
-        OEString otstr = TabExportUtils.storeSource(store, ot);
+		tabValueGroup.add ( "Term Source REF", otstr.src );
+		tabValueGroup.add ( "Term Accession Number", otstr.acc );
+	}
 
-        tabValueGroup.add("Term Source REF", otstr.src);
-        tabValueGroup.add("Term Accession Number", otstr.acc);
-    }
+	/**
+	 * Helper that adds a property to the headers/values.
+	 */
+	protected void initProperty ( String header, String value, OntologyTerm ot, UnitValue uv )
+	{
+		DefaultTabValueGroup tbg = new DefaultTabValueGroup ( header, value );
 
+		// Add the unit
+		// Unit may be present only if no OT is defined
+		if ( uv != null )
+		{
+			// TODO: Currently the ISATAB doesn't support the reporting of the Unit type
+			tbg.add ( "Unit", uv.getValue () );
+			initOntoTerm ( tbg, uv.getSingleOntologyTerm () );
+		} else
+		// If it's not a value with unit, it may have onto terms
+		{
+			initOntoTerm ( tbg, ot );
+		}
 
-    /**
-     * Helper that adds a property to the headers/values.
-     */
-    protected void initProperty(String header, String value, OntologyTerm ot, UnitValue uv) {
-        DefaultTabValueGroup tbg = new DefaultTabValueGroup(header, value);
+		tabValues.add ( tbg );
+	}
 
-        // Add the unit
-        // Unit may be present only if no OT is defined
-        if (uv != null) {
-            // TODO: Currently the ISATAB doesn't support the reporting of the Unit type
-            tbg.add("Unit", uv.getValue());
-            initOntoTerm(tbg, uv.getSingleOntologyTerm());
-        } else
-        // If it's not a value with unit, it may have onto terms
-        {
-            initOntoTerm(tbg, ot);
-        }
+	/**
+	 * Helper that adds a FV to the headers/values
+	 */
+	protected void initFactorValue ( FactorValue fv )
+	{
+		Factor type = fv.getType ();
+		initProperty ( "Factor Value [" + type.getValue () + "]", fv.getValue (), fv.getSingleOntologyTerm (), fv.getUnit () );
+	}
 
-        tabValues.add(tbg);
-    }
+	/**
+	 * Adds all the annotations of a certain type, rendering them with the specified header.
+	 */
+	protected void initAnnotations ( Annotatable source, String annType, String header )
+	{
+		for ( String annv: source.getAnnotationValues ( annType ) )
+		{
+			tabValues.add ( new DefaultTabValueGroup ( header, StringUtils.trimToNull ( annv ) ) );
+		}
+	}
 
-    /**
-     * Helper that adds a FV to the headers/values
-     */
-    protected void initFactorValue(FactorValue fv) {
-        Factor type = fv.getType();
-        initProperty(
-                "Factor Value [" + type.getValue() + "]",
-                fv.getValue(),
-                fv.getSingleOntologyTerm(),
-                fv.getUnit()
-        );
-    }
+	/**
+	 * A wrapper that calls {@link #initAnnotations(Annotatable, String, String)} for every pair of annotation type /
+	 * header in the parameter list.
+	 * 
+	 * @param annTypeAndHeaders
+	 *          a list in the format &lt;annType, header&gt;+ (ie: at least one pair needed).
+	 */
+	protected void initAnnotations ( Annotatable source, String ... annTypeAndHeaders )
+	{
+		if ( annTypeAndHeaders.length < 2 )
+		{
+			throw new TabInternalErrorException ( "I need at least one pair of annotation-type and header" );
+		}
 
-    /**
-     * Adds all the annotations of a certain type, rendering them with the specified header.
-     */
-    protected void initAnnotations(Annotatable source, String annType, String header) {
-        for (String annv : source.getAnnotationValues(annType)) {
-            tabValues.add(new DefaultTabValueGroup(header, StringUtils.trimToNull(annv)));
-        }
-    }
+		for ( int i = 0; i < annTypeAndHeaders.length; i++ )
+		{
+			initAnnotations ( source, annTypeAndHeaders[i], annTypeAndHeaders[++i] );
+		}
+	}
 
-    /**
-     * A wrapper that calls {@link #initAnnotations(Annotatable, String, String)} for every pair of
-     * annotation type / header in the parameter list.
-     *
-     * @param annTypeAndHeaders a list in the format &lt;annType, header&gt;+ (ie: at least one pair needed).
-     */
-    protected void initAnnotations(Annotatable source, String... annTypeAndHeaders) {
-        if (annTypeAndHeaders.length < 2) {
-            throw new TabInternalErrorException(
-                    "I need at least one pair of annotation-type and header"
-            );
-        }
+	/**
+	 * Adds all the comment annotations to this element's headers/values
+	 */
+	protected void initComments ( Annotatable source )
+	{
+		for ( Annotation ann: source.getAnnotationValuesByRe ( AnnotationType.COMMENT_RE ) )
+		{
+			AnnotationType atype = ann.getType ();
+			String ctype = atype.getValue ().substring ( AnnotationType.COMMENT_PREFX_LEN );
+			tabValues.add ( new DefaultTabValueGroup ( "Comment [" + ctype + "]", ann.getText () ) );
+		}
+	}
 
-        for (int i = 0; i < annTypeAndHeaders.length; i++) {
-            initAnnotations(source, annTypeAndHeaders[i], annTypeAndHeaders[++i]);
-        }
-    }
+	/**
+	 * Tells if the string contains one of the matches. This is often used to detect which type of material/data one has.
+	 * TODO: Was moved to {@link StringSearchUtils}, replace it.
+	 */
+	protected static boolean containsOne ( String target, String ... matches )
+	{
+		if ( target == null )
+		{
+			throw new TabInternalErrorException ( "containsOne(): target is null!" );
+		}
+		if ( matches == null || matches.length == 0 )
+		{
+			throw new TabInternalErrorException ( "containsOne(): target is null!" );
+		}
+		for ( String match: matches )
+		{
+			if ( StringUtils.containsIgnoreCase ( target, match ) )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
-
-    /**
-     * Adds all the comment annotations to this element's headers/values
-     */
-    protected void initComments(Annotatable source) {
-        for (Annotation ann : source.getAnnotationValuesByRe(AnnotationType.COMMENT_RE)) {
-            AnnotationType atype = ann.getType();
-            String ctype = atype.getValue().substring(AnnotationType.COMMENT_PREFX_LEN);
-            tabValues.add(new DefaultTabValueGroup("Comment [" + ctype + "]", ann.getText()));
-        }
-    }
-
-    /**
-     * Tells if the string contains one of the matches. This is often used to detect which type of material/data one has.
-     * TODO: Was moved to {@link StringSearchUtils}, replace it.
-     */
-    protected static boolean containsOne(String target, String... matches) {
-        if (target == null) {
-            throw new TabInternalErrorException(
-                    "containsOne(): target is null!"
-            );
-        }
-        if (matches == null || matches.length == 0) {
-            throw new TabInternalErrorException(
-                    "containsOne(): target is null!"
-            );
-        }
-        for (String match : matches) {
-            if (StringUtils.containsIgnoreCase(target, match)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public List<TabValueGroup> getTabValues() {
-        return tabValues;
-    }
-
-//	/**
-//	 * This is only used by {@link TableBuilder}, to add edges to split nodes.
-//	 */
-//	public boolean addInput ( Node input ) 
-//	{
-//		if ( inputs == null ) getInputs ();
-//		if ( !inputs.add ( input ) ) return false;
-//		input.addOutput ( this );
-//		return true;
-//	}
-
-
-//	/**
-//	 * This is only used by {@link TableBuilder}, to add edges to split nodes.
-//	 */
-//	public boolean addOutput ( Node output ) 
-//	{
-//		if ( outputs == null ) getOutputs ();
-//		if ( !outputs.add ( output ) ) return false;
-//		output.addInput ( this );
-//		return true;
-//	}
-
-//	/**
-//	 * This is only used by {@link TableBuilder}, to remove edges to split nodes.
-//	 */
-//	public boolean removeInput ( Node input ) 
-//	{
-//		if ( inputs == null ) return false;
-//		if ( !inputs.remove ( input ) ) return false;
-//		input.removeOutput ( this );
-//		return true;
-//
-//	}
-
-//	/**
-//	 * This is only used by {@link TableBuilder}, to remove edges to split nodes.
-//	 */
-//	public boolean removeOutput ( Node output ) 
-//	{
-//		if ( outputs == null ) return false;
-//		if ( !outputs.remove ( output ) ) return false;
-//		output.removeInput ( this );
-//		return true;
-//	}
+	public List<TabValueGroup> getTabValues ()
+	{
+		return tabValues;
+	}
 
 }

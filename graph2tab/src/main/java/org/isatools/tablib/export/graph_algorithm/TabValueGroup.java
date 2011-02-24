@@ -51,7 +51,7 @@ package org.isatools.tablib.export.graph_algorithm;
 import java.util.List;
 
 /**
- * <p>A group of header/value that is exported for a particular element in the experimental graph. Eg:
+ * <p>A group of header/value pairs that are exported for a particular element in the experimental graph. Eg:
  * Characteristic + its value and the fields about the term source and accession are an example of
  * tab value group.</p>
  * <p/>

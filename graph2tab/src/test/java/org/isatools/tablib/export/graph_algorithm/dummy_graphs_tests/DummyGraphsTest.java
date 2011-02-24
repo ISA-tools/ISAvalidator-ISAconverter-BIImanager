@@ -113,7 +113,7 @@ public class DummyGraphsTest {
 		nodes.add(g.addChain(2, "DGH"));
 		g.addChain(3, "GI");
 
-		TableBuilder tb = new TableBuilder(nodes);
+		TableBuilder tb = new TableBuilder ( nodes, false );
 		out.println(tb.report());
 
 		List<List<String>> paths = tb.getTable();
@@ -153,7 +153,7 @@ public class DummyGraphsTest {
 
 		nodes.add(g.getNode(2, "D"));
 
-		TableBuilder tb = new TableBuilder(nodes);
+		TableBuilder tb = new TableBuilder ( nodes, false );
 		out.println(tb.report());
 
 		List<List<String>> paths = tb.getTable();
