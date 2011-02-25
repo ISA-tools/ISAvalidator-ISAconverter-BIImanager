@@ -146,8 +146,12 @@ public class MaterialWrapperNode extends PipelineWrapperNode<MaterialNode> {
         // Work out the characteristics
         SortedSet<CharacteristicValue> sortedCvs = new TreeSet<CharacteristicValue>(
                 new Comparator<CharacteristicValue>() {
-                    public int compare(CharacteristicValue cv1, CharacteristicValue cv2) {
-                        return cv1.getType().getOrder() - cv2.getType().getOrder();
+                    public int compare(CharacteristicValue cv1, CharacteristicValue cv2) 
+                    {
+                    	int deltaOrder = cv1.getType().getOrder() - cv2.getType().getOrder();
+                    	if ( deltaOrder != 0 ) return deltaOrder;
+                    	// Same order because the two come from different files, so let's use the type
+                    	return cv1.getType ().getValue ().compareTo ( cv2.getType ().getValue () );
                     }
                 }
         );
