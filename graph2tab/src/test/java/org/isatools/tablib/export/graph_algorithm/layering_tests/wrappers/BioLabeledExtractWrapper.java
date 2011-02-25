@@ -11,9 +11,9 @@ import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wra
 public class BioLabeledExtractWrapper extends BioMaterialWrapper
 {
 
-	BioLabeledExtractWrapper ( BioLabeledExtract base )
+	BioLabeledExtractWrapper ( BioLabeledExtract base, NodeFactory nodeFactory )
 	{
-		super ( base );
+		super ( base, nodeFactory );
 	}
 
 	private BioLabeledExtractWrapper ( ExpNodeWrapper original )

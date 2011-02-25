@@ -43,37 +43,29 @@
  * EU NuGO [NoE 503630](http://www.nugo.org/everyone) projects and in part by EMBL-EBI.
  */
 
-package org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wrappers;
+package org.isatools.tablib.export.graph_algorithm.layering_tests.wrappers;
 
 import org.isatools.tablib.export.graph_algorithm.Node;
-import org.isatools.tablib.export.graph_algorithm.TabValueGroup;
-import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.ProtocolRef;
+import org.isatools.tablib.export.graph_algorithm.TableBuilder;
+import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.ExperimentNode;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * <dl><dt>date</dt><dd>Jun 1, 2010</dd></dl>
- *
+ * TODO: comment me!
+ * <dl><dt>date</dt><dd>Feb 25, 2011</dd></dl>
  * @author brandizi
+ *
  */
-public class ProtocolRefWrapper extends ExpNodeWrapper {
-	public ProtocolRefWrapper(ProtocolRef base, NodeFactory nodeFactory ) {
-		super(base, nodeFactory);
+public class LayeringModelTableBuilder extends TableBuilder 
+{
+	public LayeringModelTableBuilder ( Set<ExperimentNode> nodes ) 
+	{
+		super ( new HashSet<Node>(), true );
+		NodeFactory nodeFact = NodeFactory.getInstance();
+		for (ExperimentNode node : nodes) {
+			this.nodes.add(nodeFact.getNode(node));
+		}
 	}
-
-	private ProtocolRefWrapper(ExpNodeWrapper original) {
-		super(original);
-	}
-
-	/**
-	 * @return getTabValues ( "Protocol REF", "Parameter Value" )
-	 */
-	public List<TabValueGroup> getTabValues() {
-		return getTabValues("Protocol REF", "Parameter Value");
-	}
-
-	public Node createIsolatedClone() {
-		return new ProtocolRefWrapper(this);
-	}
-
 }

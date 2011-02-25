@@ -43,37 +43,55 @@
  * EU NuGO [NoE 503630](http://www.nugo.org/everyone) projects and in part by EMBL-EBI.
  */
 
-package org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wrappers;
+package org.isatools.tablib.export.graph_algorithm.layering_tests.wrappers;
 
-import org.isatools.tablib.export.graph_algorithm.Node;
-import org.isatools.tablib.export.graph_algorithm.TabValueGroup;
-import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.ProtocolRef;
-
-import java.util.List;
+import org.isatools.tablib.export.graph_algorithm.layering_tests.model.BioAssay;
+import org.isatools.tablib.export.graph_algorithm.layering_tests.model.BioExtract;
+import org.isatools.tablib.export.graph_algorithm.layering_tests.model.BioLabeledExtract;
+import org.isatools.tablib.export.graph_algorithm.layering_tests.model.BioSample;
+import org.isatools.tablib.export.graph_algorithm.layering_tests.model.BioSource;
+import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.ExperimentNode;
+import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wrappers.ExpNodeWrapper;
 
 /**
- * <dl><dt>date</dt><dd>Jun 1, 2010</dd></dl>
- *
+ * TODO: comment me!
+ * 
+ * <dl>
+ * <dt>date</dt>
+ * <dd>Feb 25, 2011</dd>
+ * </dl>
+ * 
  * @author brandizi
+ * 
  */
-public class ProtocolRefWrapper extends ExpNodeWrapper {
-	public ProtocolRefWrapper(ProtocolRef base, NodeFactory nodeFactory ) {
-		super(base, nodeFactory);
+public class NodeFactory extends 
+  org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wrappers.NodeFactory
+{
+	private NodeFactory () {
 	}
 
-	private ProtocolRefWrapper(ExpNodeWrapper original) {
-		super(original);
+	private static final NodeFactory instance = new NodeFactory ();
+
+	public static NodeFactory getInstance () {
+		return instance;
 	}
 
 	/**
-	 * @return getTabValues ( "Protocol REF", "Parameter Value" )
+	 * Works like {@link NodeFactory#createNewNode(ExperimentNode)}, adds additional nodes.
 	 */
-	public List<TabValueGroup> getTabValues() {
-		return getTabValues("Protocol REF", "Parameter Value");
+	@Override
+	protected ExpNodeWrapper createNewNode ( ExperimentNode base )
+	{
+		if ( base instanceof BioSource )
+			return new BioSourceWrapper ( (BioSource) base, this );
+		if ( base instanceof BioSample )
+			return new BioSampleWrapper ( (BioSample) base, this );
+		if ( base instanceof BioExtract )
+			return new BioExtractWrapper ( (BioExtract) base, this );
+		if ( base instanceof BioLabeledExtract )
+			return new BioLabeledExtractWrapper ( (BioLabeledExtract) base, this );
+		if ( base instanceof BioAssay )
+			return new BioAssayWrapper ( (BioAssay) base, this );
+		return super.createNewNode ( base );
 	}
-
-	public Node createIsolatedClone() {
-		return new ProtocolRefWrapper(this);
-	}
-
 }

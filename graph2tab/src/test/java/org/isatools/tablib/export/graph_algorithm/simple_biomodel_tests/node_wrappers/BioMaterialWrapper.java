@@ -61,9 +61,9 @@ import java.util.List;
  */
 public class BioMaterialWrapper extends ExpNodeWrapper
 {
-	public BioMaterialWrapper ( BioMaterial base )
+	public BioMaterialWrapper ( BioMaterial base, NodeFactory nodeFactory )
 	{
-		super ( base );
+		super ( base, nodeFactory );
 	}
 
 	protected BioMaterialWrapper ( ExpNodeWrapper original )

@@ -81,17 +81,25 @@ class ChainsBuilder {
     private SortedSet<Node> startNodes = null;
     private boolean isInitialized = false;
 
+    private LayersBuilder layersBuilder;
+    
     /**
      * Used for debugging code, number file names about dumped DOT graphs
      */
     private static int dotFileNoCounter = 0;
 
+
     /**
      * Initializes the graph to be exported with any set of nodes that allow to reach the sources and, from them, the final
-     * destinations. The resulting graph must ne layered (see the introduction above).
+     * destinations. The resulting graph must be layered (see the introduction above).
+     * 
+     * @param layersBuilder it's used in case layering is required, the method 
+     * {@link LayersBuilder#addSplittedNode(Node, Node)} will be invoked every time a node is split, so that its
+     * layering information is updated. null means we don't require layering at all (cause the graph is even).
      */
-    public ChainsBuilder(Set<Node> nodes) {
+    public ChainsBuilder(Set<Node> nodes, LayersBuilder layersBuilder ) {
         this.nodes = nodes;
+        this.layersBuilder = layersBuilder;
     }
 
     /**
@@ -157,6 +165,10 @@ class ChainsBuilder {
         if (startNodes.contains(node)) {
             startNodes.add(clone);
         }
+        
+        if ( layersBuilder != null )
+        	layersBuilder.addSplittedNode ( node, clone );
+        
         return clone;
     }
 

@@ -12,9 +12,9 @@ import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wra
 public class BioAssayWrapper extends BioMaterialWrapper
 {
 
-	BioAssayWrapper ( BioAssay base )
+	BioAssayWrapper ( BioAssay base, NodeFactory nodeFactory )
 	{
-		super ( base );
+		super ( base, nodeFactory );
 	}
 
 	private BioAssayWrapper ( ExpNodeWrapper original )

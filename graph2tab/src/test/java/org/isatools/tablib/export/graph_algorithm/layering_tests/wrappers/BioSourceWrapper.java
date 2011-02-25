@@ -11,9 +11,9 @@ import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wra
 public class BioSourceWrapper extends BioMaterialWrapper
 {
 
-	BioSourceWrapper ( BioSource base )
+	BioSourceWrapper ( BioSource base, NodeFactory nodeFactory )
 	{
-		super ( base );
+		super ( base, nodeFactory );
 	}
 
 	private BioSourceWrapper ( ExpNodeWrapper original )
@@ -21,11 +21,13 @@ public class BioSourceWrapper extends BioMaterialWrapper
 		super ( original );
 	}
 
+	@Override
 	public List<TabValueGroup> getTabValues ()
 	{
 		return super.getTabValues ( "Source Name", "Characteristic" );
 	}
 
+	@Override
 	public Node createIsolatedClone ()
 	{
 		return new BioSourceWrapper ( this );

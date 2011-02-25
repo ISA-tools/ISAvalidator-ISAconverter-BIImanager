@@ -74,6 +74,11 @@ import java.util.TreeSet;
 public abstract class ExpNodeWrapper extends DefaultAbstractNode
 {
 	/**
+	 * TODO: Comment me!
+	 */
+	private final NodeFactory nodeFactory; 
+		
+	/**
 	 * TODO: comment me!
 	 */
 	@SuppressWarnings ( "serial" )
@@ -92,11 +97,15 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode
 	private ExperimentNode base;
 
 	/**
-	 * This should be used only by your custom factory, {@link NodeFactory} in this example.
+	 * This should be used only by your custom factory, {@link NodeFactory} in this example. Here we pass the factory,
+	 * because these nodes are used in two different packages with two different factories and wrappers, but of course 
+	 * it could be a static variable in simpler cases.
+	 *  
 	 */
-	ExpNodeWrapper ( ExperimentNode base )
+	ExpNodeWrapper ( ExperimentNode base, NodeFactory nodeFactory )
 	{
 		this.base = base;
+		this.nodeFactory = nodeFactory;
 	}
 
 	/**
@@ -106,6 +115,7 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode
 	protected ExpNodeWrapper ( ExpNodeWrapper original )
 	{
 		this.base = original.base;
+		this.nodeFactory = original.nodeFactory;
 		this.inputs = new TreeSet<Node> ();
 		this.outputs = new TreeSet<Node> ();
 	}
@@ -154,10 +164,9 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode
 			return super.getInputs ();
 		}
 		inputs = new TreeSet<Node> ();
-		NodeFactory nodeFact = NodeFactory.getInstance ();
 		for ( ExperimentNode in: base.getInputs () )
 		{
-			inputs.add ( nodeFact.getNode ( in ) );
+			inputs.add ( nodeFactory.getNode ( in ) );
 		}
 		return super.getInputs ();
 	}
@@ -176,10 +185,9 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode
 			return super.getOutputs ();
 		}
 		outputs = new TreeSet<Node> ();
-		NodeFactory nodeFact = NodeFactory.getInstance ();
 		for ( ExperimentNode out: base.getOutputs () )
 		{
-			outputs.add ( nodeFact.getNode ( out ) );
+			outputs.add ( nodeFactory.getNode ( out ) );
 		}
 		return super.getOutputs ();
 	}

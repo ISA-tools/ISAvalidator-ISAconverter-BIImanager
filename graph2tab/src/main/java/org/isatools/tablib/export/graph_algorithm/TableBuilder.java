@@ -125,22 +125,31 @@ public class TableBuilder
 
 		if ( isLayeringRequired ) {
 			layersBuilder = new LayersBuilder ( nodes );
+			// It has the start nodes, so let's speed up things this way
 			nodes = layersBuilder.getStartNodes ();
 		}
 		
-		chainsBuilder = new ChainsBuilder ( nodes );
+		chainsBuilder = new ChainsBuilder ( nodes, layersBuilder );
 		layerContents = new LayerContents ();
 
 		for ( Node node: chainsBuilder.getStartNodes () )
 		{
-			int layer = 0;
+			int layer = 0, prevLayer = -1;
 			while ( true )
 			{
-				if ( isLayeringRequired )
+				if ( isLayeringRequired ) 
+				{
 					layer = layersBuilder.getLayer ( node );
+					// Start from the previous'node layer and fill-in-the-blanks until you reach the current layer 
+					for ( int layeri = prevLayer + 1; layeri < layer; layeri++ )
+						layerContents.addNullRow ( layeri );
+					prevLayer = layer;
+				}
 
-				// Skip eg: processings not having at least one protocol
-				if ( !node.getTabValues ().isEmpty () )
+				if ( node.getTabValues ().isEmpty () )
+					// Skip eg: processings not having at least one protocol
+					layerContents.addNullRow ( layer );
+				else
 					addNode ( layer, node );
 				
 				SortedSet<Node> outs = node.getOutputs ();
@@ -151,12 +160,21 @@ public class TableBuilder
 				// This flag is final, so javac optimises a bit here
 				if ( !isLayeringRequired ) layer++;
 			}
-		}
 
+			if ( isLayeringRequired )
+			{
+				// Fill-in-the-blanks untile the last layer
+				int maxLayer = layersBuilder.getMaxLayer ();
+				for ( int layeri = prevLayer + 1; layeri <= maxLayer; layeri++ )
+					layerContents.addNullRow ( layeri );
+			}
+
+		}
+		
 		table = new LayersListView ( layerContents );
 		return table;
 	}
-
+	
 	/**
 	 * This add a node of the chains prepared by {@link ChainsBuilder} to the exported table. This is done by considering
 	 * the pairs returned by {@link Node#getTabValues()}, values with the same header are merged.
@@ -270,6 +288,7 @@ public class TableBuilder
 		}
 	}
 
+	
 	/**
 	 * @return A string representation of {@link #getTable()}, to be used for debugging puorposes.
 	 */

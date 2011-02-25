@@ -45,11 +45,11 @@
 
 package org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wrappers;
 
+import java.util.List;
+
 import org.isatools.tablib.export.graph_algorithm.Node;
 import org.isatools.tablib.export.graph_algorithm.TabValueGroup;
 import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.Data;
-
-import java.util.List;
 
 /**
  * <dl><dt>date</dt><dd>Jun 1, 2010</dd></dl>
@@ -57,8 +57,9 @@ import java.util.List;
  * @author brandizi
  */
 public class DataWrapper extends ExpNodeWrapper {
-	DataWrapper(Data base) {
-		super(base);
+	public DataWrapper( Data base, NodeFactory nodeFactory )
+	{
+		super ( base, nodeFactory );
 	}
 
 	private DataWrapper(ExpNodeWrapper original) {

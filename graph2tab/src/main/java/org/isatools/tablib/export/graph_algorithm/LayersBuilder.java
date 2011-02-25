@@ -29,7 +29,7 @@ public class LayersBuilder
 	
 	private SortedMap<Integer, SortedSet<Node>> layer2Nodes = new TreeMap<Integer, SortedSet<Node>> ();
 	private Map<Node, Integer> node2Layer = new HashMap<Node, Integer> (); 
-	int maxLayer = -1;
+	private int maxLayer = -1;
 	
 	public LayersBuilder ( Set<Node> nodes )
 	{
@@ -38,14 +38,22 @@ public class LayersBuilder
 	
 	private void initEndNodes () 
 	{
-		if ( endNodes != null ) return;
-		
 		endNodes = new HashSet<Node> ();
-		for ( Node n: nodes )
-			if ( n.getInputs ().isEmpty () )
-				endNodes.add ( n );
+		for ( Node n: nodes ) initEndNodes ( n, endNodes );
 	}
 	
+	private void initEndNodes ( Node node, Set<Node> result ) 
+	{
+		if ( node.getOutputs ().isEmpty () ) {
+			result.add ( node );
+			return;
+		}
+		
+		for ( Node out: node.getOutputs () ) 
+			initEndNodes ( out, result );
+		
+		return;
+	}
 	
 	private void setLayer ( Node node, int layer ) 
 	{
@@ -271,13 +279,27 @@ public class LayersBuilder
 		return Collections.unmodifiableSortedSet ( layer2Nodes.get ( layer ) );
 	}
 	
+	public int getMaxLayer ()
+	{
+		if ( !isInitialized ) computeTypedLayers ();
+		return maxLayer;
+	}
+
 	public SortedSet<Node> getStartNodes ()
 	{
 		if ( !isInitialized ) computeTypedLayers ();
 		return Collections.unmodifiableSortedSet ( startNodes );
 	}
 	
-	
+	public void addSplittedNode ( Node original, Node newn ) 
+	{
+		Integer layer = node2Layer.get ( original );
+		if ( layer == null ) throw new RuntimeException ( 
+			"Internal Error: cannot insert a non-duped node in the layer builder, node: " + newn 
+		);
+		node2Layer.put ( newn, layer );
+		layer2Nodes.get ( layer ).add ( newn );
+	}
 	
 	@Override
 	public String toString ()
