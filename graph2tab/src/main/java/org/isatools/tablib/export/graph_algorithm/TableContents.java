@@ -56,8 +56,8 @@ import java.util.*;
 
 
 /**
- * Provides a representation of the layers in the graph. A layer is a set of homogeneous nodes having the same distance
- * from the sources (eg: the initial column of sources or all the samples after the source column).
+ * Provides a table-like representation of the layers in the graph. A layer is a set of homogeneous nodes having the 
+ * same distance from the sources (eg: the initial column of sources or all the samples after the source column).
  * <p/>
  * Basically we allow to represent the structure &lt;layer no., row, column (in the header)&gt; =&gt; value
  * <p/>
@@ -68,12 +68,12 @@ import java.util.*;
  * 
  * @author brandizi
  */
-class LayerContents
+class TableContents
 {
 	/**
 	 * All the contents
 	 */
-	private final Map<Integer, LayerContent> layerContents = new HashMap<Integer, LayerContent> ();
+	private final Map<Integer, TableLayerContent> layerContents = new HashMap<Integer, TableLayerContent> ();
 
 	/**
 	 * Counts the overall number of rows and columns
@@ -85,7 +85,7 @@ class LayerContents
 	 * system, ie a double map like [col,row] =&gt; value. Moreover, we maintain the headers separately and some cache
 	 * information (no of rows in each colum).
 	 */
-	private static class LayerContent
+	private static class TableLayerContent
 	{
 		/**
 		 * The headers, indexed by column
@@ -114,14 +114,14 @@ class LayerContents
 		return layerContents.keySet ();
 	}
 
-	private LayerContent getLayerContent ( int layer )
+	private TableLayerContent getLayerContent ( int layer )
 	{
-		LayerContent layerCont = layerContents.get ( layer );
+		TableLayerContent layerCont = layerContents.get ( layer );
 		if ( layerCont != null )
 		{
 			return layerCont;
 		}
-		layerCont = new LayerContent ();
+		layerCont = new TableLayerContent ();
 		layerContents.put ( layer, layerCont );
 		return layerCont;
 	}
@@ -161,7 +161,7 @@ class LayerContents
 	public int addHeader ( int layer, String header )
 	{
 		ncols++;
-		LayerContent layerCont = getLayerContent ( layer );
+		TableLayerContent layerCont = getLayerContent ( layer );
 		List<String> lheaders = layerCont.headers;
 		lheaders.add ( header );
 		layerCont.colSizes.add ( 0 );
@@ -177,7 +177,7 @@ class LayerContents
 		{
 			return;
 		}
-		LayerContent layerCont = getLayerContent ( layer );
+		TableLayerContent layerCont = getLayerContent ( layer );
 		int newHsz = newHeaders.size ();
 		List<String> lheaders = layerCont.headers;
 		lheaders.addAll ( newHeaders );
@@ -194,7 +194,7 @@ class LayerContents
 	 */
 	public int addHeader ( int layer, int icol, String header )
 	{
-		LayerContent layerCont = getLayerContent ( layer );
+		TableLayerContent layerCont = getLayerContent ( layer );
 		List<String> lheaders = layerCont.headers;
 		if ( icol > lheaders.size () )
 		{
@@ -241,9 +241,9 @@ class LayerContents
 	}
 
 	/**
-	 * Update the several counters in the {@link LayerContent} class and in this class
+	 * Update the several counters in the {@link TableLayerContent} class and in this class
 	 */
-	private void updatedColSize ( LayerContent layerCont, int icol, int newSize )
+	private void updatedColSize ( TableLayerContent layerCont, int icol, int newSize )
 	{
 		if ( newSize <= layerCont.colSizes.get ( icol ) )
 		{
@@ -279,7 +279,7 @@ class LayerContents
 	 */
 	public void set ( int layer, int irow, int icol, String v )
 	{
-		LayerContent layerCont = getLayerContent ( layer );
+		TableLayerContent layerCont = getLayerContent ( layer );
 		SortedObjectStore<Integer, Integer, String> table = layerCont.table;
 
 		if ( icol >= layerCont.headers.size () )
@@ -297,7 +297,7 @@ class LayerContents
 	 */
 	public String get ( int layer, int irow, int icol )
 	{
-		LayerContent layerCont = getLayerContent ( layer );
+		TableLayerContent layerCont = getLayerContent ( layer );
 		if ( icol >= layerCont.headers.size () )
 		{
 			throw new IndexOutOfBoundsException ( "while getting " + layer + ", " + icol + "," + irow );
@@ -306,6 +306,7 @@ class LayerContents
 		return StringUtils.trimToNull ( layerCont.table.get ( icol, irow ) );
 	}
 
+	// Maybe one day will be useful
 	// public void add ( int layer, int icol, String v )
 	// {
 	// LayerContent layerCont = getLayerContent ( layer );
@@ -318,11 +319,13 @@ class LayerContents
 	// }
 
 	/**
-	 * TODO: Comment me!
+	 * Adds a null row to a layer. This is used when a layer has to be skipped, because the layer of the current node is 
+	 * ahead. Another case where this is used is when a node has no attribute ({@link Node#getTabValues()} is empty).
+	 * 
 	 */
 	public void addNullRow ( int layer )
 	{
-		LayerContent layerCont = getLayerContent ( layer );
+		TableLayerContent layerCont = getLayerContent ( layer );
 		if ( layerCont.headers.size () == 0 )
 		{
 			// It has not been populated with real nodes yet (we're skipping some layers): just set the row counters and it 
@@ -359,7 +362,7 @@ class LayerContents
 	 */
 	public int colSize ( int layer, int icol )
 	{
-		LayerContent layerCont = getLayerContent ( layer );
+		TableLayerContent layerCont = getLayerContent ( layer );
 		return layerCont.colSizes.get ( icol );
 	}
 
@@ -369,7 +372,7 @@ class LayerContents
 	 */
 	public int colsMaxSize ( int layer )
 	{
-		LayerContent layerCont = getLayerContent ( layer );
+		TableLayerContent layerCont = getLayerContent ( layer );
 		return layerCont.colsMaxSize;
 	}
 
@@ -402,7 +405,7 @@ class LayerContents
 		sb.append ( "-- ROWS: " + this.nrows + ", COLS: " + this.ncols + "\n\n");
 		for ( int layer: layerContents.keySet () )
 		{
-			LayerContent layerCont = layerContents.get ( layer );
+			TableLayerContent layerCont = layerContents.get ( layer );
 			sb.append ( "---- LAYER: " + layer + ", colsMaxSize = " + layerCont.colsMaxSize + "\n" );
 			int ncols = layerCont.headers.size ();
 			if ( ncols == 0 )

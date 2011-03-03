@@ -53,11 +53,11 @@ import java.util.*;
 
 /**
  * A table view over the layer contents, that allow to get the i,j values of the resulting SDRF-like table.
- * This wraps the intermediate {@link LayerContents} view and provide the final exportable table, by hiding the
+ * This wraps the intermediate {@link TableContents} view and provide the final exportable table, by hiding the
  * per-layer organization in the layer contents view.
  */
 class LayersListView extends AbstractList<List<String>> {
-    private final LayerContents layerContents;
+    private final TableContents layerContents;
 
     private static final String UNSUPPORTED_MSG = "The table view created by the ISATAB export cannot be modified";
 
@@ -76,7 +76,7 @@ class LayersListView extends AbstractList<List<String>> {
      * Builds the table view. The result is sorted according to what it's returned by the {@link Node} interface.
      */
     @SuppressWarnings("unchecked")
-    public LayersListView(LayerContents layerContents) {
+    public LayersListView(TableContents layerContents) {
         this.layerContents = layerContents;
 
         int icol = 0;
@@ -114,35 +114,6 @@ class LayersListView extends AbstractList<List<String>> {
 
     }
 
-// TODO: REmove, everything is already sorted cause nodes are managed via SortedSet(s) and 
-// these are compared using the first tab value. 
-
-//	/**
-//	 * Sorts the table view in the order corresponding to "node value sorting", i.e.:
-//	 * sorts left to right, considering values of headers like "source name", "raw data file" etc.  
-//	 * 
-//	 * The comparison criterion is implemented in {@link SingleLayersRowView#compareTo(SingleLayersRowView)}.
-//	 * Headers row is always on the top.
-//	 * 
-//	 */
-//	public void sort () 
-//	{
-//
-//		// We must do this in case the rows are still uninitialized.
-//		if ( rows.length > 1 && rows [ 1 ] == null )
-//			for ( int i = 1; i < rows.length; i++ ) get ( i );
-//		
-//		Comparator<List<String>> comp = new Comparator<List<String>> () 
-//		{
-//			public int compare ( List<String> row1, List<String> row2 ) {
-//				// In that case is the headers row
-//				if ( ! ( row1 instanceof SingleLayersRowView) ) return !(row2 instanceof SingleLayersRowView) ? 0 : -1;
-//				if ( !(row2 instanceof SingleLayersRowView) ) return 1;
-//				return ((SingleLayersRowView) row1).compareTo ( (SingleLayersRowView) row2 );
-//			}
-//		};
-//		Arrays.sort ( rows, comp );
-//	}
 
     /**
      * Returns the headers if irow == 0, otherwise returns the {@link SingleLayersRowView} corresponding to

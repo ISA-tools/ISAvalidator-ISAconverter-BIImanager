@@ -243,6 +243,18 @@ public abstract class DefaultAbstractNode implements Node
 	}
 	
 	/**
+	 * The default is getTabValues ().get ( 0 ).getHeaders ().get ( 0 ), i.e.: the first header, 
+	 * something like 'Source Name' or 'Protocol REF'. There might be cases where the type is a different string, 
+	 * e.g.: there might be two nodes both having 'Protocol REF' as first header but having the types 
+	 * 'Sampling Protocol' and 'Extraction Protocol'.
+	 * 
+	 */
+	public String getType ()
+	{
+		return this.getTabValues ().get ( 0 ).getHeaders ().get ( 0 );
+	}
+
+	/**
 	 * Default is always -1, ie, there is no particular restriction over the node order in an experimental work-flow.
 	 * This is fine if you don't expect uneven graphs, ie, graphs where all the paths from sources (left) to sinks (right)
 	 * have the same length (which also means the corresponding table has no gap). If that is not the case, you will need

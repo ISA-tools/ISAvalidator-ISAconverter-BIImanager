@@ -76,7 +76,7 @@ public class TableBuilder
 
 	private LayersBuilder layersBuilder;
 	private ChainsBuilder chainsBuilder;
-	private LayerContents layerContents;
+	private TableContents tableContents;
 	protected List<List<String>> table = null;
 
 	/**
@@ -136,7 +136,7 @@ public class TableBuilder
 		}
 		
 		chainsBuilder = new ChainsBuilder ( nodes, layersBuilder );
-		layerContents = new LayerContents ();
+		tableContents = new TableContents ();
 
 		for ( Node node: chainsBuilder.getStartNodes () )
 		{
@@ -148,13 +148,13 @@ public class TableBuilder
 					layer = layersBuilder.getLayer ( node );
 					// Start from the previous'node layer and fill-in-the-blanks until you reach the current layer 
 					for ( int layeri = prevLayer + 1; layeri < layer; layeri++ )
-						layerContents.addNullRow ( layeri );
+						tableContents.addNullRow ( layeri );
 					prevLayer = layer;
 				}
 
 				if ( node.getTabValues ().isEmpty () )
 					// Skip eg: processings not having at least one protocol
-					layerContents.addNullRow ( layer );
+					tableContents.addNullRow ( layer );
 				else
 					addNode ( layer, node );
 				
@@ -173,11 +173,11 @@ public class TableBuilder
 				// Fill-in-the-blanks until the last layer
 				int maxLayer = layersBuilder.getMaxLayer ();
 				for ( int layeri = prevLayer + 1; layeri <= maxLayer; layeri++ )
-					layerContents.addNullRow ( layeri );
+					tableContents.addNullRow ( layeri );
 			}
 		} // for chain
 		
-		table = new LayersListView ( layerContents );
+		table = new LayersListView ( tableContents );
 		return table;
 	}
 	
@@ -187,10 +187,10 @@ public class TableBuilder
 	 */
 	private void addNode ( int layer, Node node )
 	{
-		List<String> layerHeaders = layerContents.getLayerHeaders ( layer );
+		List<String> layerHeaders = tableContents.getLayerHeaders ( layer );
 
 		int ncols = layerHeaders.size ();
-		int nrows = layerContents.colsMaxSize ( layer );
+		int nrows = tableContents.colsMaxSize ( layer );
 
 		// First header of the group => indexes of columns where the header is
 		Map<String, SortedSet<Integer>> headerIndexes = new HashMap<String, SortedSet<Integer>> ();
@@ -227,11 +227,11 @@ public class TableBuilder
 				{
 					String header = headers.get ( itb );
 					String value = values.get ( itb );
-					int jcol = layerContents.addHeader ( layer, header ) - 1;
+					int jcol = tableContents.addHeader ( layer, header ) - 1;
 					// Only the first header in the group
 					if ( itb == 0 )
 						hidx.add ( jcol );
-					layerContents.set ( layer, nrows, jcol, value );
+					tableContents.set ( layer, nrows, jcol, value );
 				}
 				continue;
 			}
@@ -242,7 +242,7 @@ public class TableBuilder
 			boolean isLanded = false;
 			for ( int jcol: hidx )
 			{
-				if ( layerContents.get ( layer, nrows, jcol ) != null )
+				if ( tableContents.get ( layer, nrows, jcol ) != null )
 					continue;
 
 				// There is a free cell for the current header, let's fill it with the corresponding object value and
@@ -250,7 +250,7 @@ public class TableBuilder
 				for ( int itb = 0; itb < tbgSz; itb++ )
 				{
 					String value = values.get ( itb );
-					layerContents.set ( layer, nrows, jcol++, value );
+					tableContents.set ( layer, nrows, jcol++, value );
 				}
 				isLanded = true;
 				break;
@@ -271,8 +271,8 @@ public class TableBuilder
 				String header = headers.get ( itb );
 				String value = values.get ( itb );
 
-				int jcol = layerContents.addHeader ( layer, header ) - 1;
-				layerContents.set ( layer, nrows, jcol, value );
+				int jcol = tableContents.addHeader ( layer, header ) - 1;
+				tableContents.set ( layer, nrows, jcol, value );
 
 				// Only the first header in the group, increment all the old headers on its left
 				if ( itb == 0 )

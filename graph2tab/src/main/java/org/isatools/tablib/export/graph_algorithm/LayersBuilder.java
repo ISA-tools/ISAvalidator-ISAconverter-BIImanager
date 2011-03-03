@@ -12,8 +12,30 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+
 /**
- * TODO: Comment me thoroughly!!! 
+ * <h2>The layer builder</h2>
+ * 
+ * <p>We try to explain below what the layering of an experimental work flow is, if you look at examples, one image
+ * tells more than a thousand words. For instance, have a look at {@link LayeringTest#testUnevenGraph1()}</p>
+ * 
+ * <p>This is optionally used by {@link TableBuilder}. It is needed if you expect an input experimental workflow graph 
+ * that may be "uneven", i.e.: it may contain paths from sources to end nodes of different length. This usually happen
+ * because some step in the experimental workflow is missing or omitted (e.g.: a data item is achieved directly from a
+ * sample, while another has a specified extract material and an extraction protocol). If that is the case, the graph 
+ * need to be "layered", in addition to being transformed into a set of chains (by {@link ChainsBuilder}). For any 
+ * node, an integer layer index is computed. The layers span from right to left, from sources to end nodes (or sinks).</p>
+ *  
+ * <p>For every chain from a source to a sink, there is at least one node per each layer and any given layer contain 
+ * nodes of the same {@link Node#getType() node type}. In simpler cases there is exactly one node per layer for all 
+ * such paths and, in this simple cases, the layer index is the same as the distance of the node from the source it 
+ * can be reached from. In the case of uneven graphs, this basic layering is adjusted, so that every layer has always 
+ * nodes of the same type.<p>  
+ * 
+ * <p>This basically uses the approach described in section 3.3.2 of the 
+ * <a href = "http://annotare.googlecode.com/files/MAGE-TABv1.1.pdf">MAGE-TAB specification</a>, adding several details 
+ * that are not addressed in that document, such as the usage of the {@link Node#getOrder() nodes' order property} to 
+ * sort out ambiguities that may arise.</p>    
  * 
  * <dl><dt>date</dt><dd>Feb 23, 2011</dd></dl>
  * @author brandizi
@@ -27,21 +49,42 @@ public class LayersBuilder
 	private Set<Node> endNodes = null;
 	private SortedSet<Node> startNodes = new TreeSet<Node> ();
 	
+	/**
+	 * Allows to know all the nodes in a given layer, which is needed for completing the layering computation.
+	 */
 	private SortedMap<Integer, SortedSet<Node>> layer2Nodes = new TreeMap<Integer, SortedSet<Node>> ();
+	
+	/**
+	 * Allows to know the layer a node is associated to. This is initially null.
+	 */
 	private Map<Node, Integer> node2Layer = new HashMap<Node, Integer> (); 
+	
+	/**
+	 * The max layer index that was computed.
+	 */
 	private int maxLayer = -1;
 	
+	/**
+	 * You can pass any set of nodes that allow one to reach the sinks, i.e. the rightmost end nodes.
+	 */
 	public LayersBuilder ( Set<Node> nodes )
 	{
 		this.nodes = nodes;
 	}
-	
+
+	/**
+	 * Compute the end nodes by walking the graph.
+	 */
 	private void initEndNodes () 
 	{
 		endNodes = new HashSet<Node> ();
 		for ( Node n: nodes ) initEndNodes ( n, endNodes );
 	}
 	
+	/**
+	 * recursion for {@link #initEndNodes()}.
+	 *
+	 */
 	private void initEndNodes ( Node node, Set<Node> result ) 
 	{
 		if ( node.getOutputs ().isEmpty () ) {
@@ -55,6 +98,10 @@ public class LayersBuilder
 		return;
 	}
 	
+	/**
+	 * Set the layer for a node, wich means all the two internal structures used for that are updated.
+	 * 
+	 */
 	private void setLayer ( Node node, int layer ) 
 	{
 		// Remove from the old layer
@@ -74,6 +121,11 @@ public class LayersBuilder
 		if ( layer > maxLayer ) maxLayer = layer;
 	}
 	
+	/**
+	 * The first stage of the layering algorithm, layer indexes are computed by walking the graph upstream, i.e.: 
+	 * layer ( n ) = max ( layer ( in ) ) for each in in {@link Node#getInputs()}. This is the recursive step.   
+	 * 
+	 */
 	private int computeUntypedLayer ( Node node )
 	{
 		Integer result = node2Layer.get ( node );
@@ -93,15 +145,10 @@ public class LayersBuilder
 	}
 
 	/**
-	 * It's simply n.getTabValues ().get ( 0 ).getHeaders ().get ( 0 ), i.e., the first header, which is something like
-	 * "Source Name" or "Data File Name". 
-	 *  
+	 * The first stage of the layering algorithm, layer indexes are computed by walking the graph upstream, i.e.: 
+	 * layer ( n ) = max ( layer ( in ) ) for each in in {@link Node#getInputs()}.   
+	 * 
 	 */
-	private String getType ( Node n )
-	{
-		return n.getTabValues ().get ( 0 ).getHeaders ().get ( 0 );
-	}
-	
 	private void computeUntypedLayers ()
 	{
 		initEndNodes ();
@@ -110,24 +157,33 @@ public class LayersBuilder
 	}
 
 	
+	/**
+	 * Computes the typed layers. It first invoked {@link #computeUntypedLayers()} and then walks all the layers, 
+	 * adjusting all the nodes that have not the same types of the others. {@link Node#getOrder()} is used to determine
+	 * which nodes have to shift on the right. Look at the code for details!
+	 * 
+	 */
 	private void computeTypedLayers ()
 	{
 		computeUntypedLayers ();
 		
+		// Go through all the layers.
 		for ( int layer = 0; layer < maxLayer; layer++ ) 
 		{
 			List<Node> layerNodes = new ArrayList<Node> ( layer2Nodes.get ( layer ) );
 			int nn = layerNodes.size ();
 			
+			// All the node pairs in the layer
 			for ( int i = 0; i < nn; i++ )
 			{
 				Node n = layerNodes.get ( i );
 				for ( int j = i + 1; j < nn; j++ )
 				{
 					Node m = layerNodes.get ( j );
+
 					// null means the node has gone to another layer
 					if ( m == null ) continue;
-					if ( getType ( n ).equals ( getType ( m ) ) ) continue;
+					if ( n.getType().equals ( m.getType () ) ) continue;
 					
 					int no = n.getOrder (), mo = m.getOrder ();
 
@@ -181,8 +237,10 @@ public class LayersBuilder
 							shift2Right ( m, layerNodes, j );
 					}
 					else if ( no <= mo )
+						// Move the node with greater order
 						shift2Right ( m, layerNodes, j );
 					else {
+						// At this point we're sure that no > mo and they're != -1 
 						shift2Right ( n );
 						break;
 					}
@@ -193,16 +251,35 @@ public class LayersBuilder
 		isInitialized = true;
 	}
 
-
-
+	/**
+	 * Shifts the node to the right (i.e.: increase its layer index) and starts the propagation of that on the right side, 
+	 * by invoking {@link #shift2Right(Node, List, int) shift2Right ( n, null, -1 )}.
+	 * 
+	 */
 	private void shift2Right ( Node n ) {
 		shift2Right ( n, null, -1 );
 	}
 
+	/**
+	 * Shifts the node to the right (i.e.: increase its layer index) and starts the propagation of that on the right side,  
+	 * by invoking {@link #shift2Right(Node, int, Set, List, int) shift2Right ( n, -1, new HashSet(), layerNodes, nodeIdx )}.
+	 */
 	private void shift2Right ( Node n, List<Node> layerNodes, int nodeIdx ) {
 		shift2Right ( n, -1, new HashSet<Node> (), layerNodes, nodeIdx );
 	}
 
+
+	/**
+	 * Shifts the node to the right (i.e.: increase its layer index) and recursively propagates that on the right side.
+	 * visitedNodes allows it to stop the propagation on nodes that were already touched by this recursion. 
+
+	 * @param n the node to be shifted, the method will recurse over n.getOutputs()
+	 * @param prevNewLayer is the layer index that was computed by the previous recursive call (initially it is -1)
+	 * @param visitedNodes allows it to stop the propagation on nodes that were already touched by this recursion
+	 * @param layerNodes is the initial layer where the node is, if it is not null, the node will be removed from there
+	 * @param nodeIdx is the initial layer index the node has i.e., this.layer2Nodes.get(nodeIdx) = n and it is used to
+	 * remove the node from its original layer (if layerNodes != null). 
+	 */
 	private void shift2Right ( Node n, int prevNewLayer, Set<Node> visitedNodes, List<Node> layerNodes, int nodeIdx )
 	{
 		// Visited, give up
@@ -223,7 +300,19 @@ public class LayersBuilder
 			layerNodes.set ( nodeIdx, null );
 	}
 	
-	
+	/**
+	 * The minimal order on the left side of the node. That is: 
+	 * <ul>
+	 *   <li>l0 = min ( nl.getOrder() != -1 and for all nl in m:layer(m) = layer(n) - 1)</li>
+	 *   <li>if no node with order != -1 exist on the immediate left, layer(n) - 2,3,4... are evaluated the same way, 
+	 *   the final result is -1 if we reach the leftmost side of the graph</li>
+	 * </ul>
+	 * 
+	 * This means that we seek for the node having a significant order that is closer to the current node, if no such 
+	 * node exists, we signal that by returning -1 (proper decisions are taken in {@link #computeTypedLayers()} in 
+	 * such cases, see there).
+	 *   
+	 */
 	private int minOrderLeft ( Node n )
 	{
 		int nl = node2Layer.get ( n );
@@ -241,7 +330,11 @@ public class LayersBuilder
 		return -1;
 	}
 	
-
+	/**
+	 * Computes the minimal order on the right side of the node, using the same approach described in 
+	 * {@link #minOrderLeft(Node)}. 
+	 * 
+	 */
 	private int minOrderRight ( Node n )
 	{
 		int nl = node2Layer.get ( n );
@@ -266,31 +359,52 @@ public class LayersBuilder
 		return -1;
 	}
 
-	
+	/**
+	 * Exposes the layer index to the world.
+	 */
 	public int getLayer ( Node n ) 
 	{
 		if ( !isInitialized ) computeTypedLayers ();
 		return node2Layer.get ( n );
 	}
 	
+	/**
+	 * Exposes the layer nodes to the world, the returned set is unmodifiable.
+	 */
 	public SortedSet<Node> getLayerNodes ( int layer ) 
 	{
 		if ( !isInitialized ) computeTypedLayers ();
 		return Collections.unmodifiableSortedSet ( layer2Nodes.get ( layer ) );
 	}
-	
+
+	/**
+	 * The highest layer index that was computed, minimal is 0 and hence there are maxLayer + 1 layer, every layer has
+	 * at least a node, which also means there is at least one source-to-sink path that touches it.
+	 * 
+	 */
 	public int getMaxLayer ()
 	{
 		if ( !isInitialized ) computeTypedLayers ();
 		return maxLayer;
 	}
 
+	/**
+	 * Exposes the computed initial nodes to the world, they are passed to {@link ChainsBuilder}, faster than passing all 
+	 * the graph. 
+	 * 
+	 */
 	public SortedSet<Node> getStartNodes ()
 	{
 		if ( !isInitialized ) computeTypedLayers ();
 		return Collections.unmodifiableSortedSet ( startNodes );
 	}
 	
+	/**
+	 * This is used by {@link ChainsBuilder}, that class transform the graph into a set of chains, by duplicating nodes and
+	 * splitting their initial set of edges. This means that we need to save here the layering information for these 
+	 * new nodes, which can be done via this method.
+	 *   
+	 */
 	public void addSplittedNode ( Node original, Node newn ) 
 	{
 		Integer layer = node2Layer.get ( original );
@@ -301,6 +415,9 @@ public class LayersBuilder
 		layer2Nodes.get ( layer ).add ( newn );
 	}
 	
+	/**
+	 * A representation of the current graph layering, useful for debugging. 
+	 */
 	@Override
 	public String toString ()
 	{

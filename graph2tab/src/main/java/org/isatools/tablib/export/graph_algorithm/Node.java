@@ -134,14 +134,17 @@ public interface Node extends Comparable<Node>
 	public List<TabValueGroup> getTabValues ();
 
 	/**
-	 * The algorithm implemented in {@link ChainsBuilder} needs to make detached duplicates of nodes, ie: nodes that
-	 * represent the same experimental entity of the source and haven't any of its incident edges (which will be properly
-	 * added by the export logics). This is what this method has to do. The result should return exactly the same result
-	 * for {@link #getTabValues()}. It is <b>very</b> important that the result is <b>distinct</b> from to the origin, ie:
-	 * {@link Object#equals(Object)} and {@link Object#hashCode()} must reflect such diversity.
+	 * The node's type is used to arrange nodes into columns, only nodes of the same type can be under the same group
+	 * of columns. Moreover, the type is used to compute the node's layer, by {@link LayersBuilder}. 
+	 * The typical default for this is getTabValues ().get ( 0 ).getHeaders ().get ( 0 ), i.e.: the first header, 
+	 * something like 'Source Name' or 'Protocol REF'. There might be cases where the type is a different string, 
+	 * e.g.: there might be two nodes both having 'Protocol REF' as first header but having the types 
+	 * 'Sampling Protocol' and 'Extraction Protocol'. In such a case the two nodes would go into different columns. 
+	 * 
 	 */
-	public Node createIsolatedClone ();
-
+	public String getType (); 
+	
+	
 	/**
 	 * This is information to be used for rearranging the graph layering when two nodes fall into the same layer but have 
 	 * a different type (the type is always the first header returned by {@link #getTabValues()}).
@@ -157,5 +160,15 @@ public interface Node extends Comparable<Node>
 	 * See also LayerBuilder TODO.
 	 */
 	public int getOrder ();
+
+	/**
+	 * The algorithm implemented in {@link ChainsBuilder} needs to make detached duplicates of nodes, ie: nodes that
+	 * represent the same experimental entity of the source and haven't any of its incident edges (which will be properly
+	 * added by the export logics). This is what this method has to do. The result should return exactly the same result
+	 * for {@link #getTabValues()}. It is <b>very</b> important that the result is <b>distinct</b> from to the origin, ie:
+	 * {@link Object#equals(Object)} and {@link Object#hashCode()} must reflect such diversity.
+	 */
+	public Node createIsolatedClone ();
+
 
 }

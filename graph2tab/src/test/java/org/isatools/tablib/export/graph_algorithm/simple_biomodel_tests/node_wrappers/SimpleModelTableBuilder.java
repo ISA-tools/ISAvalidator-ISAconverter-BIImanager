@@ -54,7 +54,7 @@ import java.util.Set;
 
 /**
  * An example of custom implementation of {@link TableBuilder}. Typically you'll want to extend this
- * class to be able to initialize it with your object model nodes.
+ * class to be able to initialise it with your object model nodes.
  * <p/>
  * <dl><dt>date</dt><dd>Jun 1, 2010</dd></dl>
  *

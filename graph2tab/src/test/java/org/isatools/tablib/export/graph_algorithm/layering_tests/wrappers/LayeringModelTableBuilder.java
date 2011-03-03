@@ -53,13 +53,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * TODO: comment me!
+ * A specific table builder for the model used for layering tests. 
+ *   
  * <dl><dt>date</dt><dd>Feb 25, 2011</dd></dl>
  * @author brandizi
  *
  */
 public class LayeringModelTableBuilder extends TableBuilder 
 {
+	/**
+	 * It just uses the {@link NodeFactory} to create initial wrappers and pass them to the parent class, as usually. 
+	 * 
+	 */
 	public LayeringModelTableBuilder ( Set<ExperimentNode> nodes ) 
 	{
 		super ( new HashSet<Node>(), true );

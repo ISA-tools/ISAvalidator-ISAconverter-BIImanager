@@ -74,12 +74,17 @@ import java.util.TreeSet;
 public abstract class ExpNodeWrapper extends DefaultAbstractNode
 {
 	/**
-	 * TODO: Comment me!
+	 * We use either this model or an extension of it (see package org.isatools.tablib.export.graph_algorithm.layering_tests.model), 
+	 * A different factory is needed for either case. This is not a typical case, probably it will be more common to get the
+	 * factory via some static getInstance() method.
+	 *  
 	 */
 	private final NodeFactory nodeFactory; 
 		
 	/**
-	 * TODO: comment me!
+	 * This is used in {@link #getOrder()} to establish the order of a node. Basically {@link Node#getType()} is used to 
+	 * lookup this map and get the order. This is a typical simple method to establish the order of a node, another may
+	 * be tracking the column of the spreadsheet the node comes from.
 	 */
 	@SuppressWarnings ( "serial" )
 	public static final Map<String, Integer> TYPE_ORDER = new HashMap<String, Integer> () 
@@ -193,8 +198,11 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode
 	}
 
 	/**
-	 * This is used for TODO. 
+	 * This is used in the layering_tests package only. 
 	 * 
+	 * As explained above, this is used to re-order nodes of different types and solve certain ambiguities, e.g., to know
+	 * that "Sample Name" comes after "Source Name". 
+	 *  
 	 * It uses a typical implementation, consisting in looking at an type order table, like {@link #TYPE_ORDER}, using the
 	 * first header as key. -1 is returned if nothing is found in this table.
 	 *  

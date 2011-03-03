@@ -90,7 +90,7 @@ class ChainsBuilder {
 
 
     /**
-     * Initializes the graph to be exported with any set of nodes that allow to reach the sources and, from them, the final
+     * Initialises the graph to be exported with any set of nodes that allow to reach the sources and, from them, the final
      * destinations. The resulting graph must be layered (see the introduction above).
      * 
      * @param layersBuilder it's used in case layering is required, the method 

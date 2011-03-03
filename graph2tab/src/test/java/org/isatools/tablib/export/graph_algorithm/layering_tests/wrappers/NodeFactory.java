@@ -54,7 +54,7 @@ import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.Ex
 import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wrappers.ExpNodeWrapper;
 
 /**
- * TODO: comment me!
+ * It extends from the simple model node factory and adds the new nodes added to the new model used for testing.
  * 
  * <dl>
  * <dt>date</dt>
