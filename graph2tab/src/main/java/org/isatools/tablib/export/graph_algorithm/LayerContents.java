@@ -54,6 +54,7 @@ import uk.ac.ebi.utils.collections.SortedObjectStore;
 
 import java.util.*;
 
+
 /**
  * Provides a representation of the layers in the graph. A layer is a set of homogeneous nodes having the same distance
  * from the sources (eg: the initial column of sources or all the samples after the source column).
@@ -168,6 +169,27 @@ class LayerContents
 	}
 
 	/**
+	 * Add all the headers
+	 */
+	public void addAllHeaders ( int layer, Collection<String> newHeaders )
+	{
+		if ( newHeaders == null )
+		{
+			return;
+		}
+		LayerContent layerCont = getLayerContent ( layer );
+		int newHsz = newHeaders.size ();
+		List<String> lheaders = layerCont.headers;
+		lheaders.addAll ( newHeaders );
+		for ( int i = 0; i < newHsz; i++ )
+		{
+			layerCont.colSizes.add ( 0 );
+		}
+		ncols += newHsz;
+	}
+
+	
+	/**
 	 * Adds an header in the icol position an shifts all on the right, like in {@link List#add(int, Object)}
 	 */
 	public int addHeader ( int layer, int icol, String header )
@@ -208,25 +230,6 @@ class LayerContents
 		return lheaders.size ();
 	}
 
-	/**
-	 * Add all the headers
-	 */
-	public void addAllHeaders ( int layer, Collection<String> newHeaders )
-	{
-		if ( newHeaders == null )
-		{
-			return;
-		}
-		LayerContent layerCont = getLayerContent ( layer );
-		int newHsz = newHeaders.size ();
-		List<String> lheaders = layerCont.headers;
-		lheaders.addAll ( newHeaders );
-		for ( int i = 0; i < newHsz; i++ )
-		{
-			layerCont.colSizes.add ( 0 );
-		}
-		ncols += newHsz;
-	}
 
 	/**
 	 * The headers for this layer
@@ -324,12 +327,12 @@ class LayerContents
 		{
 			// It has not been populated with real nodes yet (we're skipping some layers): just set the row counters and it 
 			// will be enough
-			if ( layerCont.colsMaxSize++ > nrows ) nrows++;
+			if ( ++layerCont.colsMaxSize > nrows ) nrows++;
 			return;
 		}
 		
 		// It's a null node, so it's like to add a null value to the first header.
-		set ( layer, nrows, 0, null );
+		set ( layer, layerCont.colsMaxSize, 0, null );
 	}
 	
 	
@@ -388,4 +391,39 @@ class LayerContents
 		nrows = ncols = 0;
 	}
 
+	/**
+	 * @return report of current contents
+	 * 
+	 */
+	@Override
+	public String toString ()
+	{
+		StringBuffer sb = new StringBuffer ();
+		sb.append ( "-- ROWS: " + this.nrows + ", COLS: " + this.ncols + "\n\n");
+		for ( int layer: layerContents.keySet () )
+		{
+			LayerContent layerCont = layerContents.get ( layer );
+			sb.append ( "---- LAYER: " + layer + ", colsMaxSize = " + layerCont.colsMaxSize + "\n" );
+			int ncols = layerCont.headers.size ();
+			if ( ncols == 0 )
+				sb.append ( "  --empty--" );
+			else
+			{
+				sb.append ( "\t\t" );
+				for ( int col = 0; col < ncols; col++ )
+					sb.append ( col + ": " + layerCont.headers.get ( col ) + "\t\t" );
+				sb.append ( "\n" );
+				for ( int row = 0; row < layerCont.colsMaxSize; row++ )
+				{
+					sb.append ( row + ":\t\t" );
+					for ( int col = 0; col < ncols; col++ )
+						sb.append ( col + ": " + get ( layer, row, col ) + "\t\t" );
+					sb.append ( "\n" );
+				}
+			}
+			sb.append ( "\n" );
+		}
+		return sb.toString ();
+	}
+	
 }

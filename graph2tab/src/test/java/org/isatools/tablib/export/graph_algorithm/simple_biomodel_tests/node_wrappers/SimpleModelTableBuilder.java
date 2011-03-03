@@ -68,7 +68,7 @@ public class SimpleModelTableBuilder extends TableBuilder {
 	 */
 	public SimpleModelTableBuilder ( Set<ExperimentNode> nodes ) 
 	{
-		super ( new HashSet<Node>(), false );
+		super ( new HashSet<Node>() );
 		NodeFactory nodeFact = NodeFactory.getInstance();
 		for (ExperimentNode node : nodes) {
 			this.nodes.add(nodeFact.getNode(node));

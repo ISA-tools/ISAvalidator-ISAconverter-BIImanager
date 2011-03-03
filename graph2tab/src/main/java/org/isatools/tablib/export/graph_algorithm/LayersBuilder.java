@@ -142,7 +142,7 @@ public class LayersBuilder
 						int lefto = minOrderLeft ( n );
 						int righto = minOrderRight ( n );
 						
-						// All the nodes on L/R side (or both) are "doesn't matter" nodes, so let's shift the "good" node, based on
+						// All the nodes on L or R side (or both) are "doesn't matter" nodes, so let's shift the "good" node, based on
 						// the assumption that it's more usual to specify a protocol's application output and omit the input, rather
 						// than vice versa.
 						// 

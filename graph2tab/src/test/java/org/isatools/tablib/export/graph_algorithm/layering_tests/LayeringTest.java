@@ -6,15 +6,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.isatools.tablib.export.graph_algorithm.TableBuilder;
+import org.isatools.tablib.export.graph_algorithm.layering_tests.model.BioExtract;
 import org.isatools.tablib.export.graph_algorithm.layering_tests.model.BioSample;
 import org.isatools.tablib.export.graph_algorithm.layering_tests.model.BioSource;
 import org.isatools.tablib.export.graph_algorithm.layering_tests.wrappers.LayeringModelTableBuilder;
-import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.BioMaterial;
 import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.Data;
 import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.ExperimentNode;
 import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.ProtocolRef;
 import org.junit.Test;
 
+/**
+ * TODO: comment me! 
+ * TODO: write real result checking! 
+ * 
+ * <dl><dt>date</dt><dd>Mar 2, 2011</dd></dl>
+ * @author brandizi
+ *
+ */
 public class LayeringTest
 {
 	/**
@@ -46,7 +54,7 @@ public class LayeringTest
 		src2.addOutput ( proto1 );
 
 		BioSample sample = new BioSample ( "sample" );
-		sample.addCharacteristic ( "Matrial Type", "RNA", "RNA", "MGED-Ontology" );
+		sample.addCharacteristic ( "Material Type", "RNA", "RNA", "MGED-Ontology" );
 
 		sample.addInput ( proto1 );
 		
@@ -66,6 +74,75 @@ public class LayeringTest
 
 		Set<ExperimentNode> nodes = new HashSet<ExperimentNode> ();
 		nodes.add ( sample );
+
+		TableBuilder tb = new LayeringModelTableBuilder ( nodes );
+		out.println ( tb.report () );
+	}
+	
+	/**
+	 * <p>Tests the graph:<br/><br/> <img src = 'ex_uneven_graph_1.gif' />.</p>
+	 *  
+	 * <p>Which yelds this:</p>
+	 * <p> 
+	 * <pre>
+	 *  Source Name |                    Sample Name |                    Sample Name |                   Protocol REF |                   Protocol REF |                   Extract Name | 
+	 *         null |                       Sample 1 |                       Sample 2 |                           null |                           null |                             x1 | 
+	 *         null |                       Sample 1 |                           null |            treating protocol 1 |            treating protocol 2 |                             x1 | 
+	 *     source 1 |                           null |                       Sample 2 |                           null |                           null |                             x1 | 
+	 *     source 1 |                       Sample 3 |                           null |            sampling protocol 3 |                           null |                           null | 
+	 *     source 1 |                           null |                           null |                           null |                           null |                             x2 | 	 
+	 * </pre>
+	 * </p>
+	 */
+	@Test
+	public void testUnevenGraph1 ()
+	{
+		out.println ( "_______ TEST UNEVEN GRAPH 1 ________ " );
+
+		BioSource sr1 = new BioSource ( "source 1" );
+		sr1.addCharacteristic ( "Organism", "Mus Musculus", "123", "NCBI" );
+		sr1.addCharacteristic ( "Age", "10 weeks", null, null );
+
+		BioSample sm1 = new BioSample ( "Sample 1" );
+		sm1.addCharacteristic ( "Material Type", "RNA", "RNA", "MGED-Ontology" );
+		
+		BioSample sm3 = new BioSample ( "Sample 3" );
+
+		sm3.addInput ( sr1 );
+		
+		
+		ProtocolRef p3 = new ProtocolRef ( "sampling protocol 3" );
+		p3.addParameter ( "Sampling Quantity", "10 ml", null, null );
+
+		p3.addInput ( sm3 );
+		
+		BioSample sm2 = new BioSample ( "Sample 2" );
+		sm2.addCharacteristic ( "Organism Part", "liver", null, null );
+		
+		sm2.addInput ( sm1 );
+		sm2.addInput ( sr1 );
+		
+		ProtocolRef p1 = new ProtocolRef ( "treating protocol 1" );
+
+		p1.addInput ( sm1 );
+		
+		ProtocolRef p2 = new ProtocolRef ( "treating protocol 2" );
+		
+		p2.addInput ( p1 );
+		
+		BioExtract x1 = new BioExtract ( "x1" );
+
+		BioExtract x2 = new BioExtract ( "x2" );
+		x2.addCharacteristic ( "Material Type", "DNA", "123", "OBI" );
+
+		x1.addInput ( p2 );
+		x1.addInput ( sm2 );
+		x2.addInput ( sr1 );
+
+		Set<ExperimentNode> nodes = new HashSet<ExperimentNode> ();
+		nodes.add ( x1 );
+		nodes.add ( x2 );
+		nodes.add ( p3 );
 
 		TableBuilder tb = new LayeringModelTableBuilder ( nodes );
 		out.println ( tb.report () );

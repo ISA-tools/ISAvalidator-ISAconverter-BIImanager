@@ -139,6 +139,7 @@ class ChainsBuilder {
         for (Node n : new LinkedList<Node>(startNodes)) {
             normalize(n, true);
         }
+        isInitialized = true;
     }
 
     /**

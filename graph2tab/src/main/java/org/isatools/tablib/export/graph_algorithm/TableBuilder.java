@@ -80,7 +80,10 @@ public class TableBuilder
 	protected List<List<String>> table = null;
 
 	/**
-	 * This defaults isLayeringRequired to true, hence, it is advisable that you pass the sinks to this constructor.
+	 * This defaults isLayeringRequired to true and keeps the nodes to work with uninitialised, you have to do it in your
+	 * specific constructor. Hence, it is advisable that you setup this.nodes with the sinks after the call to this 
+	 * constructor.
+	 *  
 	 */
 	protected TableBuilder ()
 	{
@@ -96,13 +99,16 @@ public class TableBuilder
 	}
 
 	/**
-	 * Nodes can be all the nodes in the graph or a subset like this: 
+	 * Nodes can be all the nodes in the graph or a subset like this:
+	 *  
 	 * <ul>
 	 *   <li>in case isLayeringRequired = true, you can pass the sinks only, 
 	 *   ie: all the right-most nodes, which have no output and allow you to reach the rest of the graph</li>
-	 *   <li>in case isLayeringRequired = false, you can pass the sources onlu, ie those nodes on the left-most side of
+	 *   <li>in case isLayeringRequired = false, you can pass the sources only, ie those nodes on the left-most side of
 	 *   the graph, which don't have inputs and allow you to reach the rest of the graph</li>
 	 * </ul>
+	 * 
+	 * Passing the node subsets described will speed things up a little. 
 	 * 
 	 * @parameter isLayeringRequired true means that the graph may be uneven (with missing steps in the path from sources to sinks)
 	 * and therefore it will require that layers are computed via {@link LayersBuilder}. Set this parameter to false
@@ -159,17 +165,17 @@ public class TableBuilder
 				
 				// This flag is final, so javac optimises a bit here
 				if ( !isLayeringRequired ) layer++;
-			}
+				
+			} // while on chain nodes
 
 			if ( isLayeringRequired )
 			{
-				// Fill-in-the-blanks untile the last layer
+				// Fill-in-the-blanks until the last layer
 				int maxLayer = layersBuilder.getMaxLayer ();
 				for ( int layeri = prevLayer + 1; layeri <= maxLayer; layeri++ )
 					layerContents.addNullRow ( layeri );
 			}
-
-		}
+		} // for chain
 		
 		table = new LayersListView ( layerContents );
 		return table;
