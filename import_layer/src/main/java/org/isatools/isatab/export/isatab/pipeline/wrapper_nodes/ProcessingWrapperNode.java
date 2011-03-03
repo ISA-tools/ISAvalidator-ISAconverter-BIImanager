@@ -98,9 +98,6 @@ public class ProcessingWrapperNode extends GraphElementWrapperNode {
         for (int order : mpapps.keySet()) {
             initProtocolApp(mpapps.get(order));
         }
-
-//		headers.add ( "Processing Name" );
-//		values.add ( processing.getAcc () );
     }
 
     /**
