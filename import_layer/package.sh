@@ -4,11 +4,8 @@
 
 #MVNOPTS="--offline"
 
-cd ../graph2tab
-mvn2 $MVNOPTS -Dmaven.test.skip=true clean install
-
 cd ../import_layer
-mvn2 $MVNOPTS -Ptools,build_cmd_deps -Dmaven.test.skip=true clean package
+mvn $MVNOPTS -Ptools,build_cmd_deps -Dmaven.test.skip=true clean package
 
 # This is necessary due to some wrong packaging in one of our dependencies
 # Final jar won't work unless you remove this silly file
