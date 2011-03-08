@@ -88,16 +88,14 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode
 	 */
 	@SuppressWarnings ( "serial" )
 	public static final Map<String, Integer> TYPE_ORDER = new HashMap<String, Integer> () 
-	{
-		{
-			put ( "Source Name", 0 );
-			put ( "Sample Name", 1 );
-			put ( "Extract Name", 2 );
-			put ( "Labeled Extract Name", 3 );
-			put ( "Assay Name", 4 );
-			put ( "Data File Name", 5 );
-		}
-	};
+	{{
+		put ( "Source Name", 0 );
+		put ( "Sample Name", 1 );
+		put ( "Extract Name", 2 );
+		put ( "Labeled Extract Name", 3 );
+		put ( "Assay Name", 4 );
+		put ( "Data File Name", 5 );
+	}};
 	
 	private ExperimentNode base;
 
@@ -210,7 +208,7 @@ public abstract class ExpNodeWrapper extends DefaultAbstractNode
 	@Override
 	public int getOrder ()
 	{
-		String header = getTabValues ().get ( 0 ).getHeaders ().get ( 0 );
+		String header = getType();
 		Integer order = TYPE_ORDER.get ( header );
 		return order == null ? -1 : order;
 	}
