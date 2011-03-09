@@ -12,4 +12,4 @@ mvn $MVNOPTS -Ptools,build_cmd_deps -Dmaven.test.skip=true clean package
 #
 zip target/import_layer_deps.jar -d '\*.class'
 
-mvn2 $MVNOPTS -Ptools,build_cmd -Dmaven.test.skip=true package
+mvn $MVNOPTS -Ptools,build_cmd -Dmaven.test.skip=true package
