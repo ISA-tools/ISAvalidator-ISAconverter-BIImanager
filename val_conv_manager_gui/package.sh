@@ -8,9 +8,6 @@
 pwd=$(dirname $0)
 cd $pwd
 
-cd ../graph2tab
-mvn $MVNOPTS -Dmaven.test.skip=true clean install
-
 cd ../import_layer
 mvn $MVNOPTS -Ptools -Dmaven.test.skip=true clean install
 
