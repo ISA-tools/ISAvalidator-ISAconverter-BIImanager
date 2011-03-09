@@ -2,4 +2,4 @@ mvn2 clean test -DargLine="-Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=5
     -Dsurefire.useFile=true \
     -Ph2,test 
 #-Dtest=ISAConfigurationBatchTest
-mvn2 -Ph2,test surefire-report:report-only
+mvn -Ph2,test surefire-report:report-only
