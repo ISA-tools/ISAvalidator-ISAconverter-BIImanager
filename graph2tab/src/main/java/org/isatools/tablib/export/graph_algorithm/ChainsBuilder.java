@@ -65,7 +65,7 @@ import java.util.*;
  * at any given layer. The latter means eg.: that the sources are all biosources and at distance 1 from them there
  * are always bio-samples. All the nodes involved must be reachable from the parameter passed to the constructor.
  * <p/>
- * <p><b>DEBUGGING NOTE</b>: you can see how the intial graph is transformed by setting the system property
+ * <p><b>DEBUGGING NOTE</b>: you can see how the initial graph is transformed by setting the system property
  * graph2tab.debug_mode=true. This can be done this way in maven:
  * <pre>
  *   mvn -DargLine='-Dgraph2tab.debug_mode=true' -Dtest=[YourTest] test
@@ -81,17 +81,25 @@ class ChainsBuilder {
     private SortedSet<Node> startNodes = null;
     private boolean isInitialized = false;
 
+    private LayersBuilder layersBuilder;
+    
     /**
      * Used for debugging code, number file names about dumped DOT graphs
      */
     private static int dotFileNoCounter = 0;
 
+
     /**
-     * Initializes the graph to be exported with any set of nodes that allow to reach the sources and, from them, the final
-     * destinations. The resulting graph must ne layered (see the introduction above).
+     * Initialises the graph to be exported with any set of nodes that allow to reach the sources and, from them, the final
+     * destinations. The resulting graph must be layered (see the introduction above).
+     * 
+     * @param layersBuilder it's used in case layering is required, the method 
+     * {@link LayersBuilder#addSplittedNode(Node, Node)} will be invoked every time a node is split, so that its
+     * layering information is updated. null means we don't require layering at all (cause the graph is even).
      */
-    public ChainsBuilder(Set<Node> nodes) {
+    public ChainsBuilder(Set<Node> nodes, LayersBuilder layersBuilder ) {
         this.nodes = nodes;
+        this.layersBuilder = layersBuilder;
     }
 
     /**
@@ -131,6 +139,7 @@ class ChainsBuilder {
         for (Node n : new LinkedList<Node>(startNodes)) {
             normalize(n, true);
         }
+        isInitialized = true;
     }
 
     /**
@@ -157,6 +166,10 @@ class ChainsBuilder {
         if (startNodes.contains(node)) {
             startNodes.add(clone);
         }
+        
+        if ( layersBuilder != null )
+        	layersBuilder.addSplittedNode ( node, clone );
+        
         return clone;
     }
 
@@ -225,7 +238,7 @@ class ChainsBuilder {
                 }
             }
         } else if (nins == 1 && nouts == 1) {
-            // Already normalized node, let's gain a bit of performance by cut it short
+            // Already normalized node, let's gain a bit of performance by stopping if we're coming back from the right
             //
             if (isTowardRight) {
                 normalize(outs.get(0), true);

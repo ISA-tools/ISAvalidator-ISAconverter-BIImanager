@@ -61,7 +61,7 @@ import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.Pr
  * @author brandizi
  */
 public class NodeFactory extends AbstractNodeFactory<ExpNodeWrapper, ExperimentNode> {
-	private NodeFactory() {
+	protected NodeFactory() {
 	}
 
 	private static final NodeFactory instance = new NodeFactory();
@@ -80,13 +80,13 @@ public class NodeFactory extends AbstractNodeFactory<ExpNodeWrapper, ExperimentN
 	@Override
 	protected ExpNodeWrapper createNewNode(ExperimentNode base) {
 		if (base instanceof BioMaterial) {
-			return new BioMaterialWrapper((BioMaterial) base);
+			return new BioMaterialWrapper((BioMaterial) base, this );
 		}
 		if (base instanceof Data) {
-			return new DataWrapper((Data) base);
+			return new DataWrapper((Data) base, this );
 		}
 		if (base instanceof ProtocolRef) {
-			return new ProtocolRefWrapper((ProtocolRef) base);
+			return new ProtocolRefWrapper((ProtocolRef) base, this );
 		}
 		throw new IllegalArgumentException(
 				"Node of type " + base.getClass().getSimpleName() + " not supported"

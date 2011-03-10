@@ -53,83 +53,122 @@ import java.util.SortedSet;
 /**
  * The Node interface.
  * <p/>
- * Defines the minimal that is needed for what concerns the conversion of an experimental graph into
- * a tabular representation (such as ISATAB or MAGETAB).
+ * Defines the minimal that is needed for what concerns the conversion of an experimental graph into a tabular
+ * representation (such as ISATAB or MAGETAB).
  * <p/>
- * What it is needed is essentially: 1) the set of input and output nodes and 2) the list of header/value pairs
- * that will represent the graph node in the final spreadsheet. For instance, a biological sample object would be
- * a node and &lt;Characteristic [ "Organism" ],mus musculus&gt; would be an example of element provided by
- * {@link #getTabValues()}.
+ * What it is needed is essentially: 1) the set of input and output nodes and 2) the list of header/value pairs that
+ * will represent the graph node in the final spreadsheet. For instance, a biological sample object would be a node and
+ * &lt;Characteristic [ "Organism" ],mus musculus&gt; would be an example of element provided by {@link #getTabValues()}.
  * <p/>
- * <dl><dt>date</dt><dd>May 10, 2010</dd></dl>
- *
+ * <dl>
+ * <dt>date</dt>
+ * <dd>May 10, 2010</dd>
+ * </dl>
+ * 
  * @author brandizi
  */
-public interface Node extends Comparable<Node> {
-    /**
-     * The inputs of the node.
-     * Should not return a modifiable set.
-     * <p/>
-     * <p>Nodes are sorted, because we need to rely on the same order over multiple
-     * calls of this method. The particular order you implement can be arbitrary, the important thing is that there is one.
-     * {@link DefaultAbstractNode} has a convenient implementation of {@link DefaultAbstractNode#compareTo(Node)}.</p>
-     */
-    public SortedSet<Node> getInputs();
+public interface Node extends Comparable<Node>
+{
+	/**
+	 * The inputs of the node. Should not return a modifiable set.
+	 * <p/>
+	 * <p>
+	 * Nodes are sorted, because we need to rely on the same order over multiple calls of this method. The particular
+	 * order you implement can be arbitrary, the important thing is that there is one. {@link DefaultAbstractNode} has a
+	 * convenient implementation of {@link DefaultAbstractNode#compareTo(Node)}.
+	 * </p>
+	 */
+	public SortedSet<Node> getInputs ();
 
-    /**
-     * Modifiers <b>must be symmetric</b>, when
-     * an input is added/removed, the corresponding output
-     * is added removed on the other side.
-     * <p>As usually, they should return true if they made actual changes.</p>
-     */
-    public boolean addInput(Node input);
+	/**
+	 * Modifiers <b>must be symmetric</b>, when an input is added/removed, the corresponding output is added removed on
+	 * the other side.
+	 * <p>
+	 * As usually, they should return true if they made actual changes.
+	 * </p>
+	 */
+	public boolean addInput ( Node input );
 
-    /**
-     * Modifiers <b>must be symmetric</b>, when
-     * an input is added/removed, the corresponding output
-     * is added removed on the other side.
-     * <p>As usually, they should return true if they made actual changes.</p>
-     */
-    public boolean removeInput(Node input);
+	/**
+	 * Modifiers <b>must be symmetric</b>, when an input is added/removed, the corresponding output is added/removed on
+	 * the other side.
+	 * <p>
+	 * As usually, they should return true if actual changes was actually made.
+	 * </p>
+	 */
+	public boolean removeInput ( Node input );
 
-    /**
-     * The outputs of the node.
-     * Should not return a modifiable set.
-     * <p/>
-     * <p>Nodes are sorted, because we need to rely on the same order over multiple
-     * calls of this method. The particular order you implement can be arbitrary, the important thing is that there is one.
-     * {@link DefaultAbstractNode} has a convenient implementation of {@link DefaultAbstractNode#compareTo(Node)}.</p>
-     */
-    public SortedSet<Node> getOutputs();
+	/**
+	 * The outputs of the node. Should not return a modifiable set.
+	 * <p/>
+	 * <p>
+	 * Nodes are sorted, because we need to rely on the same order over multiple calls of this method. The particular
+	 * order you implement can be arbitrary, the important thing is that there is one. {@link DefaultAbstractNode} has a
+	 * convenient implementation of {@link DefaultAbstractNode#compareTo(Node)}.
+	 * </p>
+	 */
+	public SortedSet<Node> getOutputs ();
 
-    /**
-     * Modifiers <b>must be symmetric</b>, when
-     * an input is added/removed, the corresponding output
-     * is added removed on the other side.
-     * <p>As usually, they should return true if they made actual changes.</p>
-     */
-    public boolean addOutput(Node output);
+	/**
+	 * Modifiers <b>must be symmetric</b>, when an input is added/removed, the corresponding output is added removed on
+	 * the other side.
+	 * <p>
+	 * As usually, they should return true if they made actual changes.
+	 * </p>
+	 */
+	public boolean addOutput ( Node output );
 
-    /**
-     * Modifiers <b>must be symmetric</b>, when
-     * an input is added/removed, the corresponding output
-     * is added removed on the other side.
-     * <p>As usually, they should return true if they made actual changes.</p>
-     */
-    public boolean removeOutput(Node output);
+	/**
+	 * Modifiers <b>must be symmetric</b>, when an input is added/removed, the corresponding output is added removed on
+	 * the other side.
+	 * <p>
+	 * As usually, they should return true if actual changes was actually made.
+	 * </p>
+	 */
+	public boolean removeOutput ( Node output );
 
-    /**
-     * The pairs of header/value that this node need to report in the exported spreadsheet.
-     * Should return an unmodifiable structure.
-     */
-    public List<TabValueGroup> getTabValues();
+	/**
+	 * The pairs of header/value that this node need to report in the exported spreadsheet. Should return an unmodifiable
+	 * structure.
+	 */
+	public List<TabValueGroup> getTabValues ();
 
-    /**
-     * The algorithm implemented in {@link ChainsBuilder} needs to make detached duplicates of nodes, ie: nodes that
-     * represent the same experimental entity of the source and haven't any of its incident edges (which will be
-     * properly added by the export logics). This is what this method has to do. The result should return exactly the same
-     * result for {@link #getTabValues()}. It is <b>very</b> important that the result is <b>distinct</b> from to the
-     * origin, ie: {@link Object#equals(Object)} and {@link Object#hashCode()} must reflect such diversity.
-     */
-    public Node createIsolatedClone();
+	/**
+	 * The node's type is used to arrange nodes into columns, only nodes of the same type can be under the same group
+	 * of columns. Moreover, the type is used to compute the node's layer, by {@link LayersBuilder}. 
+	 * The typical default for this is getTabValues ().get ( 0 ).getHeaders ().get ( 0 ), i.e.: the first header, 
+	 * something like 'Source Name' or 'Protocol REF'. There might be cases where the type is a different string, 
+	 * e.g.: there might be two nodes both having 'Protocol REF' as first header but having the types 
+	 * 'Sampling Protocol' and 'Extraction Protocol'. In such a case the two nodes would go into different columns. 
+	 * 
+	 */
+	public String getType (); 
+	
+	
+	/**
+	 * This is information to be used for rearranging the graph layering when two nodes fall into the same layer but have 
+	 * a different type (the type is always the first header returned by {@link #getTabValues()}).
+	 * This can be assigned in different ways. One way is to say that eg, the order of a node of type 'Source Name' is 0, 
+	 * 'Sample Name' is 1 etc. Nodes that have not a particular oder requirement, such as 'Protocol REF' should have -1
+	 * as order (-1 should be the default value). Another approach, to be applied to graphs initially created from tabular
+	 * input (eg, from a MAGETAB or ISATAB submission), is to track the column the nodes came from and return this as order. 
+	 * We manage the layering rearrangement with this parameter independently on the particular meaning you assign to it. 
+	 * For instance, an advanced thing to to in the case of 'Protocol REF' nodes could be going back to the protcol type
+	 * that the node refers to and establish the order on the basis of that, eg, 'Sample Treatment' come before 
+	 * 'Labeled Extract'. 
+	 * 
+	 * See also LayerBuilder TODO.
+	 */
+	public int getOrder ();
+
+	/**
+	 * The algorithm implemented in {@link ChainsBuilder} needs to make detached duplicates of nodes, ie: nodes that
+	 * represent the same experimental entity of the source and haven't any of its incident edges (which will be properly
+	 * added by the export logics). This is what this method has to do. The result should return exactly the same result
+	 * for {@link #getTabValues()}. It is <b>very</b> important that the result is <b>distinct</b> from to the origin, ie:
+	 * {@link Object#equals(Object)} and {@link Object#hashCode()} must reflect such diversity.
+	 */
+	public Node createIsolatedClone ();
+
+
 }

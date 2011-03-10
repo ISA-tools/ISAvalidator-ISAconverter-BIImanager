@@ -58,14 +58,14 @@ import java.util.Map;
  * the proper column within the layer, while the row is the one passed to the constructor.
  */
 class SingleLayersRowView extends AbstractList<String> implements Comparable<SingleLayersRowView> {
-    private final LayerContents layerContents;
+    private final TableContents layerContents;
     private final Map<Integer, int[]> col2LayerColMap;
     private final int size, irow;
 
     private static final String UNSUPPORTED_MSG = "The table view created by the ISATAB export cannot be modified";
 
 
-    public SingleLayersRowView(LayerContents layerContents, Map<Integer, int[]> col2LayerColMap, int irow) {
+    public SingleLayersRowView(TableContents layerContents, Map<Integer, int[]> col2LayerColMap, int irow) {
         this.layerContents = layerContents;
         this.col2LayerColMap = col2LayerColMap;
         this.size = col2LayerColMap.size();

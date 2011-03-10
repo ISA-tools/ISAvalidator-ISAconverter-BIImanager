@@ -54,7 +54,7 @@ import java.util.Set;
 
 /**
  * An example of custom implementation of {@link TableBuilder}. Typically you'll want to extend this
- * class to be able to initialize it with your object model nodes.
+ * class to be able to initialise it with your object model nodes.
  * <p/>
  * <dl><dt>date</dt><dd>Jun 1, 2010</dd></dl>
  *
@@ -66,12 +66,12 @@ public class SimpleModelTableBuilder extends TableBuilder {
 	 * you cannot choose to exclude sub-graphs that are connected to these nodes. In order to do that
 	 * you should work with the implementation of your {@link Node} interface.
 	 */
-	public SimpleModelTableBuilder(Set<ExperimentNode> nodes) {
-		this.nodes = new HashSet<Node>();
+	public SimpleModelTableBuilder ( Set<ExperimentNode> nodes ) 
+	{
+		super ( new HashSet<Node>() );
 		NodeFactory nodeFact = NodeFactory.getInstance();
 		for (ExperimentNode node : nodes) {
 			this.nodes.add(nodeFact.getNode(node));
 		}
 	}
-
 }

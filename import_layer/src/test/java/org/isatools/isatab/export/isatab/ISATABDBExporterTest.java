@@ -191,6 +191,7 @@ public class ISATABDBExporterTest extends TransactionalDBUnitEJB3DAOTest {
 		// TODO: check they were moved to the repo
 	}
 
+
 	@Test
 	public void testGUIInvoker() throws Exception {
 		// Loads the test submission

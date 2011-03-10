@@ -69,7 +69,7 @@ public class SimpleBioModelTest {
 	 * <p/>
 	 * <pre>
 	 * src1   proto1   sample   proto2   data1
-	 * src2            sample   proto3   data2
+	 * src2   proto1   sample   proto3   data2
 	 * </pre>
 	 */
 	@Test

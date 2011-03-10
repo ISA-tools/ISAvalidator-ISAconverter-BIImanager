@@ -4,9 +4,6 @@
 
 #MVNOPTS="--offline"
 
-cd ../graph2tab
-mvn $MVNOPTS -Dmaven.test.skip=true clean install
-
 cd ../import_layer
 mvn $MVNOPTS -Ptools,build_cmd_deps -Dmaven.test.skip=true clean package
 

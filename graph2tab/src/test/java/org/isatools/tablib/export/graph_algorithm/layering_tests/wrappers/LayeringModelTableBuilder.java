@@ -43,37 +43,34 @@
  * EU NuGO [NoE 503630](http://www.nugo.org/everyone) projects and in part by EMBL-EBI.
  */
 
-package org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.node_wrappers;
+package org.isatools.tablib.export.graph_algorithm.layering_tests.wrappers;
 
 import org.isatools.tablib.export.graph_algorithm.Node;
-import org.isatools.tablib.export.graph_algorithm.TabValueGroup;
-import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.ProtocolRef;
+import org.isatools.tablib.export.graph_algorithm.TableBuilder;
+import org.isatools.tablib.export.graph_algorithm.simple_biomodel_tests.model.ExperimentNode;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * <dl><dt>date</dt><dd>Jun 1, 2010</dd></dl>
- *
+ * A specific table builder for the model used for layering tests. 
+ *   
+ * <dl><dt>date</dt><dd>Feb 25, 2011</dd></dl>
  * @author brandizi
+ *
  */
-public class ProtocolRefWrapper extends ExpNodeWrapper {
-	public ProtocolRefWrapper(ProtocolRef base, NodeFactory nodeFactory ) {
-		super(base, nodeFactory);
-	}
-
-	private ProtocolRefWrapper(ExpNodeWrapper original) {
-		super(original);
-	}
-
+public class LayeringModelTableBuilder extends TableBuilder 
+{
 	/**
-	 * @return getTabValues ( "Protocol REF", "Parameter Value" )
+	 * It just uses the {@link NodeFactory} to create initial wrappers and pass them to the parent class, as usually. 
+	 * 
 	 */
-	public List<TabValueGroup> getTabValues() {
-		return getTabValues("Protocol REF", "Parameter Value");
+	public LayeringModelTableBuilder ( Set<ExperimentNode> nodes ) 
+	{
+		super ( new HashSet<Node>(), true );
+		NodeFactory nodeFact = NodeFactory.getInstance();
+		for (ExperimentNode node : nodes) {
+			this.nodes.add(nodeFact.getNode(node));
+		}
 	}
-
-	public Node createIsolatedClone() {
-		return new ProtocolRefWrapper(this);
-	}
-
 }

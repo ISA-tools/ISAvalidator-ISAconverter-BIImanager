@@ -19,7 +19,6 @@
     <modules>
         <module>import_layer</module>
         <module>val_conv_manager_gui</module>
-        <module>graph2tab</module>
     </modules>
 
 

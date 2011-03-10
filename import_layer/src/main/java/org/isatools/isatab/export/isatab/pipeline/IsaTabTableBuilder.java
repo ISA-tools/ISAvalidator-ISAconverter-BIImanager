@@ -64,8 +64,7 @@ import java.util.List;
 
 /**
  * Builds a table view of an experimental pipeline, taken from an instance of the BII model.
- * Uses the approach described in  section 3.3.2 of
- * <a href = "http://annotare.googlecode.com/files/MAGE-TABv1.1.pdf">this document</a>.
+ * Uses the graph2tab package.
  *
  * @author brandizi
  *         <b>date</b>: Dec 16, 2009
@@ -87,7 +86,7 @@ public class IsaTabTableBuilder extends TableBuilder {
      * store is needed to populate it with met ontology sources.
      */
     public IsaTabTableBuilder(BIIObjectStore store, Study study, String assayFileId) {
-        super();
+        super ( null, false );
         this.store = store;
         this.study = study;
         this.assayFileId = assayFileId;
@@ -102,6 +101,10 @@ public class IsaTabTableBuilder extends TableBuilder {
     }
 
 
+    /**
+     * Prepares the nodes to be exported by starting from the study's assays and going back to either the sources or the 
+     * left-most nodes belonging to assay files.
+     */
     @SuppressWarnings("unchecked")
     @Override
     public List<List<String>> getTable() {
@@ -158,7 +161,7 @@ public class IsaTabTableBuilder extends TableBuilder {
 //	public boolean wantSample () {
 //		return assayFileId == null;
 //	}
-
+    
     public String getSampleFileId() {
         return
                 study.getSingleAnnotationValue(ProcessingEntityTabMapper.SAMPLE_FILE_ANNOTATION_TAG);
