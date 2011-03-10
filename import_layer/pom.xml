@@ -6,7 +6,7 @@
     <groupId>org.isatools</groupId>
     <artifactId>import_layer</artifactId>
     <packaging>jar</packaging>
-    <version>1.2</version>
+    <version>1.2.1</version>
     <name>ISA Import Layer and Command Line Tools</name>
     <url>http://isatab.sf.net/</url>
     <description>
@@ -17,7 +17,7 @@
     <parent>
         <groupId>uk.ac.ebi</groupId>
         <artifactId>bioinvindex</artifactId>
-        <version>1.3</version>
+        <version>1.3.1</version>
 
         <!-- TODO: will we need to move the import layer under the BII hat? -->
         <!-- <relativePath>../../bioinvindex/pom.xml</relativePath> -->
@@ -36,6 +36,13 @@
         <jdbc.version>1.0.76</jdbc.version>
 
     </properties>
+
+    <repositories>
+        <repository>
+            <id>lutin</id>
+            <url>http://lutinbuilder.labs.libre-entreprise.org/maven2/net/sourceforge/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
 
@@ -75,6 +82,19 @@
             <artifactId>pride-core</artifactId>
             <type>jar</type>
             <version>2.7.1</version>
+
+            <exclusions>
+                <exclusion>
+                    <groupId>cpdetector</groupId>
+                    <artifactId>cpdetector</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>cpdetector</groupId>
+            <artifactId>cpdetector</artifactId>
+            <version>1.04</version>
         </dependency>
 
         <dependency>

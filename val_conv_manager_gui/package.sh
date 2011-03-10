@@ -15,7 +15,7 @@ cd ../import_layer
 mvn $MVNOPTS -Ptools -Dmaven.test.skip=true clean install
 
 cd ../val_conv_manager_gui
-mvn $MVNOPTS -Pbuild_base,tools -Dmaven.test.skip=true clean package 
+mvn $MVNOPTS -Pbuild_base,tools -Dmaven.test.skip=true clean package
 
 cd target
 

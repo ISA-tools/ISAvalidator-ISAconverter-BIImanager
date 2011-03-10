@@ -132,7 +132,7 @@ public class ISATABUnloader {
             if (ts.isActive()) {
                 ts.rollback();
             }
-            throw new TabInternalErrorException("Error while perforiming the unloading:" + e.getMessage());
+            throw new TabInternalErrorException("Error while performing the unloading:" + e.getMessage());
         }
         finally {
             session.flush();
