@@ -135,7 +135,7 @@ class ChainsBuilder {
      */
     private void buildPaths() {
         initStartNodes();
-
+        // DEBUG outDot ( System.err );      
         for (Node n : new LinkedList<Node>(startNodes)) {
             normalize(n, true);
         }

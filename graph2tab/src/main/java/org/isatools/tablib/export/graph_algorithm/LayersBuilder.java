@@ -177,12 +177,16 @@ public class LayersBuilder
 			for ( int i = 0; i < nn; i++ )
 			{
 				Node n = layerNodes.get ( i );
+				// null means the node has gone to another layer
+				if ( n == null ) continue; 
+				
 				for ( int j = i + 1; j < nn; j++ )
 				{
 					Node m = layerNodes.get ( j );
-
 					// null means the node has gone to another layer
 					if ( m == null ) continue;
+					
+					// Same type, they're OK, go ahead
 					if ( n.getType().equals ( m.getType () ) ) continue;
 					
 					int no = n.getOrder (), mo = m.getOrder ();

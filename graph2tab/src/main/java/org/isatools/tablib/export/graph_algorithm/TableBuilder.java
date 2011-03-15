@@ -296,7 +296,7 @@ public class TableBuilder
 
 	
 	/**
-	 * @return A string representation of {@link #getTable()}, to be used for debugging puorposes.
+	 * @return A string representation of {@link #getTable()}, to be used for debugging purposes.
 	 */
 	public String report ()
 	{
