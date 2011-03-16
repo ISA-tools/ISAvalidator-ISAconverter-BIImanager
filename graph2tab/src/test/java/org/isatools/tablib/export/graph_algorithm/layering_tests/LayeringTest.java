@@ -149,4 +149,34 @@ public class LayeringTest
 		TableBuilder tb = new LayeringModelTableBuilder ( nodes );
 		out.println ( tb.report () );
 	}
+	
+	@Test
+	public void testCloseSameTypes ()
+	{
+		out.println ( "_______ TEST FOR CLOSE SAME TYPES ________ " );
+
+		BioSample sample1 = new BioSample ( "sample 1" );
+		sample1.addCharacteristic ( "Material Type", "RNA", "RNA", "MGED-Ontology" );
+
+		BioSample sample2 = new BioSample ( "sample 2" );
+		sample2.addInput ( sample1 );
+		
+		ProtocolRef proto1 = new ProtocolRef ( "treatment protocol 1" );
+		proto1.addParameter ( "Foo Quantity", "10 ml", null, null );
+		proto1.addInput ( sample1 );
+		
+		BioSample sample4 = new BioSample ( "sample 4" );
+		sample4.addInput ( proto1 );
+		
+		BioExtract xtract1 = new BioExtract ( "extract 1" );
+		xtract1.addInput ( sample2 );
+
+		Set<ExperimentNode> nodes = new HashSet<ExperimentNode> ();
+		nodes.add ( sample4 );
+		nodes.add ( xtract1 );
+
+		TableBuilder tb = new LayeringModelTableBuilder ( nodes );
+		out.println ( tb.report () );
+	}
+	
 }

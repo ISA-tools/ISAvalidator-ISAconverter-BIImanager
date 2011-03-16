@@ -312,40 +312,65 @@ class ChainsBuilder {
      * A facility useful for debugging. Outputs a syntax that can be used by GraphViz to show the graph being
      * built.
      */
-    public void outDot(PrintStream out) {
+    public void outDot(PrintStream out) 
+    {
         Map<Node, Integer> ids = new HashMap<Node, Integer>();
         Set<Node> visited = new HashSet<Node>();
 
         out.println("strict digraph ExperimentalPipeline {");
         out.println("  graph [rankdir=LR];");
-
-        for (Node node : startNodes) {
+        
+        for (Node node : startNodes)
             outDot(out, ids, visited, node);
-        }
 
+        // Adds up the layers if available
+        if ( layersBuilder != null )
+        {
+        	out.println ();
+
+        	int maxLayer = layersBuilder.getMaxLayer ();
+        	for ( int layer = 0; layer <= maxLayer; layer++ )
+        	{
+        		Set<Node> lnodes = layersBuilder.getLayerNodes ( layer );
+        		if ( lnodes == null || lnodes.isEmpty () ) continue;
+        		
+        		out.println ( "    // layer " + layer );
+        		out.print   ( "    { rank = same" );
+        		for ( Node node: lnodes ) {
+        			int nodeid = ids.get ( node );
+        			out.print ( "; " + nodeid ); 
+        		}
+        		out.println ( " }\n" );
+        	}
+        	out.println ();
+        }
+        
         out.println("}");
     }
 
     /**
      * @see #outDot(PrintStream).
      */
-    private void outDot(PrintStream out, Map<Node, Integer> ids, Set<Node> visited, Node node) {
-        if (visited.contains(node)) {
+    private void outDot(PrintStream out, Map<Node, Integer> ids, Set<Node> visited, Node node) 
+    {
+        if (visited.contains(node))
             return;
-        }
         visited.add(node);
 
         String nodelbl = node.toString();
         Integer nodeid = ids.get(node);
-        if (nodeid == null) {
+        if (nodeid == null) 
+        {
             nodeid = ids.size();
             ids.put(node, nodeid);
             out.println("  " + nodeid + "[label = \"" + nodelbl + "\"];");
         }
 
-        for (Node nout : node.getOutputs()) {
+        for (Node nout : node.getOutputs()) 
+        {
             Integer outid = ids.get(nout);
-            if (outid == null) {
+            if (outid == null) 
+            {
                 outid = ids.size();
                 ids.put(nout, outid);
                 String outlbl = nout.toString();

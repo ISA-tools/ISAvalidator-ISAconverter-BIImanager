@@ -212,6 +212,13 @@ public class LayersBuilder
 						// Shift based on the side m is closer to, with respect to the layers preceding/following n
 						// The rationale is that nodes like "Protocol REF" shift closer to their output side, reflecting the fact
 						// that if one specifies a protocol omitting the input is more likely than omitting the output.
+						// 
+						// Note that when the node m is part of a chain of nodes having the same type (e.g.: sample1->sample2->sampl3
+						// in one path and sample4->protocol1->sample5 in the other, where m = sample2 and n = protocol1)
+						// it is that node (sample2), and not the other (protocol1), that is shifted. This is because likely
+						// there are paths that didn't need multiple processing to elements of the same type (sample5 was 
+						// likely obtained straight from sample4, without requiring an intermediate like sample2). Again, this is 
+						// euristics based on experience with real use cases.
 						//
 						if ( righto - mo <= mo - lefto )
 							shift2Right ( m, layerNodes, j );
@@ -280,7 +287,9 @@ public class LayersBuilder
 	 * @param n the node to be shifted, the method will recurse over n.getOutputs()
 	 * @param prevNewLayer is the layer index that was computed by the previous recursive call (initially it is -1)
 	 * @param visitedNodes allows it to stop the propagation on nodes that were already touched by this recursion
-	 * @param layerNodes is the initial layer where the node is, if it is not null, the node will be removed from there
+	 * @param layerNodes is the initial layer where the node is, if it is not null, the node will be removed from there. This
+	 * parameter is sent here, cause {@link #computeTypedLayers()} needs to maintain an updated list of the nodes in the 
+	 * layer it is being processing.
 	 * @param nodeIdx is the initial layer index the node has i.e., this.layer2Nodes.get(nodeIdx) = n and it is used to
 	 * remove the node from its original layer (if layerNodes != null). 
 	 */
