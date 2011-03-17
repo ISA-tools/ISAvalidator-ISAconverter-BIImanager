@@ -3,6 +3,7 @@
 <schema xmlns:cfg="http://www.ebi.ac.uk/bii/isatab_configuration#" xmlns="http://www.w3.org/2001/XMLSchema"
         targetNamespace="http://www.ebi.ac.uk/bii/isatab_configuration#"
         elementFormDefault="qualified">
+
     <element name="field" type="cfg:FieldType"/>
 
     <complexType name="FieldType">
@@ -17,6 +18,8 @@
         </all>
         <attribute name="header" type="string"/>
         <attribute name="data-type" type="string"/>
+        <attribute name="section" type="string" use="optional"/>
+        <attribute name="is-hidden" type="boolean" use="optional"/>
         <attribute name="is-file-field" type="boolean"/>
         <attribute name="is-multiple-value" type="boolean"/>
         <attribute name="is-required" type="boolean"/>
@@ -55,7 +58,6 @@
         <attribute name="protocol-type" type="string"/>
         <attribute name="data-type" type="string"/>
         <attribute name="is-required" type="boolean"/>
-        <attribute name="is-editable" type="boolean"/>
     </complexType>
 
 
@@ -69,7 +71,6 @@
         <attribute name="data-type" type="string"/>
         <attribute name="is-multiple-value" type="boolean"/>
         <attribute name="is-required" type="boolean"/>
-        <attribute name="is-editable" type="boolean"/>
     </complexType>
 
     <element name="recommended-ontologies" type="cfg:RecommendedOntologiesType"/>
@@ -133,8 +134,7 @@
                 certain endpoint/technology is specified in the
                 ISA Configuration, but the ISATAB Assay Type (i.e.: the value of this attribute) is not, then the ISA
                 configuration is used for performing
-                the validation and the internal Import Layer configuration is used to see if there is an ISATAB type
-                that
+                the validation and the internal IL configuration is used to see if there is an ISATAB type that
                 corresponds to the pair.
                 If the pair is not even defined in the ISA Configuration, then the import layer will try to use the
                 values defined in its internal
