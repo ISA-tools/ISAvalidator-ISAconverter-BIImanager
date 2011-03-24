@@ -237,7 +237,19 @@ public class DataFilesDispatcher {
                     continue;
                 }
 
-                File srcFile = new File(sourcePath + "/" + srcFileRelPath);
+                // Relative paths occur e.g. for an unzipped, self-contained ISAtab archive,
+                // Absolute paths can be expected if the ISAtab files are describing data 
+                // on a local filesystem
+                //
+                // TODO: make this platform independent (c:\data\...) !!
+                
+                File srcFile;
+                if (srcFileRelPath.startsWith("/")) {
+                    srcFile = new File(srcFileRelPath);                                            
+                } else {
+                    srcFile = new File(sourcePath + "/" + srcFileRelPath);
+                }
+
                 File targetDir = new File(targetPath);
                 File targetFile = new File(targetPath + "/" + srcFileRelPath);
 
