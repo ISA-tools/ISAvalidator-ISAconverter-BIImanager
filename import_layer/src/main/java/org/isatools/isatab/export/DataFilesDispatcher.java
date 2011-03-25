@@ -262,7 +262,13 @@ public class DataFilesDispatcher {
                                 + "': they seem to be the same.");
                     } else {
                         log.trace("Copying data file '" + fieldHeader + "' / '" + srcFileRelPath + "' to data repository...");
-                        FileUtils.copyFileToDirectory(srcFile, targetDir, true);
+
+                        if (srcFile.isDirectory()) {
+                            FileUtils.copyDirectory(srcFile, targetDir, true);
+                        } else {
+                            FileUtils.copyFileToDirectory(srcFile, targetDir, true);
+                        }
+
                         // Needed cause of a bug in the previous function
                         targetFile.setLastModified(srcFile.lastModified());
                         log.trace("...done");
