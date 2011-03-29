@@ -85,9 +85,7 @@ public abstract class DefaultAbstractNode implements Node
 		synchronized ( DefaultAbstractNode.class )
 		{
 			if ( size == Long.MAX_VALUE )
-			{
 				throw new RuntimeException ( "No more integers for generating nodes!" );
-			}
 			id = size++;
 		}
 	}
@@ -299,7 +297,7 @@ public abstract class DefaultAbstractNode implements Node
 			return "{Node " + id + "}";
 		}
 		TabValueGroup tbg = tbvs.get ( 0 );
-		return tbg.getHeaders ().get ( 0 ) + ": " + tbg.getValues ().get ( 0 );
+		return getType () + ": " + tbg.getValues ().get ( 0 );
 	}
 
 }

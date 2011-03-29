@@ -133,13 +133,15 @@ public class LayersBuilder
 		
 		result = -1;
 		SortedSet<Node> ins = node.getInputs ();
-		if ( ins.isEmpty () ) startNodes.add ( node );
 		
-		for ( Node in: node.getInputs () )
-		{
-			int il = computeUntypedLayer ( in );
-			if ( result < il ) result = il;
-		}
+		if ( ins.isEmpty () ) 
+			startNodes.add ( node );
+		else
+			for ( Node in: ins )
+			{
+				int il = computeUntypedLayer ( in );
+				if ( result < il ) result = il;
+			}
 		setLayer ( node, ++result );
 		return result;
 	}

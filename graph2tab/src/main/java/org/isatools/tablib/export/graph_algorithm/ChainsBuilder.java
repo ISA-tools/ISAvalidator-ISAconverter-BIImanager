@@ -52,6 +52,8 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * <p>The graph-to-table conversion algorithm.</p>
  * <p/>
@@ -131,11 +133,12 @@ class ChainsBuilder {
     }
 
     /**
-     * Loops over {@link #getStartNodes()} and applies {@link #normalize(Node, boolean)} to all the graph.
+     * Loops over {@link #getStartNodes()} and applies {@link #normalize(Node, boolean)} to all the graph. The result
+     * is a graph of chains, ie, the paths to build the table.
+     * 
      */
     private void buildPaths() {
         initStartNodes();
-        // DEBUG outDot ( System.err );      
         for (Node n : new LinkedList<Node>(startNodes)) {
             normalize(n, true);
         }
@@ -184,23 +187,44 @@ class ChainsBuilder {
      *                       edge going back to the left. by passing false to this parameter, the method knows it is going back and not
      *                       traversing the graph for the first time. See the source code for details.
      */
-    private void normalize(Node node, boolean isTowardRight) {
-        if ("true".equals(System.getProperty("graph2tab.debug_mode"))) {
-            try {
-                PrintStream outstr = new PrintStream(new File("/tmp/g2t_chains_builder_" + ++dotFileNoCounter + ".dot"));
-                outDot(outstr);
-                outstr.close();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+    private void normalize(Node node, boolean isTowardRight) 
+    {
+    		boolean isDebug = "true".equals ( System.getProperty ( "graph2tab.debug_mode" ));
+        if ( isDebug ) 
+        {
+	        try 
+	        {
+	            PrintStream outstr = new PrintStream(new File("/tmp/g2t_chains_builder_" + ++dotFileNoCounter + ".dot"));
+	            outDot(outstr, node);
+	            outstr.close();
+	        }
+	        catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        
+	        //if ( nlabel.contains ( "Sample Name: AG Culture (B)" ) )
+	        //System.out.println ( "Working with the target assay " + nlabel + " at graph " + dotFileNoCounter );
         }
 
+        
         List<Node> ins = new LinkedList<Node>(node.getInputs());
         List<Node> outs = new LinkedList<Node>(node.getOutputs());
 
         int nins = ins.size(), nouts = outs.size();
 
+        if ( isDebug )
+        {
+	        String nlabel = node.toString ();
+	        Throwable t = new Throwable ();
+	        t.fillInStackTrace ();
+	        int depth = t.getStackTrace ().length - 4;
+	        System.out.println ( 
+	        	StringUtils.repeat ( " ", depth ) 
+	        		+ dotFileNoCounter + ": " + nlabel + " " + ( isTowardRight ? ">" : "<" ) 
+	        );
+	        if ( isTowardRight && nouts == 0 || nins == 0 ) System.out.println ();
+        }
+        
         if (nins == 0 || startNodes.contains(node)) {
             // Starting nodes, do the splitting if more than 1 out
             //
@@ -232,6 +256,7 @@ class ChainsBuilder {
             }
 
             // Propagate back
+            // TODO: should be redundant, test without
             if (isTowardRight) {
                 for (Node in : ins) {
                     normalize(in, false);
@@ -311,75 +336,99 @@ class ChainsBuilder {
     /**
      * A facility useful for debugging. Outputs a syntax that can be used by GraphViz to show the graph being
      * built.
+     * 
      */
-    public void outDot(PrintStream out) 
+    public void outDot(PrintStream out )
     {
-        Map<Node, Integer> ids = new HashMap<Node, Integer>();
-        Set<Node> visited = new HashSet<Node>();
+    	outDot ( out, null );
+    }
 
-        out.println("strict digraph ExperimentalPipeline {");
-        out.println("  graph [rankdir=LR];");
-        
-        for (Node node : startNodes)
-            outDot(out, ids, visited, node);
-
-        // Adds up the layers if available
-        if ( layersBuilder != null )
-        {
-        	out.println ();
-
-        	int maxLayer = layersBuilder.getMaxLayer ();
-        	for ( int layer = 0; layer <= maxLayer; layer++ )
-        	{
-        		Set<Node> lnodes = layersBuilder.getLayerNodes ( layer );
-        		if ( lnodes == null || lnodes.isEmpty () ) continue;
-        		
-        		out.println ( "    // layer " + layer );
-        		out.print   ( "    { rank = same" );
-        		for ( Node node: lnodes ) {
-        			int nodeid = ids.get ( node );
-        			out.print ( "; " + nodeid ); 
-        		}
-        		out.println ( " }\n" );
-        	}
-        	out.println ();
-        }
-        
-        out.println("}");
+    /**
+     * A facility useful for debugging. Outputs a syntax that can be used by GraphViz to show the graph being
+     * built.
+     */
+    public void outDot(PrintStream out, Node currentNode ) 
+    {
+	    Map<Node, Integer> ids = new HashMap<Node, Integer>();
+	    Set<Node> visited = new HashSet<Node>();
+	
+	    out.println("strict digraph ExperimentalPipeline {");
+	    out.println("  graph [rankdir=LR];");
+	    
+	    for (Node node : startNodes)
+	        outDot(out, ids, visited, node, currentNode );
+	
+	    // Adds up the layers if available
+	    if ( layersBuilder != null )
+	    {
+	    	out.println ();
+	
+	    	int maxLayer = layersBuilder.getMaxLayer ();
+	    	for ( int layer = 0; layer <= maxLayer; layer++ )
+	    	{
+	    		Set<Node> lnodes = layersBuilder.getLayerNodes ( layer );
+	    		if ( lnodes == null || lnodes.isEmpty () ) continue;
+	    		
+	    		out.println ( "    // layer " + layer );
+	    		out.print   ( "    { rank = same" );
+	    		for ( Node node: lnodes ) {
+	    			int nodeid = ids.get ( node );
+	    			out.print ( "; " + nodeid ); 
+	    		}
+	    		out.println ( " }\n" );
+	    	}
+	    	out.println ();
+	    }
+	    
+	    out.println("}");
     }
 
     /**
      * @see #outDot(PrintStream).
      */
-    private void outDot(PrintStream out, Map<Node, Integer> ids, Set<Node> visited, Node node) 
+    private void outDot(PrintStream out, Map<Node, Integer> ids, Set<Node> visited, Node node, Node currentNode ) 
     {
-        if (visited.contains(node))
-            return;
-        visited.add(node);
+	    if (visited.contains(node))
+	        return;
+	    visited.add(node);
 
-        String nodelbl = node.toString();
-        Integer nodeid = ids.get(node);
-        if (nodeid == null) 
-        {
-            nodeid = ids.size();
-            ids.put(node, nodeid);
-            out.println("  " + nodeid + "[label = \"" + nodelbl + "\"];");
-        }
-
-        for (Node nout : node.getOutputs()) 
-        {
-            Integer outid = ids.get(nout);
-            if (outid == null) 
-            {
-                outid = ids.size();
-                ids.put(nout, outid);
-                String outlbl = nout.toString();
-                out.println("  " + outid + "[label = \"" + outlbl + "\"];");
-            }
-
-            out.println("  " + nodeid + " -> " + outid + ";");
-            outDot(out, ids, visited, nout);
-        }
+	    // The rainbow can help in tracking the graph manually.
+	    final String[] colors = { "black", "red", "blue", "magenta", "green", "orange", "purple", "turquoise" }; 
+	    
+	    String nodelbl = node.toString();
+	    Integer nodeid = ids.get(node);
+	    if (nodeid == null) 
+	    {
+	        nodeid = ids.size();
+	        ids.put(node, nodeid);
+	        String bgcolor = node.equals ( currentNode ) ? "yellow" : "white";
+	        String color = colors [ nodeid % colors.length ];
+	        out.println ( 
+	        	"  " + nodeid 
+	        	+ "[label = \"" + nodelbl + "\", style = filled, color = " + color + ", fillcolor = " + bgcolor + "];"
+	        );
+	    }
+	
+	    for (Node nout : node.getOutputs()) 
+	    {
+	        Integer outid = ids.get(nout);
+	        if (outid == null) 
+	        {
+	            outid = ids.size();
+	            ids.put(nout, outid);
+	            String outlbl = nout.toString();
+	  	        String bgcolor = nout.equals ( currentNode ) ? "yellow" : "white";
+	  	        String color = colors [ outid % colors.length ];
+	            out.println(
+	            	"  " + outid 
+	            	+ "[label = \"" + outlbl + "\", style = filled, color = " + color + ", fillcolor = " + bgcolor + "];"
+	            );
+	        }
+	
+	        String color = colors [ ( nodeid + outid ) % colors.length ];
+	        out.println("  " + nodeid + " -> " + outid + "[color = " + color + "];");
+	        outDot(out, ids, visited, nout, currentNode);
+	    }
     }
 
 }
