@@ -55,380 +55,381 @@ import java.util.*;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * <p>The graph-to-table conversion algorithm.</p>
+ * <p>
+ * The graph-to-table conversion algorithm.
+ * </p>
  * <p/>
- * <p>This applies the method of node splitting: when an experimental graph node is not normalized, ie: has not at most
- * one input and at most one output, it is duplicated into multiple nodes, so that it is possible to redistribute the
- * excess of nodes. The final result is that the initial graph to be converted is transformed into a set of chains, each
- * corresponding to one row of the exported spreadsheet.</p>
+ * <p>
+ * This applies the method of node splitting: when an experimental graph node is not normalized, ie: has not at most one
+ * input and at most one output, it is duplicated into multiple nodes, so that it is possible to redistribute the excess
+ * of nodes. The final result is that the initial graph to be converted is transformed into a set of chains, each
+ * corresponding to one row of the exported spreadsheet.
+ * </p>
  * <p/>
- * <p><b>PLEASE NOTE</b>: we assume that the graph is already layered, ie: every path from a source (a node without inputs)
+ * <p>
+ * <b>PLEASE NOTE</b>: we assume that the graph is already layered, ie: every path from a source (a node without inputs)
  * to a destination (a node without outputs) has the same number of nodes of the others and has the same type of nodes
- * at any given layer. The latter means eg.: that the sources are all biosources and at distance 1 from them there
- * are always bio-samples. All the nodes involved must be reachable from the parameter passed to the constructor.
+ * at any given layer. The latter means eg.: that the sources are all biosources and at distance 1 from them there are
+ * always bio-samples. All the nodes involved must be reachable from the parameter passed to the constructor.
  * <p/>
- * <p><b>DEBUGGING NOTE</b>: you can see how the initial graph is transformed by setting the system property
+ * <p>
+ * <b>DEBUGGING NOTE</b>: you can see how the initial graph is transformed by setting the system property
  * graph2tab.debug_mode=true. This can be done this way in maven:
+ * 
  * <pre>
  *   mvn -DargLine='-Dgraph2tab.debug_mode=true' -Dtest=[YourTest] test
  * </pre
+ * 
  * </p>
  * <p/>
- * <dl><dt>date</dt><dd>May 10, 2010</dd></dl>
- *
+ * <dl>
+ * <dt>date</dt>
+ * <dd>May 10, 2010</dd>
+ * </dl>
+ * 
  * @author brandizi
  */
-class ChainsBuilder {
-    private Set<Node> nodes;
-    private SortedSet<Node> startNodes = null;
-    private boolean isInitialized = false;
+class ChainsBuilder
+{
+	private Set<Node> nodes;
+	private SortedSet<Node> startNodes = null;
+	private boolean isInitialized = false;
 
-    private LayersBuilder layersBuilder;
-    
-    /**
-     * Used for debugging code, number file names about dumped DOT graphs
-     */
-    private static int dotFileNoCounter = 0;
+	private LayersBuilder layersBuilder;
 
+	/**
+	 * Used for debugging code, number file names about dumped DOT graphs
+	 */
+	private static int dotFileNoCounter = 0;
 
-    /**
-     * Initialises the graph to be exported with any set of nodes that allow to reach the sources and, from them, the final
-     * destinations. The resulting graph must be layered (see the introduction above).
-     * 
-     * @param layersBuilder it's used in case layering is required, the method 
-     * {@link LayersBuilder#addSplittedNode(Node, Node)} will be invoked every time a node is split, so that its
-     * layering information is updated. null means we don't require layering at all (cause the graph is even).
-     */
-    public ChainsBuilder(Set<Node> nodes, LayersBuilder layersBuilder ) {
-        this.nodes = nodes;
-        this.layersBuilder = layersBuilder;
-    }
+	/**
+	 * Initialises the graph to be exported with any set of nodes that allow to reach the sources and, from them, the
+	 * final destinations. The resulting graph must be layered (see the introduction above).
+	 * 
+	 * @param layersBuilder
+	 *          it's used in case layering is required, the method {@link LayersBuilder#addSplittedNode(Node, Node)} will
+	 *          be invoked every time a node is split, so that its layering information is updated. null means we don't
+	 *          require layering at all (cause the graph is even).
+	 */
+	public ChainsBuilder ( Set<Node> nodes, LayersBuilder layersBuilder )
+	{
+		this.nodes = nodes;
+		this.layersBuilder = layersBuilder;
+	}
 
-    /**
-     * Just finds and stores the sources (all the nodes having no input).
-     */
-    private void initStartNodes() {
-        if (startNodes != null) {
-            return;
-        }
+	/**
+	 * Just finds and stores the sources (all the nodes having no input).
+	 */
+	private void initStartNodes ()
+	{
+		if ( startNodes != null )
+			return;
 
-        startNodes = new TreeSet<Node>();
-        for (Node n : nodes) {
-            initStartNodes(n);
-        }
-    }
+		startNodes = new TreeSet<Node> ();
+		for ( Node n: nodes )
+			initStartNodes ( n );
+	}
 
-    /**
-     * Just finds and stores the sources (all the nodes having no input). This is the recursive party.
-     */
-    private void initStartNodes(Node node) {
-        SortedSet<Node> ins = node.getInputs();
-        if (ins.isEmpty()) {
-            startNodes.add(node);
-            return;
-        }
-        for (Node in : ins) {
-            initStartNodes(in);
-        }
-    }
+	/**
+	 * Just finds and stores the sources (all the nodes having no input). This is the recursive party.
+	 */
+	private void initStartNodes ( Node node )
+	{
+		SortedSet<Node> ins = node.getInputs ();
+		if ( ins.isEmpty () ) {
+			startNodes.add ( node );
+			return;
+		}
+		
+		for ( Node in: ins )
+			initStartNodes ( in );
+	}
 
-    /**
-     * Loops over {@link #getStartNodes()} and applies {@link #normalize(Node, boolean)} to all the graph. The result
-     * is a graph of chains, ie, the paths to build the table.
-     * 
-     */
-    private void buildPaths() {
-        initStartNodes();
-        for (Node n : new LinkedList<Node>(startNodes)) {
-            normalize(n, true);
-        }
-        isInitialized = true;
-    }
+	/**
+	 * Loops over {@link #getStartNodes()} and applies {@link #normalize(Node, boolean)} to all the graph. The result is a
+	 * graph of chains, ie, the paths to build the table.
+	 * 
+	 */
+	private void buildPaths ()
+	{
+		initStartNodes ();
+		for ( Node n: new LinkedList<Node> ( startNodes ) )
+			normalize ( n, true );
+		isInitialized = true;
+	}
 
-    /**
-     * Duplicates the parameter node. The new node will have nodeIn as input (if not null) and nodeOut as
-     * output (if not null). Furthermore, nodeIn (nodeOut) is removed from the original node, if this doesn't
-     * leave it with zero inputs (outputs)
-     */
-    private Node split(Node node, Node nodeIn, Node nodeOut) {
-        Node clone = node.createIsolatedClone();
+	/**
+	 * Duplicates the parameter node. The new node will have nodeIn as input (if not null) and nodeOut as output (if not
+	 * null). Furthermore, nodeIn (nodeOut) is removed from the original node, if this doesn't leave it with zero inputs
+	 * (outputs)
+	 */
+	private Node split ( Node node, Node nodeIn, Node nodeOut )
+	{
+		Node clone = node.createIsolatedClone ();
 
-        if (nodeIn != null) {
-            clone.addInput(nodeIn);
-            if (node.getInputs().size() > 1) {
-                node.removeInput(nodeIn);
-            }
-        }
-        if (nodeOut != null) {
-            clone.addOutput(nodeOut);
-            if (node.getOutputs().size() > 1) {
-                node.removeOutput(nodeOut);
-            }
-        }
+		if ( nodeIn != null )
+		{
+			clone.addInput ( nodeIn );
+			if ( node.getInputs ().size () > 1 )
+				node.removeInput ( nodeIn );
+		}
+		if ( nodeOut != null )
+		{
+			clone.addOutput ( nodeOut );
+			if ( node.getOutputs ().size () > 1 )
+				node.removeOutput ( nodeOut );
+		}
 
-        if (startNodes.contains(node)) {
-            startNodes.add(clone);
-        }
-        
-        if ( layersBuilder != null )
-        	layersBuilder.addSplittedNode ( node, clone );
-        
-        return clone;
-    }
+		if ( startNodes.contains ( node ) )
+			startNodes.add ( clone );
 
-    /**
-     * The core of the splitting-based algorithm. This function is called for every node in the graph (initial calls pass
-     * the source nodes and then there is a recursion inside here). For every node that has too many inputs and/or outputs
-     * the graph is transformed via a call to {@link #split(Node, Node, Node)}. This encompasses several cases differing
-     * in the number of inputs/outputs that the node has, see the source code for details.
-     *
-     * @param isTowardRight: the recursion is initially from left to right, in certain cases, we need to re-check nodes
-     *                       on the left of the current one, because the latter has been split and, after the split, there are more than one
-     *                       edge going back to the left. by passing false to this parameter, the method knows it is going back and not
-     *                       traversing the graph for the first time. See the source code for details.
-     */
-    private void normalize(Node node, boolean isTowardRight) 
-    {
-    		boolean isDebug = "true".equals ( System.getProperty ( "graph2tab.debug_mode" ));
-        if ( isDebug ) 
-        {
-	        try 
-	        {
-	            PrintStream outstr = new PrintStream(new File("/tmp/g2t_chains_builder_" + ++dotFileNoCounter + ".dot"));
-	            outDot(outstr, node);
-	            outstr.close();
-	        }
-	        catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	        
-	        //if ( nlabel.contains ( "Sample Name: AG Culture (B)" ) )
-	        //System.out.println ( "Working with the target assay " + nlabel + " at graph " + dotFileNoCounter );
-        }
+		if ( layersBuilder != null )
+			layersBuilder.addSplittedNode ( node, clone );
 
-        
-        List<Node> ins = new LinkedList<Node>(node.getInputs());
-        List<Node> outs = new LinkedList<Node>(node.getOutputs());
+		return clone;
+	}
 
-        int nins = ins.size(), nouts = outs.size();
+	/**
+	 * The core of the splitting-based algorithm. This function is called for every node in the graph (initial calls pass
+	 * the source nodes and then there is a recursion inside here). For every node that has too many inputs and/or outputs
+	 * the graph is transformed via a call to {@link #split(Node, Node, Node)}. This encompasses several cases differing
+	 * in the number of inputs/outputs that the node has, see the source code for details.
+	 * 
+	 * @param isTowardRight
+	 *          : the recursion is initially from left to right, in certain cases, we need to re-check nodes on the left
+	 *          of the current one, because the latter has been split and, after the split, there are more than one edge
+	 *          going back to the left. by passing false to this parameter, the method knows it is going back and not
+	 *          traversing the graph for the first time. See the source code for details.
+	 */
+	private void normalize ( Node node, boolean isTowardRight )
+	{
+		boolean isDebug = "true".equals ( System.getProperty ( "graph2tab.debug_mode" ) );
+		if ( isDebug )
+		{
+			try
+			{
+				PrintStream outstr = new PrintStream ( new File ( "/tmp/g2t_chains_builder_" + ++dotFileNoCounter + ".dot" ) );
+				outDot ( outstr, node );
+				outstr.close ();
+			} catch ( Exception e )
+			{
+				e.printStackTrace ();
+			}
 
-        if ( isDebug )
-        {
-	        String nlabel = node.toString ();
-	        Throwable t = new Throwable ();
-	        t.fillInStackTrace ();
-	        int depth = t.getStackTrace ().length - 4;
-	        System.out.println ( 
-	        	StringUtils.repeat ( " ", depth ) 
-	        		+ dotFileNoCounter + ": " + nlabel + " " + ( isTowardRight ? ">" : "<" ) 
-	        );
-	        if ( isTowardRight && nouts == 0 || nins == 0 ) System.out.println ();
-        }
-        
-        if (nins == 0 || startNodes.contains(node)) {
-            // Starting nodes, do the splitting if more than 1 out
-            //
-            Iterator<Node> outItr = outs.iterator();
+			// if ( nlabel.contains ( "Sample Name: AG Culture (B)" ) )
+			// System.out.println ( "Working with the target assay " + nlabel + " at graph " + dotFileNoCounter );
+		}
 
-            // Let's recycle this node for the first splitting
-            outItr.next();
+		List<Node> ins = new LinkedList<Node> ( node.getInputs () );
+		List<Node> outs = new LinkedList<Node> ( node.getOutputs () );
 
-            while (outItr.hasNext()) {
-                split(node, null, outItr.next());
-            }
+		int nins = ins.size (), nouts = outs.size ();
 
-            if (isTowardRight) {
-                for (Node out : outs) {
-                    normalize(out, true);
-                }
-            }
-        } else if (nouts == 0) {
-            // End nodes, do the splitting if more than 1 input.
-            //
-            Iterator<Node> inItr = ins.iterator();
+		if ( isDebug )
+		{
+			String nlabel = node.toString ();
+			Throwable t = new Throwable ();
+			t.fillInStackTrace ();
+			int depth = t.getStackTrace ().length - 4;
+			System.out.println ( StringUtils.repeat ( " ", depth ) + dotFileNoCounter + ": " + nlabel + " "
+					+ ( isTowardRight ? ">" : "<" ) );
+			if ( isTowardRight && nouts == 0 || nins == 0 )
+				System.out.println ();
+		}
 
-            // Let's recycle this node for the first splitting
-            inItr.next();
+		if ( nins == 0 || startNodes.contains ( node ) )
+		{
+			// Starting nodes, do the splitting if more than 1 out
+			//
+			Iterator<Node> outItr = outs.iterator ();
 
+			// Let's recycle this node for the first splitting
+			outItr.next ();
 
-            while (inItr.hasNext()) {
-                split(node, inItr.next(), null);
-            }
+			while ( outItr.hasNext () )
+				split ( node, null, outItr.next () );
 
-            // Propagate back
-            // TODO: should be redundant, test without
-            if (isTowardRight) {
-                for (Node in : ins) {
-                    normalize(in, false);
-                }
-            }
-        } else if (nins == 1 && nouts == 1) {
-            // Already normalized node, let's gain a bit of performance by stopping if we're coming back from the right
-            //
-            if (isTowardRight) {
-                normalize(outs.get(0), true);
-            }
-        } else if (nins >= nouts) {
-            // Excess of inputs, we have to spread inputs over outputs via splittings
-            //
-            Iterator<Node> inItr = ins.iterator(),
-                    outItr = outs.iterator();
+			if ( isTowardRight )
+			{
+				for ( Node out: outs )
+					normalize ( out, true );
+			}
+		} 
+		else if ( nouts == 0 )
+		{
+			// End nodes, do the splitting if more than 1 input.
+			//
+			Iterator<Node> inItr = ins.iterator ();
 
-            // Recycle this node for the first splitting
-            inItr.next();
-            outItr.next();
-            while (inItr.hasNext()) {
-                if (!outItr.hasNext()) {
-                    outItr = outs.iterator();
-                }
-                split(node, inItr.next(), outItr.next());
-            }
+			// Let's recycle this node for the first splitting
+			inItr.next ();
 
-            // and then we have to continue rightward
-            //
-            if (isTowardRight) {
-                for (Node out : outs) {
-                    normalize(out, true);
-                }
-            }
-        } else // nins < nouts
-        {
-            // Excess of outputs, we need to spread outputs over inputs
-            //
-            Iterator<Node> inItr = ins.iterator(),
-                    outItr = outs.iterator();
-            // Recycle this node for the first splitting
-            inItr.next();
-            outItr.next();
-            while (outItr.hasNext()) {
-                if (!inItr.hasNext()) {
-                    inItr = ins.iterator();
-                }
-                split(node, inItr.next(), outItr.next());
-            }
+			while ( inItr.hasNext () )
+				split ( node, inItr.next (), null );
+		}
+		else if ( nins == 1 && nouts == 1 )
+		{
+			// Already normalized node, continue toward right. Note that we do that even in the case we're going back to left,
+			// cause we need to re-visit nodes that were created during the let-ward walk, by the case nins < nouts.
+			//
+			normalize ( outs.get ( 0 ), true );
+		} 
+		else if ( nins >= nouts )
+		{
+			// Excess of inputs, we have to spread inputs over outputs via splittings
+			//
+			Iterator<Node> inItr = ins.iterator (), outItr = outs.iterator ();
 
-            // and then we have to continue both leftward and rightward
-            // The right spread is only to be issued when we come here from the left, otherwise we're just going back
-            // to left and some other caller is already taking care of the right direction
-            //
-            if (isTowardRight) {
-                for (Node out : outs) {
-                    normalize(out, true);
-                }
-            }
-            for (Node in : ins) {
-                normalize(in, false);
-            }
-        }
-    }
+			// Recycle this node for the first splitting
+			inItr.next ();
+			outItr.next ();
+			while ( inItr.hasNext () )
+			{
+				if ( !outItr.hasNext () )
+				{
+					outItr = outs.iterator ();
+				}
+				split ( node, inItr.next (), outItr.next () );
+			}
 
-    /**
-     * The computed starting nodes, ie: those that haven't any inputs. This returns a set of chains, each one representing
-     * a row in the exported table.
-     */
-    public Set<Node> getStartNodes() {
-        if (!isInitialized) {
-            buildPaths();
-        }
-        return Collections.unmodifiableSet(startNodes);
-    }
+			// and then we have to continue rightward. Note that we do that even in the case we're going back to left,
+			// cause we need to re-visit nodes that were created during the let-ward walk, by the case nins < nouts.
+			//
+			for ( Node out: outs )
+				normalize ( out, true );
+		} 
+		else // nins < nouts
+		{
+			// Excess of outputs, we need to spread outputs over inputs
+			//
+			Iterator<Node> inItr = ins.iterator (), outItr = outs.iterator ();
+			// Recycle this node for the first splitting
+			inItr.next ();
+			outItr.next ();
+			while ( outItr.hasNext () )
+			{
+				if ( !inItr.hasNext () )
+					inItr = ins.iterator ();
+				split ( node, inItr.next (), outItr.next () );
+			}
 
-    /**
-     * A facility useful for debugging. Outputs a syntax that can be used by GraphViz to show the graph being
-     * built.
-     * 
-     */
-    public void outDot(PrintStream out )
-    {
-    	outDot ( out, null );
-    }
+			// and then we have to continue both leftward and rightward
+			// The right spread is only to be issued when we come here from the left, otherwise we're just going back
+			// to left and some other caller is already taking care of the right direction
+			//
+			if ( isTowardRight )
+			{
+				for ( Node out: outs )
+					normalize ( out, true );
+			}
+			
+			for ( Node in: ins )
+				normalize ( in, false );
+		}
+	}
 
-    /**
-     * A facility useful for debugging. Outputs a syntax that can be used by GraphViz to show the graph being
-     * built.
-     */
-    public void outDot(PrintStream out, Node currentNode ) 
-    {
-	    Map<Node, Integer> ids = new HashMap<Node, Integer>();
-	    Set<Node> visited = new HashSet<Node>();
-	
-	    out.println("strict digraph ExperimentalPipeline {");
-	    out.println("  graph [rankdir=LR];");
-	    
-	    for (Node node : startNodes)
-	        outDot(out, ids, visited, node, currentNode );
-	
-	    // Adds up the layers if available
-	    if ( layersBuilder != null )
-	    {
-	    	out.println ();
-	
-	    	int maxLayer = layersBuilder.getMaxLayer ();
-	    	for ( int layer = 0; layer <= maxLayer; layer++ )
-	    	{
-	    		Set<Node> lnodes = layersBuilder.getLayerNodes ( layer );
-	    		if ( lnodes == null || lnodes.isEmpty () ) continue;
-	    		
-	    		out.println ( "    // layer " + layer );
-	    		out.print   ( "    { rank = same" );
-	    		for ( Node node: lnodes ) {
-	    			int nodeid = ids.get ( node );
-	    			out.print ( "; " + nodeid ); 
-	    		}
-	    		out.println ( " }\n" );
-	    	}
-	    	out.println ();
-	    }
-	    
-	    out.println("}");
-    }
+	/**
+	 * The computed starting nodes, ie: those that haven't any inputs. This returns a set of chains, each one representing
+	 * a row in the exported table.
+	 */
+	public Set<Node> getStartNodes ()
+	{
+		if ( !isInitialized )
+			buildPaths ();
+		return Collections.unmodifiableSet ( startNodes );
+	}
 
-    /**
-     * @see #outDot(PrintStream).
-     */
-    private void outDot(PrintStream out, Map<Node, Integer> ids, Set<Node> visited, Node node, Node currentNode ) 
-    {
-	    if (visited.contains(node))
-	        return;
-	    visited.add(node);
+	/**
+	 * A facility useful for debugging. Outputs a syntax that can be used by GraphViz to show the graph being built.
+	 * 
+	 */
+	public void outDot ( PrintStream out )
+	{
+		outDot ( out, null );
+	}
 
-	    // The rainbow can help in tracking the graph manually.
-	    final String[] colors = { "black", "red", "blue", "magenta", "green", "orange", "purple", "turquoise" }; 
-	    
-	    String nodelbl = node.toString();
-	    Integer nodeid = ids.get(node);
-	    if (nodeid == null) 
-	    {
-	        nodeid = ids.size();
-	        ids.put(node, nodeid);
-	        String bgcolor = node.equals ( currentNode ) ? "yellow" : "white";
-	        String color = colors [ nodeid % colors.length ];
-	        out.println ( 
-	        	"  " + nodeid 
-	        	+ "[label = \"" + nodelbl + "\", style = filled, color = " + color + ", fillcolor = " + bgcolor + "];"
-	        );
-	    }
-	
-	    for (Node nout : node.getOutputs()) 
-	    {
-	        Integer outid = ids.get(nout);
-	        if (outid == null) 
-	        {
-	            outid = ids.size();
-	            ids.put(nout, outid);
-	            String outlbl = nout.toString();
-	  	        String bgcolor = nout.equals ( currentNode ) ? "yellow" : "white";
-	  	        String color = colors [ outid % colors.length ];
-	            out.println(
-	            	"  " + outid 
-	            	+ "[label = \"" + outlbl + "\", style = filled, color = " + color + ", fillcolor = " + bgcolor + "];"
-	            );
-	        }
-	
-	        String color = colors [ ( nodeid + outid ) % colors.length ];
-	        out.println("  " + nodeid + " -> " + outid + "[color = " + color + "];");
-	        outDot(out, ids, visited, nout, currentNode);
-	    }
-    }
+	/**
+	 * A facility useful for debugging. Outputs a syntax that can be used by GraphViz to show the graph being built.
+	 */
+	public void outDot ( PrintStream out, Node currentNode )
+	{
+		Map<Node, Integer> ids = new HashMap<Node, Integer> ();
+		Set<Node> visited = new HashSet<Node> ();
+
+		out.println ( "strict digraph ExperimentalPipeline {" );
+		out.println ( "  graph [rankdir=LR];" );
+
+		for ( Node node: startNodes )
+			outDot ( out, ids, visited, node, currentNode );
+
+		// Adds up the layers if available
+		if ( layersBuilder != null )
+		{
+			out.println ();
+
+			int maxLayer = layersBuilder.getMaxLayer ();
+			for ( int layer = 0; layer <= maxLayer; layer++ )
+			{
+				Set<Node> lnodes = layersBuilder.getLayerNodes ( layer );
+				if ( lnodes == null || lnodes.isEmpty () )
+					continue;
+
+				out.println ( "    // layer " + layer );
+				out.print ( "    { rank = same" );
+				for ( Node node: lnodes ) {
+					int nodeid = ids.get ( node );
+					out.print ( "; " + nodeid );
+				}
+				out.println ( " }\n" );
+			}
+			out.println ();
+		}
+
+		out.println ( "}" );
+	}
+
+	/**
+	 * @see #outDot(PrintStream).
+	 */
+	private void outDot ( PrintStream out, Map<Node, Integer> ids, Set<Node> visited, Node node, Node currentNode )
+	{
+		if ( visited.contains ( node ) )
+			return;
+		visited.add ( node );
+
+		// The rainbow can help in tracking the graph manually.
+		final String[] colors = { "black", "red", "blue", "magenta", "green", "orange", "purple", "turquoise" };
+
+		String nodelbl = node.toString ();
+		Integer nodeid = ids.get ( node );
+		if ( nodeid == null )
+		{
+			nodeid = ids.size ();
+			ids.put ( node, nodeid );
+			String bgcolor = node.equals ( currentNode ) ? "yellow" : "white";
+			String color = colors[nodeid % colors.length];
+			out.println ( "  " + nodeid + "[label = \"" + nodelbl + "\", style = filled, color = " + color + ", fillcolor = " + bgcolor
+					+ "];" );
+		}
+
+		for ( Node nout: node.getOutputs () )
+		{
+			Integer outid = ids.get ( nout );
+			if ( outid == null )
+			{
+				outid = ids.size ();
+				ids.put ( nout, outid );
+				String outlbl = nout.toString ();
+				String bgcolor = nout.equals ( currentNode ) ? "yellow" : "white";
+				String color = colors[outid % colors.length];
+				out.println ( "  " + outid + "[label = \"" + outlbl + "\", style = filled, color = " + color + ", fillcolor = " + bgcolor
+						+ "];" );
+			}
+
+			String color = colors[ ( nodeid + outid ) % colors.length];
+			out.println ( "  " + nodeid + " -> " + outid + "[color = " + color + "];" );
+			outDot ( out, ids, visited, nout, currentNode );
+		}
+	}
 
 }
