@@ -242,6 +242,7 @@ public class DataFilesDispatcher {
                 // on a local filesystem
                 //
                 // TODO: make this platform independent (c:\data\...) !!
+		// TODO: rename srcFileRelPath, it's not necessarily relative anymore ...
                 
                 File srcFile;
                 if (srcFileRelPath.startsWith("/")) {
@@ -251,7 +252,8 @@ public class DataFilesDispatcher {
                 }
 
                 File targetDir = new File(targetPath);
-                File targetFile = new File(targetPath + "/" + srcFileRelPath);
+		// the getName() is a disguised basename() function
+                File targetFile = new File(targetPath + "/" + (new File(srcFileRelPath)).getName());
 
                 if (!srcFile.exists()) {
                     log.info("WARNING: Source file '" + srcFileRelPath + "' / '" + fieldHeader + "' not found");
@@ -264,12 +266,12 @@ public class DataFilesDispatcher {
                         log.trace("Copying data file '" + fieldHeader + "' / '" + srcFileRelPath + "' to data repository...");
 
                         if (srcFile.isDirectory()) {
-                            FileUtils.copyDirectory(srcFile, targetDir, true);
+                            FileUtils.copyDirectory(srcFile, targetFile, true);
                         } else {
                             FileUtils.copyFileToDirectory(srcFile, targetDir, true);
                         }
 
-                        // Needed cause of a bug in the previous function
+                        // Needed cause of a bug in the copyFileToDirectory() function
                         targetFile.setLastModified(srcFile.lastModified());
                         log.trace("...done");
                         log.info(
