@@ -4,18 +4,24 @@
 - Issue tracking and bug reporting: <https://github.com/ISA-tools/ISAvalidator-ISAconverter-BIImanager/issues>
 - Mainline source code: <https://github.com/ISA-tools/ISAvalidator-ISAconverter-BIImanager>
 - Twitter: [@isatools](http://twitter.com/isatools)
-- IRC: [irc://irc.freenode.net/#isatab](irc://irc.freenode.net/#isatab)
-- Development blog: [http://isatools.wordpress.com]
+- IRC: [irc://irc.freenode.net/](irc://irc.freenode.net/ - group is isatab)
+- Development blog: <http://isatools.wordpress.com>
 
 ## Development
 
 **Get the source:**
 
-    You should ***fork*** the ISAvalidator, ISAconverter and BII Data Management tool project to your own GitHub "repository". Then clone this forked repository and start developing. When you make changes to the ISAvalidator, ISAconverter and BII Data Management tool code, we can see the changes you made, review the code and merge with the main repository code base.
+You should ***fork*** the ISAvalidator, ISAconverter and BII Data Management tool project to your own GitHub "repository". Then clone this forked repository and start developing. When you make changes to the ISAvalidator, ISAconverter and BII Data Management tool code, we can see the changes you made, review the code and merge with the main repository code base.
 
 **Build dependencies:**
+Dependencies are managed by Apache Maven. Please use version 2.1. 
 
-    Dependencies are managed by Apache Maven. You do not need to download anything other than Maven itself. Please use version 2.1.
+You also need to clone and install the graph2tab module available here <https://github.com/ISA-tools/graph2tab>. Follow these commands to do so:
+'git clone git@github.com:ISA-tools/graph2tab.git'
+'cd graph2tab'
+'mvn clean install' <- this will compile and install the graph2tab module to you local maven repository so that it is made available to the ISAvalidator, ISAconverter and BII Data Management tool package.
+    
+
 
 ### Refreshing your clone
 
