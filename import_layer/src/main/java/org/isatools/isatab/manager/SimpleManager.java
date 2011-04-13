@@ -84,14 +84,6 @@ public class SimpleManager {
 
     }
 
-    private Set<String> convertArrayToSet(String... toUnload) {
-        Set<String> asSet = new HashSet<String>();
-
-        asSet.addAll(Arrays.asList(toUnload));
-
-        return asSet;
-    }
-
     private boolean loadConfiguration(String configuration) {
         if (new File(configuration).exists()) {
             ISAConfigurationSet.setConfigPath(configuration);
