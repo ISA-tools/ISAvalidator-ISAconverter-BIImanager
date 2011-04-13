@@ -145,7 +145,7 @@ LOADING INTO THE BII DATABASE
 This command is typically used after the validation, to upload a submission into the BII database.
 
 Configuration of database access
-Please refer to the the general documentation for the ISA Tolls for that aspect.
+Please refer to the the general documentation for the ISA Tools for that aspect.
 
 Syntax:
 
