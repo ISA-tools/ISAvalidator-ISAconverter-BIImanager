@@ -117,6 +117,8 @@ public class SimpleManager {
                 toUnload.addAll(Arrays.asList(args).subList(1, args.length));
                 manager.unLoadISAtab(toUnload);
                 System.exit(0);
+            } else {
+                log.info("No studies to load.");
             }
         }
     }
