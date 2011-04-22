@@ -237,9 +237,23 @@ public class DataFilesDispatcher {
                     continue;
                 }
 
-                File srcFile = new File(sourcePath + "/" + srcFileRelPath);
+                // Relative paths occur e.g. for an unzipped, self-contained ISAtab archive,
+                // Absolute paths can be expected if the ISAtab files are describing data 
+                // on a local filesystem
+                //
+                // TODO: make this platform independent (c:\data\...) !!
+		// TODO: rename srcFileRelPath, it's not necessarily relative anymore ...
+                
+                File srcFile;
+                if (srcFileRelPath.startsWith("/")) {
+                    srcFile = new File(srcFileRelPath);                                            
+                } else {
+                    srcFile = new File(sourcePath + "/" + srcFileRelPath);
+                }
+
                 File targetDir = new File(targetPath);
-                File targetFile = new File(targetPath + "/" + srcFileRelPath);
+		// the getName() is a disguised basename() function
+                File targetFile = new File(targetPath + "/" + (new File(srcFileRelPath)).getName());
 
                 if (!srcFile.exists()) {
                     log.info("WARNING: Source file '" + srcFileRelPath + "' / '" + fieldHeader + "' not found");
@@ -250,8 +264,14 @@ public class DataFilesDispatcher {
                                 + "': they seem to be the same.");
                     } else {
                         log.trace("Copying data file '" + fieldHeader + "' / '" + srcFileRelPath + "' to data repository...");
-                        FileUtils.copyFileToDirectory(srcFile, targetDir, true);
-                        // Needed cause of a bug in the previous function
+
+                        if (srcFile.isDirectory()) {
+                            FileUtils.copyDirectory(srcFile, targetFile, true);
+                        } else {
+                            FileUtils.copyFileToDirectory(srcFile, targetDir, true);
+                        }
+
+                        // Needed cause of a bug in the copyFileToDirectory() function
                         targetFile.setLastModified(srcFile.lastModified());
                         log.trace("...done");
                         log.info(

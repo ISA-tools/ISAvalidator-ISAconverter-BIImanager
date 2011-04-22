@@ -85,13 +85,19 @@ public class GUIISATABLoader extends AbstractGUIInvoker {
      * Persist the store, assuming it has already been loaded.
      */
     public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath) {
+        Properties hibProps = AbstractImportLayerShellCommand.getHibernateProperties();
+        hibProps.setProperty("hibernate.search.indexing_strategy", "manual");
+        hibProps.setProperty("hbm2ddl.drop", "false");
+        hibProps.setProperty("hibernate.hbm2ddl.auto", "update");
+
+        return persist(store, isatabSubmissionPath, hibProps);
+    }
+
+    public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath, Properties hibProps) {
         try {
             vlog.info("Persisting " + store.size() + " object(s)");
 
-            Properties hibProps = AbstractImportLayerShellCommand.getHibernateProperties();
-            hibProps.setProperty("hibernate.search.indexing_strategy", "manual");
-            hibProps.setProperty("hbm2ddl.drop", "false");
-            hibProps.setProperty("hibernate.hbm2ddl.auto", "update");
+
             EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("BIIEntityManager", hibProps);
             EntityManager entityManager = entityManagerFactory.createEntityManager();
             ISATABPersister persister = new ISATABPersister(store, DaoFactory.getInstance(entityManager));
@@ -111,8 +117,7 @@ public class GUIISATABLoader extends AbstractGUIInvoker {
             );
 
             return GUIInvokerResult.SUCCESS;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             vlog.error(ex.getMessage(), ex);
             return GUIInvokerResult.ERROR;
         }
