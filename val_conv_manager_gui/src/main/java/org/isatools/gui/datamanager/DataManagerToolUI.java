@@ -57,6 +57,7 @@ import org.isatools.isatab.gui_invokers.GUIBIIReindex;
 import org.isatools.isatab.gui_invokers.GUIISATABExporter;
 import org.isatools.isatab.gui_invokers.GUIISATABLoader;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
+import org.isatools.isatab.manager.UserManagementControl;
 import org.isatools.tablib.exceptions.TabException;
 import org.isatools.tablib.utils.BIIObjectStore;
 import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
@@ -130,6 +131,7 @@ public class DataManagerToolUI extends CommonUI {
         MouseAdapter buttonMouseListener = new MouseAdapter() {
 
             public void mousePressed(MouseEvent mouseEvent) {
+
                 if (mouseEvent.getSource() == loadIsatabButton) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -634,7 +636,9 @@ public class DataManagerToolUI extends CommonUI {
                 transaction.rollback();
             }
 
-            umControl.getEntityManager().clear();
+            if (umControl != null) {
+                umControl.getEntityManager().clear();
+            }
             e.printStackTrace();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

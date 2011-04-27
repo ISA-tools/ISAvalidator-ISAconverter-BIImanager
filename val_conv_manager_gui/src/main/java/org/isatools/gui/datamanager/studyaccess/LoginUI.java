@@ -53,6 +53,7 @@ import org.isatools.effects.UIHelper;
 import org.isatools.gui.AppContainer;
 import org.isatools.gui.Globals;
 import org.isatools.gui.ViewingPane;
+import org.isatools.isatab.manager.UserManagementControl;
 import uk.ac.ebi.bioinvindex.model.security.Person;
 import uk.ac.ebi.bioinvindex.model.security.UserRole;
 import uk.ac.ebi.bioinvindex.utils.StringEncryption;
