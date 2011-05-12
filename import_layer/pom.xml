@@ -42,6 +42,12 @@
             <id>lutin</id>
             <url>http://lutinbuilder.labs.libre-entreprise.org/maven2/net/sourceforge/</url>
         </repository>
+
+        <repository>
+            <id>oerc</id>
+            <url>http://frog.oerc.ox.ac.uk:8080/artifactory/repo/</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
