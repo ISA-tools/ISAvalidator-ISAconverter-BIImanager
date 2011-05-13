@@ -78,10 +78,23 @@ import java.util.*;
 public class SimpleManager {
 
     private static Logger log = Logger.getLogger(SimpleManager.class.getName());
+    
+    private VisibilityStatus status = VisibilityStatus.PUBLIC;
 
     public SimpleManager() {
     }
 
+    public VisibilityStatus getStatus(){
+    	return status;
+    }
+    public void setStatus(VisibilityStatus status){
+    	this.status = status;
+    }
+    public void loadISATab(String isatabFile, String userName, VisibilityStatus status) {
+    	this.status = status;
+    	loadISAtab(isatabFile, userName);
+    }
+    
     public void loadISAtab(String isatabFile, String configurationDirectory, String userName) {
 
         if (loadConfiguration(configurationDirectory)) {
@@ -114,7 +127,7 @@ public class SimpleManager {
                     accessions.add(study.getAcc());
                 }
 
-                changeStudyPermissions(VisibilityStatus.PUBLIC, userName, accessions.toArray(new String[accessions.size()]));
+                changeStudyPermissions(status, userName, accessions.toArray(new String[accessions.size()]));
                 log.info("Loading completed and reindexing performed");
             }
 
