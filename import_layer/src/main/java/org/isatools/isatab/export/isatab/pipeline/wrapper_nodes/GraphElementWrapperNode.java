@@ -228,6 +228,7 @@ public abstract class GraphElementWrapperNode extends DefaultAbstractNode
 	 * Tells if the string contains one of the matches. This is often used to detect which type of material/data one has.
 	 * TODO: Was moved to {@link StringSearchUtils}, replace it.
 	 */
+	@Deprecated
 	protected static boolean containsOne ( String target, String ... matches )
 	{
 		if ( target == null )
