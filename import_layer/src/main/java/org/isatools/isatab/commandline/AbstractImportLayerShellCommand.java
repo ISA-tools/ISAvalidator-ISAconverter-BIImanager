@@ -284,13 +284,28 @@ public class AbstractImportLayerShellCommand {
             return _configPath;
         }
 
-        _configPath = StringUtils.trimToEmpty(
-                System.getProperty(PROPERTY_NAME_CONFIG_PATH, System.getProperty("user.dir") + "/config/")
-        );
+        //Try to look first in the root folder
+        _configPath =AbstractImportLayerShellCommand.class.getClassLoader().getResource("").getPath() + "config/";
+        
+        System.out.println("Initial config path is :" + _configPath);
+        
+        
+        //If this path do not exists...
+        if (!new File(_configPath).exists()){
 
+        	//...then use system properties.
+            _configPath = StringUtils.trimToEmpty(
+                    System.getProperty(PROPERTY_NAME_CONFIG_PATH, System.getProperty("user.dir") + "/config/")
+            );
+
+        }
+        
+        
         if (_configPath.length() > 0 && !_configPath.endsWith("/")) {
             _configPath += "/";
         }
+        
+        System.out.println("Final config path is :" + _configPath);
         return _configPath;
     }
 
