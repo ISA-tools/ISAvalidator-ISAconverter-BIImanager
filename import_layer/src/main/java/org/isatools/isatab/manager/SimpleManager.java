@@ -48,21 +48,21 @@
 
 package org.isatools.isatab.manager;
 
-import com.sun.tools.javac.util.Log;
+//import com.sun.tools.javac.util.Log;
 import org.apache.log4j.Logger;
-import org.apache.log4j.lf5.LogLevel;
+//import org.apache.log4j.lf5.LogLevel;
 import org.isatools.isatab.gui_invokers.GUIISATABLoader;
 import org.isatools.isatab.gui_invokers.GUIISATABUnloader;
 import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.isatab.isaconfigurator.ISAConfigurationSet;
-import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
+//import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import uk.ac.ebi.bioinvindex.model.Study;
 import uk.ac.ebi.bioinvindex.model.VisibilityStatus;
 import uk.ac.ebi.bioinvindex.model.security.User;
 
 import javax.persistence.EntityTransaction;
-import javax.swing.*;
+//import javax.swing.*;
 import java.io.File;
 import java.util.*;
 
@@ -90,12 +90,12 @@ public class SimpleManager {
     public void setStatus(VisibilityStatus status){
     	this.status = status;
     }
-    public void loadISATab(String isatabFile, String userName, VisibilityStatus status) {
+    public void loadISATab(String isatabFile, String userName, VisibilityStatus status) throws Exception {
     	this.status = status;
     	loadISAtab(isatabFile, userName);
     }
     
-    public void loadISAtab(String isatabFile, String configurationDirectory, String userName) {
+    public void loadISAtab(String isatabFile, String configurationDirectory, String userName) throws Exception {
 
         if (loadConfiguration(configurationDirectory)) {
             loadISAtab(isatabFile, userName);
@@ -105,7 +105,7 @@ public class SimpleManager {
 
     }
 
-    public void loadISAtab(String isatabFile, String userName) {
+    public void loadISAtab(String isatabFile, String userName) throws Exception {
 
         GUIISATABValidator isatabValidator = new GUIISATABValidator();
 
@@ -202,7 +202,7 @@ public class SimpleManager {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         SimpleManager manager = new SimpleManager();
 
         if (args[0].equals("load")) {

@@ -83,8 +83,9 @@ public class GUIISATABLoader extends AbstractGUIInvoker {
 
     /**
      * Persist the store, assuming it has already been loaded.
+     * @throws Exception 
      */
-    public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath) {
+    public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath) throws Exception {
         Properties hibProps = AbstractImportLayerShellCommand.getHibernateProperties();
         hibProps.setProperty("hibernate.search.indexing_strategy", "manual");
         hibProps.setProperty("hbm2ddl.drop", "false");
@@ -93,7 +94,7 @@ public class GUIISATABLoader extends AbstractGUIInvoker {
         return persist(store, isatabSubmissionPath, hibProps);
     }
 
-    public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath, Properties hibProps) {
+    public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath, Properties hibProps) throws Exception {
         try {
             vlog.info("Persisting " + store.size() + " object(s)");
 
@@ -119,7 +120,11 @@ public class GUIISATABLoader extends AbstractGUIInvoker {
             return GUIInvokerResult.SUCCESS;
         } catch (Exception ex) {
             vlog.error(ex.getMessage(), ex);
-            return GUIInvokerResult.ERROR;
+            
+            //Throw exceptions
+            throw ex;
+            
+            //return GUIInvokerResult.ERROR;
         }
     }
 }

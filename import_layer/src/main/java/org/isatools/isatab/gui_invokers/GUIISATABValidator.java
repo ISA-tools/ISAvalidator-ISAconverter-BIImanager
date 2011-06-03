@@ -75,8 +75,9 @@ public class GUIISATABValidator extends AbstractGUIInvoker {
 
     /**
      * Do the job, the log returned by {@link #getLog()} is reset by this call.
+     * @throws Exception 
      */
-    public GUIInvokerResult validate(String isatabSubmissionPath) {
+    public GUIInvokerResult validate(String isatabSubmissionPath) throws Exception {
         try {
             // Save there the log file
             AbstractImportLayerShellCommand.setupLog4JPath(isatabSubmissionPath + "/isatools.log");
@@ -95,7 +96,10 @@ public class GUIISATABValidator extends AbstractGUIInvoker {
             return GUIInvokerResult.SUCCESS;
         } catch (Exception e) {
             vlog.error(e.getMessage(), e);
-            return GUIInvokerResult.ERROR;
+            
+            //throw Exception up...
+            throw e;
+            //return GUIInvokerResult.ERROR;
         }
     }
 
