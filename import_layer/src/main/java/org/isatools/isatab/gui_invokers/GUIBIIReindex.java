@@ -6,6 +6,9 @@ import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Study;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * GUIBIIReindex
@@ -17,39 +20,68 @@ import java.util.Collection;
 
 public class GUIBIIReindex extends AbstractGUIInvokerWithStudySelection {
 
-	public GUIBIIReindex() {
-		super();
-		AbstractImportLayerShellCommand.setupLog4JPath(System.getProperty("user.dir") + "/reindexer.log");
-		initEntityManager();
-	}
+    public GUIBIIReindex() {
+        super();
+        AbstractImportLayerShellCommand.setupLog4JPath(System.getProperty("user.dir") + "/reindexer.log");
+        initEntityManager();
+    }
 
-	public GUIInvokerResult reindexDatabase() {
+    public GUIInvokerResult reindexSelectedStudies(Set<String> studyIds) {
+        try {
+            BIIObjectStore store = new BIIObjectStore();
 
-		try {
-			BIIObjectStore store = new BIIObjectStore();
 
-			if (loadStudiesFromDB() == GUIInvokerResult.SUCCESS) {
+            if (loadStudiesFromDB() == GUIInvokerResult.SUCCESS) {
 
-				Collection<Study> studies = getRetrievedStudies();
-				if (studies == null || studies.size() == 0) {
-					vlog.info("No studies in the BII DB");
-				} else {
-					for (Study s : studies) {
-						store.put(Study.class, s.getAcc(), s);
-					}
-				}
-				PersistenceShellCommand.reindexStudies(store, getHibernateProperties());
-				return GUIInvokerResult.SUCCESS;
-			} else {
-				vlog.error("Failed to load studies from database.");
-				return GUIInvokerResult.ERROR;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			vlog.error("Problem occurred when reindexing BII database: " + e.getMessage());
-			return GUIInvokerResult.ERROR;
-		}
-	}
+                Collection<Study> studies = getRetrievedStudies();
+                if (studies == null || studies.size() == 0) {
+                    vlog.info("No studies in the BII DB");
+                } else {
+                    for (Study s : studies) {
+                        if (studyIds.contains(s.getAcc())) {
+                            store.put(Study.class, s.getAcc(), s);
+                        }
+                    }
+                }
+                PersistenceShellCommand.reindexStudies(store, getHibernateProperties());
+                return GUIInvokerResult.SUCCESS;
+            } else {
+                vlog.error("Failed to load studies from database.");
+                return GUIInvokerResult.ERROR;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            vlog.error("Problem occurred when reindexing BII database: " + e.getMessage());
+            return GUIInvokerResult.ERROR;
+        }
+    }
 
+    public GUIInvokerResult reindexDatabase() {
+
+        try {
+            BIIObjectStore store = new BIIObjectStore();
+
+            if (loadStudiesFromDB() == GUIInvokerResult.SUCCESS) {
+
+                Collection<Study> studies = getRetrievedStudies();
+                if (studies == null || studies.size() == 0) {
+                    vlog.info("No studies in the BII DB");
+                } else {
+                    for (Study s : studies) {
+                        store.put(Study.class, s.getAcc(), s);
+                    }
+                }
+                PersistenceShellCommand.reindexStudies(store, getHibernateProperties());
+                return GUIInvokerResult.SUCCESS;
+            } else {
+                vlog.error("Failed to load studies from database.");
+                return GUIInvokerResult.ERROR;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            vlog.error("Problem occurred when reindexing BII database: " + e.getMessage());
+            return GUIInvokerResult.ERROR;
+        }
+    }
 
 }

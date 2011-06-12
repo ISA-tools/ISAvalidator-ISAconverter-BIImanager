@@ -51,10 +51,7 @@ package org.isatools.isatab.manager;
 import com.sun.tools.javac.util.Log;
 import org.apache.log4j.Logger;
 import org.apache.log4j.lf5.LogLevel;
-import org.isatools.isatab.gui_invokers.GUIISATABLoader;
-import org.isatools.isatab.gui_invokers.GUIISATABUnloader;
-import org.isatools.isatab.gui_invokers.GUIISATABValidator;
-import org.isatools.isatab.gui_invokers.GUIInvokerResult;
+import org.isatools.isatab.gui_invokers.*;
 import org.isatools.isatab.isaconfigurator.ISAConfigurationSet;
 import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import uk.ac.ebi.bioinvindex.model.Study;
@@ -122,6 +119,26 @@ public class SimpleManager {
             log.error("Loading failed. See log for details.");
         }
 
+    }
+
+    public void reindexDatabase() {
+        GUIBIIReindex reindexer = new GUIBIIReindex();
+
+        if (reindexer.reindexDatabase() == GUIInvokerResult.SUCCESS) {
+            log.info("Successfully reindexed database...");
+        } else {
+            log.info("Reindexing has failed. Please see log for errors");
+        }
+    }
+
+    public void reindexStudies(Set<String> studyIds) {
+        GUIBIIReindex reindexer = new GUIBIIReindex();
+
+        if (reindexer.reindexSelectedStudies(studyIds) == GUIInvokerResult.SUCCESS) {
+            log.info("Successfully reindexed selected studies...");
+        } else {
+            log.info("Reindexing has failed. Please see log for errors");
+        }
     }
 
     /**
@@ -211,6 +228,23 @@ public class SimpleManager {
                 System.exit(0);
             } else {
                 log.info("No studies to load.");
+            }
+        }
+
+        if (args[0].equals("reindexAll")) {
+            manager.reindexDatabase();
+
+            System.exit(0);
+        }
+
+        if (args[0].equals("reindex")) {
+            if (args.length > 1) {
+                Set<String> toReindex = new HashSet<String>();
+                toReindex.addAll(Arrays.asList(args).subList(1, args.length));
+                manager.reindexStudies(toReindex);
+                System.exit(0);
+            } else {
+                log.info("No studies to reindex.");
             }
         }
     }

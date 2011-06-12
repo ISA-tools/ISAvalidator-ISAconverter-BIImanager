@@ -63,7 +63,8 @@ import java.util.Properties;
 
 import static java.lang.System.out;
 
-public class PermModShellCommand extends AbstractImportLayerShellCommand {
+public class
+        PermModShellCommand extends AbstractImportLayerShellCommand {
 
     public static void main(String[] args) {
 
