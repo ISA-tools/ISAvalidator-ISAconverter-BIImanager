@@ -97,7 +97,7 @@ public class AbstractGUIInvoker {
      * Allows you to set the log reporting level, which can possibly be chosen by the end user
      */
     public void setLogLevel(Level logLevel) {
-        Logger log = Logger.getLogger("uk.ac.ebi");
+        Logger log = Logger.getLogger("org.isatools");
         log.setLevel(logLevel);
         if (appender == null) {
             return;

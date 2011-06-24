@@ -82,10 +82,7 @@ import java.util.Set;
 /**
  * The ISATAB file dispatcher. Copies the ISATAB meta-data files and data files to the repositories, according to the
  * configuration retrieved by the {@link DataLocationManager}.
- * <p/>
  * TODO: probably the {@link #undispatch(List)} method should be in an Undispatcher class.
- * <p/>
- * <dl><dt>date:</dt><dd>Jan 15, 2009</dd></dl>
  *
  * @author brandizi
  */
@@ -99,6 +96,8 @@ public class DataFilesDispatcher {
 
     /**
      * Wrapper with store = null, sourcePath = null, used for undispatching
+     *
+     * @param entityManager @link #EntityManager
      */
     public DataFilesDispatcher(EntityManager entityManager) {
         this(null, null, entityManager);
@@ -117,7 +116,7 @@ public class DataFilesDispatcher {
 
 
     /**
-     * WARNING: IT IS NECESSARY that this is called BEFORE persistence, since it also calls {@link #addFilePathAnnotations()},
+     * WARNING: IT IS NECESSARY that this is called BEFORE persistence, since it also calls {@link #addFilePathAnnotations(uk.ac.ebi.bioinvindex.model.Study)},
      * which needs to check if files were copied to the target repositories.
      */
     public void dispatch() {
@@ -127,8 +126,7 @@ public class DataFilesDispatcher {
                 dispatchStudy(study);
                 addFilePathAnnotations(study);
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             throw new TabIOException(MessageFormat.format(
                     "ERROR while copying the submission files to file repositories: {0}", ex.getMessage()), ex
             );
@@ -137,7 +135,10 @@ public class DataFilesDispatcher {
 
     /**
      * Dispatch the files about the study and then calls dispatch operations over the assays
-     * ({@link #dispatchAssayGroup(String, AssayGroup)}.
+     * ({@link #dispatchAssayGroup(org.isatools.isatab.mapping.AssayGroup)}.
+     *
+     * @param study @link #Study to be dispatched
+     * @throws java.io.IOException Can be thrown in the event of file system issues.
      */
     private void dispatchStudy(Study study) throws IOException {
         // Copy the investigation file to the submission repo
@@ -172,10 +173,7 @@ public class DataFilesDispatcher {
                     if (!outDir.exists()) {
                         FileUtils.forceMkdir(outDir);
                     }
-                } else
-                // TODO: externalization
-                // TODO: single message
-                {
+                } else {
                     log.debug(MessageFormat.format(
                             "WARNING: no file dispatching destination defined for the type: \"{0}\"/\"{1}\"/\"{2}\", files of this type will be ignored",
                             ag.getMeasurement().getName(), ag.getTechnologyName(), targetType
@@ -190,7 +188,8 @@ public class DataFilesDispatcher {
     /**
      * Dispatch the files about a given assay group
      *
-     * @param outPath where the files go, no dispatch done if this is null.
+     * @param ag the @see AssayGroup to be dispatched.
+     * @throws java.io.IOException - this method is resolving file paths, IO Exceptions are therefore a likelihood.
      */
     private void dispatchAssayGroup(final AssayGroup ag) throws IOException {
         SectionInstance assaySectionInstance = ag.getAssaySectionInstance();
@@ -207,17 +206,18 @@ public class DataFilesDispatcher {
         for (Record record : assaySectionInstance.getRecords()) {
             int recSize = record.size();
             for (int fieldIndex = 0; fieldIndex < recSize; fieldIndex++) {
-                // TODO: change this so that we get: field name, file-type, file-path
-                String[] filePathPair = FormatExporter.getExternalFileValue(record, fieldIndex);
 
-                if (filePathPair == null) {
+                String[] filePathTriple = FormatExporter.getExternalFileValue(record, fieldIndex);
+
+                if (filePathTriple == null) {
                     continue;
                 }
-                String fieldHeader = filePathPair[0],
-                        srcFileRelPath = filePathPair[1],
-                        srcFileType = filePathPair[2];
 
-                if (srcFileRelPath == null) {
+                String fieldHeader = filePathTriple[0];
+                String sourceFilePath = filePathTriple[1];
+                String srcFileType = filePathTriple[2];
+
+                if (sourceFilePath == null) {
                     continue;
                 }
 
@@ -231,8 +231,9 @@ public class DataFilesDispatcher {
                 }
 
                 String targetPath = StringUtils.trimToNull(
-                        dataLocationMgr.getDataLocation(study, ag.getMeasurement(), ag.getTechnology(), targetType)
-                );
+                        dataLocationMgr.getDataLocation(study, ag.getMeasurement(), ag.getTechnology(), targetType));
+
+
                 if (targetPath == null) {
                     continue;
                 }
@@ -240,30 +241,27 @@ public class DataFilesDispatcher {
                 // Relative paths occur e.g. for an unzipped, self-contained ISAtab archive,
                 // Absolute paths can be expected if the ISAtab files are describing data 
                 // on a local filesystem
-                //
-                // TODO: make this platform independent (c:\data\...) !!
-		// TODO: rename srcFileRelPath, it's not necessarily relative anymore ...
-                
-                File srcFile;
-                if (srcFileRelPath.startsWith("/")) {
-                    srcFile = new File(srcFileRelPath);                                            
-                } else {
-                    srcFile = new File(sourcePath + "/" + srcFileRelPath);
+
+                File srcFile = new File(sourceFilePath);
+                // if the path already exists, it is an absolute path
+                if (!srcFile.exists()) {
+                    // otherwise, it's most likely to be a relative path
+                    srcFile = new File(sourcePath + "/" + sourceFilePath);
                 }
 
                 File targetDir = new File(targetPath);
-		// the getName() is a disguised basename() function
-                File targetFile = new File(targetPath + "/" + (new File(srcFileRelPath)).getName());
+
+                File targetFile = new File(targetPath + "/" + (new File(sourceFilePath)).getName());
 
                 if (!srcFile.exists()) {
-                    log.info("WARNING: Source file '" + srcFileRelPath + "' / '" + fieldHeader + "' not found");
+                    log.info("WARNING: Source file '" + sourceFilePath + "' / '" + fieldHeader + "' not found");
                 } else {
 
                     if (targetFile.exists() && targetFile.lastModified() == srcFile.lastModified()) {
                         log.debug("Not copying “" + srcFile.getCanonicalPath() + "' to '" + targetFile.getCanonicalPath()
                                 + "': they seem to be the same.");
                     } else {
-                        log.trace("Copying data file '" + fieldHeader + "' / '" + srcFileRelPath + "' to data repository...");
+                        log.trace("Copying data file '" + fieldHeader + "' / '" + sourceFilePath + "' to data repository...");
 
                         if (srcFile.isDirectory()) {
                             FileUtils.copyDirectory(srcFile, targetFile, true);
@@ -287,8 +285,13 @@ public class DataFilesDispatcher {
 
     /**
      * Dispatches a file to the submission repository, where meta-data files are supposed to go.
+     *
+     * @param study               - @link #Study to be dispatched
+     * @param fieldName           - Field containing the data file locations?
+     * @param srcFileRelativePath - Relative path of Source files
+     * @throws java.io.IOException - Can be thrown as a result of file system problems.
      */
-    private void dispatchFileToSubmissionRepo(final Study study, String fieldName, String srcFileRelativePath)
+    private void dispatchFileToSubmissionRepo(Study study, String fieldName, String srcFileRelativePath)
             throws IOException {
         // Get the file from the location manager
         String targetPath = dataLocationMgr.buildISATabMetaDataLocation(study);
@@ -335,19 +338,17 @@ public class DataFilesDispatcher {
         log.trace("...done");
 
         log.info("'" + srcFile.getPath() + "' copied to '" + targetFilePath + "' (and to original/)");
-
-        return;
     }
 
 
     /**
      * Remove those files that were copied into data file repositories, i.e.: directories built on the basis of
      * study accessions and their contents.
+     *
+     * @param studies - @link #List<Study> to be unloaded
      */
-    @SuppressWarnings("static-access")
     public void undispatch(List<Study> studies) {
         final String placeOlder = DataSourceConfigFields.ACCESSION_PLACEHOLDER.getName();
-        StudyDAO studyDAO = DaoFactory.getInstance(dataLocationMgr.getEntityManager()).getStudyDAO();
 
         try {
             if (studies == null || studies.size() == 0) {
@@ -372,7 +373,7 @@ public class DataFilesDispatcher {
                     //
                     int istrip = location.indexOf(placeOlder);
                     String studyLoc = StringUtils.substring(location, 0, istrip + placeOlder.length());
-                    studyLoc = dataLocationMgr.buildLocation(studyLoc, study);
+                    studyLoc = DataLocationManager.buildLocation(studyLoc, study);
 
                     File targetDir = new File(studyLoc);
                     if (targetDir.exists()) {
@@ -385,8 +386,7 @@ public class DataFilesDispatcher {
                     }
                 }
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             throw new TabIOException(MessageFormat.format(
                     "ERROR while undeleting the submission files from file repositories: {0}", ex.getMessage(), ex
             ));
@@ -399,6 +399,7 @@ public class DataFilesDispatcher {
      * TODO: this is a quite dirty solution that comes from previous implementations. We add these annotations just
      * to mark the fact the assays has indeed some file that was actually copied to some repository. The web link
      * is no longer set here, but taken from the system configuration, i.e.: from DataLocationManager
+     * @param study @link #Study to have files loaded for.
      */
     private void addFilePathAnnotations(Study study) {
         final String studyDirName = DataLocationManager.getObfuscatedStudyFileName(study);
@@ -407,31 +408,38 @@ public class DataFilesDispatcher {
 
         for (Assay assay : study.getAssays()) {
 
-            final Measurement ep = assay.getMeasurement();
-            final AssayTechnology tech = assay.getTechnology();
-            final String
-                    epacc = ep.getAcc(), techacc = tech.getAcc(),
-                    epstr = ep.getName(), techstr = tech.getName();
+            Measurement measurement = assay.getMeasurement();
+            AssayTechnology technology = assay.getTechnology();
+
+
+            String measurementTypeAccession = measurement.getAcc();
+            String technologyAccession = technology.getAcc();
+            String measurementType = measurement.getName();
+            String technologyType = technology.getName();
 
             for (AnnotationTypes targetType : AnnotationTypes.DATA_PATH_ANNOTATIONS) {
+
+                // todo need to make sure the correct data location reference is used for dispatch.
                 String targetLocation = StringUtils.trimToNull(
-                        dataLocationMgr.getDataLocation(study, ep, tech, targetType)
-                );
-                if (targetLocation == null) {
+                        dataLocationMgr.getDataLocation(study, measurement, technology, targetType));
+
+
+                // if there is no target location specified, skip this iteration
+                if (targetLocation == null || targetLocation.trim().equals("")) {
                     continue;
                 }
 
-                File[] dfiles = new File(targetLocation).listFiles();
-                if (dfiles == null || dfiles.length == 0) {
+                File[] dataFiles = new File(targetLocation).listFiles();
+
+                if (dataFiles == null || dataFiles.length == 0) {
                     continue;
                 }
 
-                if (
-                        targetType == AnnotationTypes.DATA_PATH_ANNOTATIONS[0] // check it the first time only
-                                && assay.getSingleXrefContaining(":RAW") != null
-                                || assay.getSingleXrefContaining(":PROCESSED") != null
-                                || assay.getSingleXrefContaining(":GENERIC") != null
-                        ) {
+                if (targetType == AnnotationTypes.DATA_PATH_ANNOTATIONS[0] // check it the first time only
+                        && assay.getSingleXrefContaining(":RAW") != null
+                        || assay.getSingleXrefContaining(":PROCESSED") != null
+                        || assay.getSingleXrefContaining(":GENERIC") != null) {
+
                     messages.add(
                             "Some assays for the study #" + studyAcc + " have both file link annotation comments and a data location" +
                                     " defined. You should probably review the ISATAB or the configured data locations. Keeping the comments in" +
@@ -454,10 +462,10 @@ public class DataFilesDispatcher {
                     targetTypeTitle = "Generic Data Files Repository";
                 }
 
-                webAnnType = epacc + ":" + techacc + ":" + webAnnType;
+                webAnnType = measurementTypeAccession + ":" + technologyAccession + ":" + webAnnType;
 
                 // TODO: these values are already inside the data location manager
-                targetTypeTitle += " [" + epstr + ", " + techstr + "]";
+                targetTypeTitle += " [" + measurementType + ", " + technologyType + "]";
 
                 ReferenceSource source = new ReferenceSource(webAnnType);
                 source.setDescription(targetTypeTitle);

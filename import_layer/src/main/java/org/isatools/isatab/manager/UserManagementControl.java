@@ -46,7 +46,7 @@
 
  */
 
-package org.isatools.gui.datamanager.studyaccess;
+package org.isatools.isatab.manager;
 
 import org.isatools.isatab.commandline.AbstractImportLayerShellCommand;
 import uk.ac.ebi.bioinvindex.dao.UserDAO;
