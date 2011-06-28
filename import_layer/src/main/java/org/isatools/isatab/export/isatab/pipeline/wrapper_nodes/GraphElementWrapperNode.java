@@ -144,8 +144,9 @@ public abstract class GraphElementWrapperNode extends DefaultAbstractNode
 	{
 		OEString otstr = TabExportUtils.storeSource ( store, ot );
 
-		tabValueGroup.add ( "Term Source REF", otstr.src );
-		tabValueGroup.add ( "Term Accession Number", otstr.acc );
+		tabValueGroup.append ( new DefaultTabValueGroup ( 
+			"Term Source REF", otstr.src, new DefaultTabValueGroup ( "Term Accession Number", otstr.acc )
+		));
 	}
 
 	/**
@@ -160,7 +161,7 @@ public abstract class GraphElementWrapperNode extends DefaultAbstractNode
 		if ( uv != null )
 		{
 			// TODO: Currently the ISATAB doesn't support the reporting of the Unit type
-			tbg.add ( "Unit", uv.getValue () );
+			tbg.append ( new DefaultTabValueGroup ( "Unit", uv.getValue () ));
 			initOntoTerm ( tbg, uv.getSingleOntologyTerm () );
 		} else
 		// If it's not a value with unit, it may have onto terms
