@@ -48,30 +48,20 @@
 
 package org.isatools.isatab.manager;
 
-import com.sun.tools.javac.util.Log;
 import org.apache.log4j.Logger;
-import org.apache.log4j.lf5.LogLevel;
 import org.isatools.isatab.gui_invokers.*;
 import org.isatools.isatab.isaconfigurator.ISAConfigurationSet;
-import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import uk.ac.ebi.bioinvindex.model.Study;
 import uk.ac.ebi.bioinvindex.model.VisibilityStatus;
 import uk.ac.ebi.bioinvindex.model.security.User;
 
 import javax.persistence.EntityTransaction;
-import javax.swing.*;
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-
-/**
- * Created by the ISA team
- *
- * @author Eamonn Maguire (eamonnmag@gmail.com)
- *         <p/>
- *         Date: 13/04/2011
- *         Time: 11:32
- */
 public class SimpleManager {
 
     private static Logger log = Logger.getLogger(SimpleManager.class.getName());
