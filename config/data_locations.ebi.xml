@@ -232,31 +232,31 @@
 
     <datasource measurement_type="metabolite profiling" technology_type="mass spectrometry">
         <raw_data
-                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/study_${study-acc}/raw_data"
-                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/study_${study-acc}/raw_data"
+                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/ms/study_${study-acc}/raw_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/ms/study_${study-acc}/raw_data"
                 />
         <processed_data
-                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/study_${study-acc}/processed_data"
-                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/study_${study-acc}/processed_data"
+                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/ms/study_${study-acc}/processed_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/ms/study_${study-acc}/processed_data"
                 />
         <generic_data
-                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/study_${study-acc}/generic_data"
-                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/study_${study-acc}/generic_data"
+                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/ms/study_${study-acc}/generic_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/ms/study_${study-acc}/generic_data"
                 />
     </datasource>
 
     <datasource measurement_type="metabolite profiling" technology_type="NMR spectroscopy">
         <raw_data
-                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/study_${study-acc}/raw_data"
-                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/study_${study-acc}/raw_data"
+                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/nmr/study_${study-acc}/raw_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/nmr/study_${study-acc}/raw_data"
                 />
         <processed_data
-                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/study_${study-acc}/processed_data"
-                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/study_${study-acc}/processed_data"
+                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/nmr/study_${study-acc}/processed_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/nmr/study_${study-acc}/processed_data"
                 />
         <generic_data
-                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/study_${study-acc}/generic_data"
-                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/study_${study-acc}/generic_data"
+                filesystem_path="/ebi/ftp/pub/databases/bii/meda_repo/nmr/study_${study-acc}/generic_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/meda_repo/nmr/study_${study-acc}/generic_data"
                 />
     </datasource>
 
@@ -319,6 +319,59 @@
                 web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_repo/study_${study-acc}/generic_data"
                 />
     </datasource>
+
+<datasource measurement_type="transcription profiling" technology_type="DNA microarray"
+name="Generic"
+>
+        <raw_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_genechip_repo/study_${study-acc}/raw_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_genechip_repo/study_${study-acc}/raw_data"
+                />
+        <processed_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_genechip_repo/study_${study-acc}/processed_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_genechip_repo/study_${study-acc}/processed_data"
+                />
+        <generic_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_genechip_repo/study_${study-acc}/generic_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_genechip_repo/study_${study-acc}/generic_data"
+                />
+</datasource> 
+
+
+
+ <datasource measurement_type="protein identification" technology_type="mass spectrometry"
+             name="Generic"
+             >
+        <raw_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/raw_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/raw_data"
+                />
+        <processed_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/processed_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/processed_data"
+                />
+        <generic_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/generic_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/generic_data"
+                />
+ </datasource>
+
+ <datasource measurement_type="protein expression profiling" technology_type="mass spectrometry"
+             name="Generic"
+             >
+        <raw_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/raw_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/raw_data"
+                />
+        <processed_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/processed_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/processed_data"
+                />
+        <generic_data
+                filesystem_path="/ebi/ftp/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/generic_data"
+                web_url="ftp://ftp.ebi.ac.uk/pub/databases/bii/generic_proteomic_repo/study_${study-acc}/generic_data"
+                />
+ </datasource>
 
 </datasources>
         
