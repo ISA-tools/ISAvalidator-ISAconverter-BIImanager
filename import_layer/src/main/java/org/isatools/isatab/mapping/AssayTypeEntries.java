@@ -76,26 +76,18 @@ import static java.lang.System.out;
  * <p>A small helper that reads the configuration file used to map the Measurement/Technology pairs to assay format in
  * the ISATAB format description. An assay format is essentially the description of the acceptable fields in the assay,
  * see the code documentation for details.</p>
- * <p/>
  * <p>TODO: We will get rid of the file {@link #ASSAY_TYPE_ENTRIES_FILE_NAME}. All the information will come from
  * the {@link ISAConfigurationSet}.</p>
- * <p/>
- * <p>The list in the specs:
- * <p/>
- * <pre>
+ * The list in the specs:
  * 4.3.1 Generic
  * 4.3.2 DNA microarray hybridization
- *   Alias: DNA Microarray
+ * Alias: DNA Microarray
  * 4.3.3 Gel electrophoresis
  * 4.3.4 Mass Spectrometry
  * 4.3.5 Nuclear Magnetic Resonance spectroscopy (NMR)
- *   Alias: NMR Spectrometry
+ * Alias: NMR Spectrometry
  * 4.3.6 High throughput sequencing
- *   under dev, needs to be ignored
- * </pre>
- * </p>
- * <p/>
- * <dl><dt>date:</dt><dd>Jan 21, 2009</dd></dl>
+ * under dev, needs to be ignored
  *
  * @author brandizi
  */
@@ -134,7 +126,7 @@ public class AssayTypeEntries {
 
             List<String[]> entriesL = new LinkedList<String[]>();
             boolean isFirst = true;
-            for (String[] line = null; (line = csvReader.readNext()) != null;) {
+            for (String[] line = null; (line = csvReader.readNext()) != null; ) {
                 // Skip the header
                 if (isFirst) {
                     isFirst = false;
@@ -145,8 +137,7 @@ public class AssayTypeEntries {
 
             entries = entriesL.toArray(new String[][]{});
             return entries;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new TabIOException(i18n.msg("assaytype_entries_no_load", e.getMessage()), e);
         }
     }
@@ -395,23 +386,6 @@ public class AssayTypeEntries {
                 dispatchTargetId = "proteomics";
             }
 
-// Version for Local installations
-//	  out.print ( MessageFormat.format (
-//			"<datasource measurement_type=\"{0}\" technology_type=\"{1}\">\n" + 
-//			"  <raw_data\n" + 
-//			"    filesystem_path=\"/tmp/bii_test_repo/{2}/study_{3}/raw_data\"\n" + 
-//			"    web_url=\"file:///tmp/bii_test_repo/{2}/study_{3}/raw_data\"\n" + 
-//			"  />\n" + 
-//			"  <processed_data\n" + 
-//			"    filesystem_path=\"/tmp/bii_test_repo/{2}/study_{3}/processed_data\"\n" + 
-//			"    web_url=\"file:///tmp/bii_test_repo/{2}/study_{3}/processed_data\"\n" + 
-//			"  />\n" + 
-//			"</datasource>\n\n",  
-//			ep, tech, dispatchTargetId, DataSourceConfigFields.ACCESSION_PLACEHOLDER.getName ()
-//		));  				
-
-
-// Version for EBI
 
             if ("microarray".equals(dispatchTargetId)) {
                 out.print(MessageFormat.format(
