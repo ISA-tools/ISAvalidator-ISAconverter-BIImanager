@@ -55,13 +55,10 @@ package org.isatools.isatab.isaconfigurator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.isatab_v1.ISATABLoader;
 import org.isatools.isatab_v1.mapping.ISATABReducedMapper;
-import org.isatools.tablib.exceptions.TabValidationException;
 import org.isatools.tablib.utils.BIIObjectStore;
 import org.junit.Test;
 
-import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class ISAConfiguratorValidatorTest {
 
@@ -78,40 +75,5 @@ public class ISAConfiguratorValidatorTest {
 
         assertEquals("Gosh! The validator should return WARNING", GUIInvokerResult.WARNING, validator.validate());
     }
-
-    @Test
-    public void testLoadingNewAssayType() throws Exception {
-        String baseDir = System.getProperty("basedir");
-        String cfgPath = baseDir + "/target/test-classes/test-data/isatab/isa_configurator/isa_config_test";
-        String isapath = baseDir + "/target/test-classes/test-data/isatab/isa_configurator/new_assay_submission";
-        ISAConfigurationSet.setConfigPath(cfgPath);
-
-        ISATABLoader loader = new ISATABLoader(isapath);
-        ISATABReducedMapper mapper = new ISATABReducedMapper(new BIIObjectStore(), loader.load());
-        ISAConfiguratorValidator validator = new ISAConfiguratorValidator(mapper.map());
-
-        assertEquals("Gosh! The validator should return WARNING", GUIInvokerResult.WARNING, validator.validate());
-    }
-
-    @Test
-    public void testLoadingRequiredFields() throws Exception {
-        String baseDir = System.getProperty("basedir");
-        String cfgPath = baseDir + "/target/test-classes/test-data/isatab/isa_configurator/isa_config_required_fields_test";
-        String isapath = baseDir + "/target/test-classes/test-data/isatab/isa_configurator/new_assay_submission";
-        ISAConfigurationSet.setConfigPath(cfgPath);
-
-        ISATABLoader loader = new ISATABLoader(isapath);
-        ISATABReducedMapper mapper = new ISATABReducedMapper(new BIIObjectStore(), loader.load());
-        ISAConfiguratorValidator validator = new ISAConfiguratorValidator(mapper.map());
-
-        try {
-            validator.validate();
-        } catch (TabValidationException ex) {
-            out.println("We got the expected exception: \"" + ex.getMessage() + "\", congratulations!");
-            return;
-        }
-        fail("Oh no! Error exception not generated!");
-    }
-
 
 }
