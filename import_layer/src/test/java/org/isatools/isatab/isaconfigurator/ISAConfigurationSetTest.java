@@ -52,7 +52,10 @@
 
 package org.isatools.isatab.isaconfigurator;
 
-import org.isatools.isatab.configurator.schema.*;
+import org.isatools.isatab.configurator.schema.FieldType;
+import org.isatools.isatab.configurator.schema.IsaTabConfigurationType;
+import org.isatools.isatab.configurator.schema.OntologyEntryType;
+import org.isatools.isatab.configurator.schema.ProtocolFieldType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -64,91 +67,68 @@ import static org.junit.Assert.assertNotNull;
 
 @SuppressWarnings("static-access")
 public class ISAConfigurationSetTest {
-	private static ISAConfigurationSet cfgSet;
+    private static ISAConfigurationSet cfgSet;
 
-	@BeforeClass
-	public static void load() {
-		String baseDir = System.getProperty("basedir");
-		String cfgPath = baseDir + "/target/test-classes/test-data/isatab/isa_configurator/isa_config_test";
-		ISAConfigurationSet.setConfigPath(cfgPath);
-		cfgSet = new ISAConfigurationSet();
-	}
+    @BeforeClass
+    public static void load() {
+        String baseDir = System.getProperty("basedir");
+        String cfgPath = baseDir + "/target/test-classes/test-data/isatab/batch_test/configs/isa_configurator";
+        ISAConfigurationSet.setConfigPath(cfgPath);
+        cfgSet = new ISAConfigurationSet();
+    }
 
-	@Test
-	public void testLoading() {
-		IsaTabConfigurationType cfg = cfgSet.getConfig("[sample]", "");
-		assertNotNull("Ouch! I couldn't get the expected configuration", cfg);
-		out.println("\n\n_____ The tested config:");
-		out.println(cfg);
+    @Test
+    public void testLoading() {
+        IsaTabConfigurationType cfg = cfgSet.getConfig("[sample]", "");
+        assertNotNull("Ouch! I couldn't get the expected configuration", cfg);
+        out.println("\n\n_____ The tested config:");
+        out.println(cfg);
 
-		assertEquals("URP! Wrong no. of <field> elements", 7, cfg.sizeOfFieldArray());
-	}
-
-
-	@Test
-	public void testGetConfigurationField() {
-		IsaTabConfigurationType cfg = cfgSet.getConfig("transcription profiling", "DNA microarray");
-		assertNotNull("Ouch! I couldn't get the expected configuration", cfg);
-
-		FieldType f = cfgSet.getConfigurationField(cfg, "Sample Name");
-		assertNotNull("Ouch! Sample field not found in the configuration via getConfigurationField()", f);
-		assertEquals("Uhm... Bad sample field retrived via getConfigurationField()", "Sample Name", f.getHeader());
-	}
+        assertEquals("URP! Wrong no. of <field> elements", 2, cfg.sizeOfFieldArray());
+    }
 
 
-	@Test
-	public void testGetUnitField() {
-		IsaTabConfigurationType cfg = cfgSet.getConfig("[sample]", "");
-		assertNotNull("Ouch! I couldn't get the expected configuration", cfg);
+    @Test
+    public void testGetConfigurationField() {
+        IsaTabConfigurationType cfg = cfgSet.getConfig("transcription profiling", "DNA microarray");
+        assertNotNull("Ouch! I couldn't get the expected configuration", cfg);
 
-		FieldType f = cfgSet.getConfigurationField(cfg, "Parameter Value [Concentration]");
-		assertNotNull("Ouch! concentration parameter not found in the cfg!", f);
+        FieldType f = cfgSet.getConfigurationField(cfg, "Sample Name");
+        assertNotNull("Ouch! Sample field not found in the configuration via getConfigurationField()", f);
+        assertEquals("Uhm... Bad sample field retrived via getConfigurationField()", "Sample Name", f.getHeader());
+    }
 
-		UnitFieldType uf = cfgSet.getUnitField(f);
-		assertNotNull("Argh! Unit field not found next to concentration!", uf);
+    @Test
+    public void testProtocolsBetween() {
+        IsaTabConfigurationType cfg = cfgSet.getConfig("[sample]", "");
+        assertNotNull("Ouch! I couldn't get the expected configuration!", cfg);
 
-		RecommendedOntologiesType ronto = uf.getRecommendedOntologies();
-		assertNotNull("Argh! Unit field should have an ontology element!", ronto);
+        FieldType fin = cfgSet.getConfigurationField(cfg, "Source Name");
+        assertNotNull("Ouch! I couldn't get the Source Field", fin);
 
-		OntologyType[] ontos = ronto.getOntologyArray();
-		assertNotNull("Argh! the recommendend ontology element in the unit is null!", ontos);
-		assertEquals("Argh! the recommendend ontology element has bad size!", 1, ontos.length);
+        FieldType fout = cfgSet.getConfigurationField(cfg, "Sample Name");
+        assertNotNull("Ouch! I couldn't get the Source Field!", fout);
 
-		assertEquals("Ops! Bad name for the ontology in the Unit element!", "Unit Ontology", ontos[0].getName());
-	}
+        List<ProtocolFieldType> protos = cfgSet.getProtocolsBetween(fin, fout);
+        assertEquals("Argh! Wrong no of returned by getProtocolsBetween()!", 1, protos.size());
+    }
 
+    @Test
+    public void testGetMeasurment() {
+        IsaTabConfigurationType cfg = cfgSet.getConfig("transcription profiling", "DNA microarray");
+        assertNotNull("Ouch! I couldn't get the expected configuration!", cfg);
 
-	@Test
-	public void testProtocolsBetween() {
-		IsaTabConfigurationType cfg = cfgSet.getConfig("[sample]", "");
-		assertNotNull("Ouch! I couldn't get the expected configuration!", cfg);
+        OntologyEntryType mes = cfg.getMeasurement();
+        assertNotNull("Ach! couldn't get the measurement!", mes);
+        assertEquals("Ach! Bad measurement!", "transcription profiling", mes.getTermLabel());
+    }
 
-		FieldType fin = cfgSet.getConfigurationField(cfg, "Source Name");
-		assertNotNull("Ouch! I couldn't get the Source Field", fin);
+    @Test
+    public void testGetTechnology() {
+        IsaTabConfigurationType cfg = cfgSet.getConfig("transcription profiling", "DNA microarray");
+        assertNotNull("Ouch! I couldn't get the expected configuration!", cfg);
 
-		FieldType fout = cfgSet.getConfigurationField(cfg, "Sample Name");
-		assertNotNull("Ouch! I couldn't get the Source Field!", fout);
-
-		List<ProtocolFieldType> protos = cfgSet.getProtocolsBetween(fin, fout);
-		assertEquals("Argh! Wrong no of returned by getProtocolsBetween()!", 2, protos.size());
-	}
-
-	@Test
-	public void testGetMeasurment() {
-		IsaTabConfigurationType cfg = cfgSet.getConfig("transcription profiling", "DNA microarray");
-		assertNotNull("Ouch! I couldn't get the expected configuration!", cfg);
-
-		OntologyEntryType mes = cfg.getMeasurement();
-		assertNotNull("Ach! couldn't get the measurement!", mes);
-		assertEquals("Ach! Bad measurement!", "transcription profiling", mes.getTermLabel());
-	}
-
-	@Test
-	public void testGetTechnology() {
-		IsaTabConfigurationType cfg = cfgSet.getConfig("transcription profiling", "DNA microarray");
-		assertNotNull("Ouch! I couldn't get the expected configuration!", cfg);
-
-		OntologyEntryType mes = cfg.getTechnology();
-		assertEquals("Ach! Bad technlogy!", "DNA microarray", mes.getTermLabel());
-	}
+        OntologyEntryType mes = cfg.getTechnology();
+        assertEquals("Ach! Bad technlogy!", "DNA microarray", mes.getTermLabel());
+    }
 }

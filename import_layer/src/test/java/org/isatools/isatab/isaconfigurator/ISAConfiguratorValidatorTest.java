@@ -68,7 +68,7 @@ public class ISAConfiguratorValidatorTest {
     @Test
     public void testLoading() throws Exception {
         String baseDir = System.getProperty("basedir");
-        String cfgPath = baseDir + "/target/test-classes/test-data/isatab/isa_configurator/isa_config_test";
+        String cfgPath = baseDir + "/target/test-classes/test-data/isatab/batch_test/configs/isa_configurator";
         String isapath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/JCastrillo-BII-I-1";
         ISAConfigurationSet.setConfigPath(cfgPath);
 
@@ -112,7 +112,6 @@ public class ISAConfiguratorValidatorTest {
         }
         fail("Oh no! Error exception not generated!");
     }
-
 
 
 }
