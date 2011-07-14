@@ -10,17 +10,14 @@
     <name>ISA Import Layer and Command Line Tools</name>
     <url>http://isatab.sf.net/</url>
     <description>
-        The library that implements ISATAB loading, validation and
-        storage to the BII database
+        The library that implements validation, conversion and
+        loading of the ISA-tab format
     </description>
 
     <parent>
         <groupId>uk.ac.ebi</groupId>
         <artifactId>bioinvindex</artifactId>
-        <version>1.4</version>
-
-        <!-- TODO: will we need to move the import layer under the BII hat? -->
-        <relativePath>../../bii/pom.xml</relativePath>
+        <version>1.4.1</version>
     </parent>
 
     <properties>
