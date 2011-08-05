@@ -111,13 +111,31 @@ public class SimpleManager {
 
     }
 
-    public void reindexDatabase() {
-        GUIBIIReindex reindexer = new GUIBIIReindex();
+    protected Collection<Study> loadStudiesFromDatabase() {
 
-        if (reindexer.reindexDatabase() == GUIInvokerResult.SUCCESS) {
-            log.info("Successfully reindexed database...");
+        GUIISATABUnloader unloaderUtil = new GUIISATABUnloader();
+        // get study accessions!
+        if (unloaderUtil.loadStudiesFromDB() == GUIInvokerResult.SUCCESS) {
+            return unloaderUtil.getRetrievedStudies();
         } else {
-            log.info("Reindexing has failed. Please see log for errors");
+            return null;
+        }
+    }
+
+    public void reindexDatabase() {
+        GUIBIIReindex reindexer;
+
+        for (Study study : loadStudiesFromDatabase()) {
+            reindexer = new GUIBIIReindex();
+
+            Set<String> studies = new HashSet<String>();
+            studies.add(study.getAcc());
+
+            if (reindexer.reindexSelectedStudies(studies) == GUIInvokerResult.SUCCESS) {
+                log.info("Successfully reindexed database...");
+            } else {
+                log.info("Reindexing has failed. Please see log for errors");
+            }
         }
     }
 
