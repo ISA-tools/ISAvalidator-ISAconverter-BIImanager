@@ -129,8 +129,7 @@ public class PersistenceShellCommand extends AbstractImportLayerShellCommand {
                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(ts) + "." + ts.getNanos()) + "\n"
             );
             System.exit(0);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             String msg = "ERROR: problem while running the ISATAB loader: " + ex.getMessage();
             if (log == null) {
                 out.println(msg + "\n");
@@ -140,6 +139,41 @@ public class PersistenceShellCommand extends AbstractImportLayerShellCommand {
             }
             System.exit(1);
         }
+    }
+
+    /**
+     * TODO: this is a patch used until we are able to make the auto-indexing upon load feature working
+     * It is called after persistence.
+     *
+     * @param store               must contain the studies that have to be reindexed (with proper accession).
+     * @param entityManager1 - use a supplied entity manager.
+     * @param hibernateProperties - The hibernate properties indicating DB properties and Index location/Strategy,
+     *                            and so forth.
+     */
+    public static void reindexStudiesEfficient(BIIObjectStore store, EntityManager entityManager1, Properties hibernateProperties) {
+        // Need to initialize this here, otherwise above config will fail
+        log = Logger.getLogger(PersistenceShellCommand.class);
+
+        hibernateProperties.setProperty("hibernate.search.indexing_strategy", "event");
+        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "update");
+        hibernateProperties.setProperty("hbm2ddl.drop", "false");
+
+        StudyDAO studyDAO = DaoFactory.getInstance(entityManager1).getStudyDAO();
+        FullTextEntityManager fullTxtEm = Search.getFullTextEntityManager(entityManager1);
+        EntityTransaction tnx = entityManager1.getTransaction();
+
+        tnx.begin();
+        for (Study study : store.valuesOfType(Study.class)) {
+            Study dbStudy = studyDAO.getByAcc(study.getAcc());
+            if (dbStudy != null) {
+                out.println("Indexing Study #" + dbStudy.getAcc());
+                fullTxtEm.index(dbStudy);
+                log.info("Indexing of Study # " + dbStudy.getAcc() + " is complete!");
+            }
+
+        }
+        log.info("Commiting & closing Entity Manager.");
+        tnx.commit();
     }
 
     /**

@@ -26,6 +26,7 @@ public class GUIBIIReindex extends AbstractGUIInvokerWithStudySelection {
         initEntityManager();
     }
 
+
     public GUIInvokerResult reindexSelectedStudies(Set<String> studyIds) {
         try {
             BIIObjectStore store = new BIIObjectStore();
@@ -43,7 +44,7 @@ public class GUIBIIReindex extends AbstractGUIInvokerWithStudySelection {
                         }
                     }
                 }
-                PersistenceShellCommand.reindexStudies(store, getHibernateProperties());
+                PersistenceShellCommand.reindexStudiesEfficient(store, entityManager, getHibernateProperties());
                 return GUIInvokerResult.SUCCESS;
             } else {
                 vlog.error("Failed to load studies from database.");
@@ -53,6 +54,11 @@ public class GUIBIIReindex extends AbstractGUIInvokerWithStudySelection {
             e.printStackTrace();
             vlog.error("Problem occurred when reindexing BII database: " + e.getMessage());
             return GUIInvokerResult.ERROR;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+
         }
     }
 
@@ -71,7 +77,7 @@ public class GUIBIIReindex extends AbstractGUIInvokerWithStudySelection {
                         store.put(Study.class, s.getAcc(), s);
                     }
                 }
-                PersistenceShellCommand.reindexStudies(store, getHibernateProperties());
+                PersistenceShellCommand.reindexStudiesEfficient(store, entityManager, getHibernateProperties());
                 return GUIInvokerResult.SUCCESS;
             } else {
                 vlog.error("Failed to load studies from database.");
@@ -81,6 +87,8 @@ public class GUIBIIReindex extends AbstractGUIInvokerWithStudySelection {
             e.printStackTrace();
             vlog.error("Problem occurred when reindexing BII database: " + e.getMessage());
             return GUIInvokerResult.ERROR;
+        } finally {
+            entityManager.close();
         }
     }
 

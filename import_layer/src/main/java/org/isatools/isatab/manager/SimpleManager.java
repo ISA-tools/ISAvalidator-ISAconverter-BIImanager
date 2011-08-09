@@ -57,10 +57,7 @@ import uk.ac.ebi.bioinvindex.model.security.User;
 
 import javax.persistence.EntityTransaction;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class SimpleManager {
 
@@ -123,20 +120,31 @@ public class SimpleManager {
     }
 
     public void reindexDatabase() {
-        GUIBIIReindex reindexer;
+        GUIBIIReindex reindexer = new GUIBIIReindex();
+//        int reindexThreshold = 10;
+//        int reindexCount = 0;
+//        for (Study study : loadStudiesFromDatabase()) {
+//
+//            System.out.println("Reindexing database");
+//            if (reindexer.reindexSelectedStudies(Collections.singleton(study.getAcc())) == GUIInvokerResult.SUCCESS) {
+//                log.info("Successfully reindexed database...");
+//                reindexCount++;
+//            } else {
+//                log.info("Reindexing has failed. Please see log for errors");
+//            }
+//
+//            if(reindexCount == reindexThreshold) {
+//
+//                reindexCount = 0;
+//
+//            }
+//        }
 
-        for (Study study : loadStudiesFromDatabase()) {
-            reindexer = new GUIBIIReindex();
+        System.out.println("Reindexing database");
 
-            Set<String> studies = new HashSet<String>();
-            studies.add(study.getAcc());
+        reindexer.reindexDatabase();
 
-            if (reindexer.reindexSelectedStudies(studies) == GUIInvokerResult.SUCCESS) {
-                log.info("Successfully reindexed database...");
-            } else {
-                log.info("Reindexing has failed. Please see log for errors");
-            }
-        }
+        System.out.println("Finished reindexing database");
     }
 
     public void reindexStudies(Set<String> studyIds) {
