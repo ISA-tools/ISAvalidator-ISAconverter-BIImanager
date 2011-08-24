@@ -585,4 +585,14 @@
             </build>
         </profile>
     </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>oerc-repo</id>
+            <name>OeRC Maven repository</name>
+            <url>http://frog.oerc.ox.ac.uk:8080/artifactory/libs-release-local/</url>
+        </repository>
+    </distributionManagement>
+
+
 </project>

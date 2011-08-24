@@ -50,6 +50,7 @@ package org.isatools.isatab.mapping;
 
 
 import org.apache.commons.lang.StringUtils;
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.mapping.ClassTabMapper;
 import org.isatools.tablib.mapping.MappingUtils;
@@ -92,6 +93,10 @@ public class ContactTabMapper extends ClassTabMapper<Contact> implements StudyCo
                 )
         );
 
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+                CommentMappingHelper.class
+        ));
+
         mappingUtils = new MappingUtils(store);
     }
 
@@ -103,7 +108,7 @@ public class ContactTabMapper extends ClassTabMapper<Contact> implements StudyCo
 
         // The role, retrieved from the corresponding fields
 
-        ContactRole role = (ContactRole) mappingUtils.createOntologyEntry(
+        ContactRole role = mappingUtils.createOntologyEntry(
                 sectionInstance, recordIndex, "Person Roles Term Accession Number", "Person Roles", "Person Roles Term Source REF", ContactRole.class
         );
 
@@ -148,7 +153,7 @@ public class ContactTabMapper extends ClassTabMapper<Contact> implements StudyCo
     /**
      * Set the study before doing the mapping and the contact will be attached to it
      */
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

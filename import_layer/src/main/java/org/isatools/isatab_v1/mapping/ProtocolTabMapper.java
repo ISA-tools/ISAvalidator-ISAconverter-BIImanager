@@ -168,7 +168,7 @@ public class ProtocolTabMapper extends ClassTabMapper<Protocol> implements Study
     }
 
 
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

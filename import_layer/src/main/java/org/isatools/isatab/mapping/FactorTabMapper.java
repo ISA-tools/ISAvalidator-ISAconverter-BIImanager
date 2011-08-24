@@ -48,6 +48,7 @@
 
 package org.isatools.isatab.mapping;
 
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.mapping.ClassTabMapper;
@@ -77,6 +78,10 @@ public class FactorTabMapper extends ClassTabMapper<FactorTypeHelper> implements
 
         mappingHelpersConfig.put("Factor Name", new MappingHelperConfig<StringPropertyMappingHelper>(
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "value"}}
+        ));
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+                CommentMappingHelper.class, (String[][]) null
         ));
 
         mappingUtils = new MappingUtils(store);
@@ -132,7 +137,7 @@ public class FactorTabMapper extends ClassTabMapper<FactorTypeHelper> implements
     }
 
 
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

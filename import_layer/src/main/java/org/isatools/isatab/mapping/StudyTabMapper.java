@@ -50,6 +50,7 @@ package org.isatools.isatab.mapping;
 
 
 import org.apache.commons.lang.StringUtils;
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.mapping.ClassTabMapper;
@@ -90,6 +91,10 @@ public class StudyTabMapper extends ClassTabMapper<Study> {
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "description"}}
         ));
 
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+                CommentMappingHelper.class
+        ));
+
         mappingUtils = new MappingUtils(store);
     }
 
@@ -110,6 +115,8 @@ public class StudyTabMapper extends ClassTabMapper<Study> {
                 sectionInstance, recordIndex, "Study Design Type Term Accession Number", "Study Design Type", "Study Design Type Term Source REF",
                 Design.class, OntologyTerm.class
         );
+
+
         mappedStudy.addDesign(design);
 
         // The investigation

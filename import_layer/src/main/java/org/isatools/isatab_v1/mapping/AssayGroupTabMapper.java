@@ -213,7 +213,7 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
         return 90;
     }
 
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

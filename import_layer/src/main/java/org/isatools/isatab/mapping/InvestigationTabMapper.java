@@ -98,7 +98,8 @@ public class InvestigationTabMapper extends ClassTabMapper<Investigation> {
         mappingHelpersConfig.put("Investigation Public Release Date", new MappingHelperConfig<DatePropertyMappingHelper>(
                 DatePropertyMappingHelper.class, new String[][]{{"propertyName", "releaseDate"}}
         ));
-        this.mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
                 CommentMappingHelper.class
         ));
 

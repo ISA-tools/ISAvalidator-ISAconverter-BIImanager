@@ -95,7 +95,7 @@ public class StudyBlockTabMapper extends SectionBlockTabMapper {
                 if (mappedStudy == null) {
                     throw new TabInternalErrorException(i18n.msg("orphan_study_block"));
                 }
-                ((StudyComponentTabMapper) mapper).setMappedStudy(mappedStudy);
+                ((StudyComponentTabMapper) mapper).setMappedInvestigation(mappedStudy);
             }
 
             mapper.map();

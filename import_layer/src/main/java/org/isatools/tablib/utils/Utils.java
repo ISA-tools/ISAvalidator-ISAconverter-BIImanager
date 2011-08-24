@@ -49,6 +49,7 @@
 package org.isatools.tablib.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.isatools.tablib.schema.Field;
 import uk.ac.ebi.bioinvindex.model.term.*;
 
 import java.util.Collection;
@@ -178,23 +179,13 @@ public class Utils {
         return splitMultiValue(mvalue, sepRe, -1);
     }
 
-//	/**
-//	 * Logs the message and sets the validation result as {@link GUIInvokerResult#WARNING}. Does that by 
-//	 * TODO: taking the context from some static variable (to be defined) and setting the "validation.result" 
-//	 * key in it.
-//	 *   
-//	 */
-//	public static void logValidationWarning ( Logger log, String msg ) {
-//		log.warn ( msg );
-//		store.valueOfType ( TabMappingContext.class ).put ( "validation.result", GUIInvokerResult.WARNING );
-//	}
-//
-//	/**
-//	 * Like {@link #logValidationWarning(BIIObjectStore, Logger, String)}, but logs an error instead.
-//	 */
-//	public static void logValidationError ( Logger log, String msg ) {
-//		log.error ( msg );
-//		store.valueOfType ( TabMappingContext.class ).put ( "validation.result", GUIInvokerResult.WARNING );
-//	}
+    /**
+     * Checks if the field name is Comment type.
+     * @param field - Field to be checked
+     * @return true if it is a Comment, false otherwise
+     */
+    public static boolean checkIfFieldIsComment(Field field) {
+        return field != null && field.dump().toString().toLowerCase().contains("comment");
+    }
 
 }

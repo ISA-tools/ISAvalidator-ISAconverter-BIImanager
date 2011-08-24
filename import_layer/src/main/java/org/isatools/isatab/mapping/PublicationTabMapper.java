@@ -48,6 +48,7 @@
 
 package org.isatools.isatab.mapping;
 
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.mapping.ClassTabMapper;
 import org.isatools.tablib.mapping.MappingUtils;
 import org.isatools.tablib.mapping.properties.StringPropertyMappingHelper;
@@ -82,6 +83,10 @@ public class PublicationTabMapper extends ClassTabMapper<Publication> implements
         ));
         mappingHelpersConfig.put("Publication Title", new MappingHelperConfig<StringPropertyMappingHelper>(
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "title"}}
+        ));
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+                CommentMappingHelper.class
         ));
 
         mappingUtils = new MappingUtils(store);
@@ -139,7 +144,7 @@ public class PublicationTabMapper extends ClassTabMapper<Publication> implements
     /**
      * Set the study before doing the mapping and the contact will be attached to it
      */
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

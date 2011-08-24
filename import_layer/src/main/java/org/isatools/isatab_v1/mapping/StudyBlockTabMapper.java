@@ -99,7 +99,7 @@ public class StudyBlockTabMapper extends SectionBlockTabMapper {
                             "Mapping study block, no mapped study I can use to go ahead with the mapping"
                     );
                 }
-                ((StudyComponentTabMapper) mapper).setMappedStudy(mappedStudy);
+                ((StudyComponentTabMapper) mapper).setMappedInvestigation(mappedStudy);
             }
 
             mapper.map();

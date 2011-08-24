@@ -48,6 +48,7 @@
 
 package org.isatools.isatab.mapping;
 
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.isatab.mapping.attributes.ProtocolComponentMappingHelper;
 import org.isatools.isatab.mapping.attributes.ProtocolParameterMappingHelper;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
@@ -95,6 +96,10 @@ public class ProtocolTabMapper extends ClassTabMapper<Protocol> implements Study
         ));
         mappingHelpersConfig.put("Protocol Components", new MappingHelperConfig<ProtocolComponentMappingHelper>(
                 ProtocolComponentMappingHelper.class, (String[][]) null
+        ));
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+                CommentMappingHelper.class, (String[][]) null
         ));
 
         mappingUtils = new MappingUtils(store);
@@ -155,7 +160,7 @@ public class ProtocolTabMapper extends ClassTabMapper<Protocol> implements Study
     }
 
 
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

@@ -58,5 +58,5 @@ import uk.ac.ebi.bioinvindex.model.Study;
  * @author brandizi
  */
 public interface StudyComponentTabMapper {
-    public void setMappedStudy(Study mappedStudy);
+    public void setMappedInvestigation(Study mappedStudy);
 }

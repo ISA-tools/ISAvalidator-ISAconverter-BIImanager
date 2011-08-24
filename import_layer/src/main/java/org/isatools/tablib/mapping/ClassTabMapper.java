@@ -59,6 +59,7 @@ import org.isatools.tablib.schema.SectionInstance;
 import org.isatools.tablib.schema.constraints.FieldCardinalityConstraint;
 import org.isatools.tablib.schema.constraints.FieldConstraint;
 import org.isatools.tablib.utils.BIIObjectStore;
+import org.isatools.tablib.utils.Utils;
 import uk.ac.ebi.bioinvindex.model.Identifiable;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 
@@ -191,8 +192,7 @@ public abstract class ClassTabMapper<T extends Identifiable> extends RecordOrien
             }
 
             return mappedObject;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new TabInternalErrorException(String.format(
                     "Problem while mapping the class '%s': %s", getMappedClass().getSimpleName(), ex.getMessage()),
                     ex
@@ -273,8 +273,7 @@ public abstract class ClassTabMapper<T extends Identifiable> extends RecordOrien
                             },
                             new Class<?>[]{BIIObjectStore.class, SectionInstance.class, Map.class, Integer.class}
                     );
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new TabInternalErrorException(
                     "Error while creating the mapper for the property "
                             + fieldName + "/" + helperConfig.getOption("propertyName") + ": " + ex.getMessage(),
@@ -307,9 +306,12 @@ public abstract class ClassTabMapper<T extends Identifiable> extends RecordOrien
         boolean result = true;
         SectionInstance sectionInstance = getSectionInstance();
         int size = sectionInstance.getFields().size();
+
         List<Integer> matchedFieldIndexes = getMatchedFieldIndexes();
+
         for (int i = 0; i < size; i++) {
-            if (!matchedFieldIndexes.contains(i)) {
+            if (!matchedFieldIndexes.contains(i) && !Utils.checkIfFieldIsComment(sectionInstance.getField(i))) {
+
                 log.warn(i18n.msg("wrong_field_or_position", sectionInstance.getField(i).getId(), i));
                 result = false;
             }
