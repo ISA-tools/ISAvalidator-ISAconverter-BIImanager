@@ -119,7 +119,7 @@ public class ValidatorTest {
 //        out.println("\n\n" + StringUtils.center("Testing validator for the case where comments are in the investigation file", 120, "-") + "\n");
 //
 //		String baseDir = System.getProperty("basedir");
-//		String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/BII-I-1-Comments";
+//		String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/test-bii-s-3";
 //
 //		GUIISATABValidator validator = new GUIISATABValidator();
 //		GUIInvokerResult result = validator.validate(subDir);
