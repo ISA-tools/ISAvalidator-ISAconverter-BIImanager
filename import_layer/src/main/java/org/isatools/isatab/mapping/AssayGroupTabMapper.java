@@ -49,6 +49,7 @@
 package org.isatools.isatab.mapping;
 
 
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.mapping.ClassTabMapper;
 import org.isatools.tablib.mapping.MappingUtils;
@@ -81,6 +82,10 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
                         StringPropertyMappingHelper.class, new String[][]{{"propertyName", "filePath"}}
                 )
         );
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+                CommentMappingHelper.class
+        ));
 
         mappingUtils = new MappingUtils(store);
     }
@@ -152,7 +157,7 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
         return 90;
     }
 
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

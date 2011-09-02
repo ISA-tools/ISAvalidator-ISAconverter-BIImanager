@@ -114,6 +114,22 @@ public class ValidatorTest {
 		out.println("\n" + StringUtils.center("/end:Testing the validator with Castrillo submission", 120, "-") + "\n\n");
 	}
 
+//    @Test
+//    public void testValidatorOnFileWithInvestigationComments() throws Exception {
+//        out.println("\n\n" + StringUtils.center("Testing validator for the case where comments are in the investigation file", 120, "-") + "\n");
+//
+//		String baseDir = System.getProperty("basedir");
+//		String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/test-bii-s-3";
+//
+//		GUIISATABValidator validator = new GUIISATABValidator();
+//		GUIInvokerResult result = validator.validate(subDir);
+//
+//		assertEquals("Validation should have failed!", GUIInvokerResult.SUCCESS, result);
+//
+//
+//		out.println("\n" + StringUtils.center("/end:Testing validator for the comment in investigation file case", 120, "-") + "\n\n");
+//    }
+
 	@Test
 	public void testValidatorDupeFiles() throws Exception {
 		out.println("\n\n" + StringUtils.center("Testing validator for the dupe files case", 120, "-") + "\n");

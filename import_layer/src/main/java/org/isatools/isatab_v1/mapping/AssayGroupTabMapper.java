@@ -166,9 +166,6 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
                         AssayTechnology.class
                 );
 
-// TODO: remove
-//				if ( technology == null )
-//					throw new TabInternalErrorException ( "Technology Type is null for the assay " + rval.getFilePath () );
             }
         }
 
@@ -216,7 +213,7 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
         return 90;
     }
 
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

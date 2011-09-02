@@ -28,6 +28,34 @@
             <field id="Comment" type="typed(string)"/>
         </section>
 
+         <section id="invPubs" type="many-in-cols" header="INVESTIGATION PUBLICATIONS">
+            <field id="Investigation PubMed ID" cardinality="1-"/>
+            <field id="Investigation Publication DOI" cardinality="1-"/>
+            <field id="Investigation Publication Author List" cardinality="1-"/>
+            <field id="Investigation Publication Title" cardinality="1-"/>
+            <field id="Investigation Publication Status" cardinality="1-"/>
+            <field id="Investigation Publication Status Term Accession Number" cardinality="1-"/>
+            <field id="Investigation Publication Status Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
+        <section id="invContacts" type="many-in-cols" header="INVESTIGATION CONTACTS">
+            <field id="Investigation Person Last Name" cardinality="1-"/>
+            <field id="Investigation Person First Name" cardinality="1-"/>
+            <field id="Investigation Person Mid Initials" cardinality="1-"/>
+            <field id="Investigation Person Email" cardinality="1-"/>
+            <field id="Investigation Person Phone" cardinality="1-"/>
+            <field id="Investigation Person Fax" cardinality="1-"/>
+            <field id="Investigation Person Address" cardinality="1-"/>
+            <field id="Investigation Person Affiliation" cardinality="1-"/>
+            <field id="Investigation Person Roles" cardinality="1-"/>
+            <field id="Investigation Person Roles Term Accession Number" cardinality="1-"/>
+            <field id="Investigation Person Roles Term Source REF" cardinality="1-"/>
+
+            <field id="Comment" type="typed(string)"/>
+        </section>
+
 
         <!--  __________________________ BEGIN: repeatable Study block ______________________________________ -->
 

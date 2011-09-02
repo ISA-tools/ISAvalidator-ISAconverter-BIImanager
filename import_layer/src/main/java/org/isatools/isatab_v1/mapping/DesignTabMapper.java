@@ -113,7 +113,7 @@ public class DesignTabMapper extends ClassTabMapper<Design> implements StudyComp
     }
 
 
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

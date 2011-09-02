@@ -98,7 +98,8 @@ public class InvestigationTabMapper extends ClassTabMapper<Investigation> {
         mappingHelpersConfig.put("Investigation Public Release Date", new MappingHelperConfig<DatePropertyMappingHelper>(
                 DatePropertyMappingHelper.class, new String[][]{{"propertyName", "releaseDate"}}
         ));
-        this.mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
                 CommentMappingHelper.class
         ));
 
@@ -113,13 +114,13 @@ public class InvestigationTabMapper extends ClassTabMapper<Investigation> {
         Investigation rval = super.map(recordIndex);
 
         if (StringUtils.trimToNull(rval.getAcc()) == null) {
-            throw new TabMissingValueException(i18n.msg("inv_missing_accession", rval.getTitle()));
+            // we have a comment in place, in which case we should ignore
+            if (rval.getAnnotations().size() == 0) {
+                throw new TabMissingValueException(i18n.msg("inv_missing_accession", rval.getTitle()));
+            }
         }
 
-        // Also save the investigation file
-        // TODO: Is it OK to have this here? Do we need a proper field?
         rval.addAnnotation(new Annotation(new AnnotationType("investigationFile"), sectionInstance.getFileId()));
-
 
         log.trace("New/Saved mapped investigation: " + rval);
         return rval;

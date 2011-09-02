@@ -1,22 +1,16 @@
 package org.isatools.isatab.isaconfigurator;
 
-import com.sun.tools.javac.util.Pair;
 import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
 import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
-import org.isatools.isatab_v1.ISATABLoader;
-import org.isatools.isatab_v1.mapping.ISATABReducedMapper;
-import org.isatools.tablib.exceptions.TabValidationException;
-import org.isatools.tablib.utils.BIIObjectStore;
 import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import org.junit.Test;
+import uk.ac.ebi.utils.collections.ISAPair;
 
 import java.io.File;
 import java.util.*;
 
 import static java.lang.System.out;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by the ISA team
@@ -40,7 +34,7 @@ public class ISAConfigurationBatchTest {
 
         File[] isatabFiles = isatabDirectory.listFiles();
 
-        Map<Pair<File, GUIInvokerResult>, Set<String>> summaryReport = new HashMap<Pair<File, GUIInvokerResult>, Set<String>>();
+        Map<ISAPair<File, GUIInvokerResult>, Set<String>> summaryReport = new HashMap<ISAPair<File, GUIInvokerResult>, Set<String>>();
 
         out.println("These files will be tested:");
 
@@ -53,7 +47,7 @@ public class ISAConfigurationBatchTest {
                 out.println("-- TESTING | " + isatab.getName() + " --");
                 GUIISATABValidator validator = new GUIISATABValidator();
                 GUIInvokerResult result = validator.validate(isatab.getAbsolutePath());
-                summaryReport.put(new Pair(isatab, result), getValidatorReport(validator.getLog()));
+                summaryReport.put(new ISAPair(isatab, result), getValidatorReport(validator.getLog()));
             } else {
                 out.println(isatab.getName() + " is not a directory");
             }
@@ -61,12 +55,12 @@ public class ISAConfigurationBatchTest {
 
         System.out.println("Summary");
 
-        for (Pair<File, GUIInvokerResult> file : summaryReport.keySet()) {
+        for (ISAPair<File, GUIInvokerResult> file : summaryReport.keySet()) {
             System.out.println(file.fst.getName() + " " + (file.snd == GUIInvokerResult.SUCCESS ? " Passed" : "Failed") + " validation!");
             Set<String> messages = summaryReport.get(file);
-            if(messages.size() > 0 ) {
+            if (messages.size() > 0) {
                 System.out.println("Errors found: ");
-                for(String message : messages) {
+                for (String message : messages) {
                     System.out.println("\t" + message);
                 }
             } else {

@@ -67,14 +67,8 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.*;
 
 /**
  * The specific loader to be used with the ISATAB format.
- * <p/>
  * PLEASE NOTE: This is *not* the GUI Loader, mentioned in the end-user documentation. That loader is actually
  * a wrapper of {@link ISATABPersister}. This loader refers to the first in-memory loading of the ISATAB structure.
- * TODO: review the names.
- * <p/>
- * <p/>
- * TODO: Write a test for the management of {@link #alreadyLoadedFiles}.
- * <p/>
  * date: Mar 12, 2008
  *
  * @author brandizi

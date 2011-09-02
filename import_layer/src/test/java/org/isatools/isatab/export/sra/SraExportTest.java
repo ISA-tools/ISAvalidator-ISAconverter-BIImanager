@@ -112,6 +112,8 @@ public class SraExportTest {
 
             System.out.println("exportPath = " + studyExportPath);
 
+            System.out.println(studyExportPath + "/sra/" + testData.get(directory) + "/study.xml");
+
             assertTrue("Ouch! No SRA export directory created for " + directory + ": " + studyExportPath, new File(studyExportPath).exists());
             assertTrue("Ouch! No SRA study.xml created", new File(studyExportPath + "/sra/" + testData.get(directory) + "/study.xml").exists());
 
@@ -119,11 +121,11 @@ public class SraExportTest {
             try {
                 XmlOptions xopts = new XmlOptions();
                 xopts.setValidateOnSet();
-                SubmissionType xsub = SubmissionType.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/submission.xml"), xopts);
-                StudyType xstudy = StudyType.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/study.xml"), xopts);
-                SAMPLESETDocument xsamples = SAMPLESETDocument.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/sample_set.xml"), xopts);
-                EXPERIMENTSETDocument xexps = EXPERIMENTSETDocument.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/experiment_set.xml"), xopts);
-                RUNSETDocument xruns = RUNSETDocument.Factory.parse(new File(studyExportPath + "/sra/"+ testData.get(directory) + "/run_set.xml"), xopts);
+                SubmissionType xsub = SubmissionType.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/submission.xml"), xopts);
+                StudyType xstudy = StudyType.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/study.xml"), xopts);
+                SAMPLESETDocument xsamples = SAMPLESETDocument.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/sample_set.xml"), xopts);
+                EXPERIMENTSETDocument xexps = EXPERIMENTSETDocument.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/experiment_set.xml"), xopts);
+                RUNSETDocument xruns = RUNSETDocument.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/run_set.xml"), xopts);
             } catch (XmlException ex) {
                 throw new XmlException("Argh! Validation of resulting SRA/XML failed!: " + ex.getMessage(), ex);
             } catch (IOException e) {
@@ -131,15 +133,12 @@ public class SraExportTest {
             }
         }
 
-        // TODO: search (XPath) some items that must be there
-
     }
 
     private Map<String, String> getTestData() {
         Map<String, String> testData = new HashMap<String, String>();
 
-        testData.put("LTR_Moorea_Coral_Reef_2008", "LTR_MRC_2008_Bacteria_16SRNA_gene_survey");
-        testData.put("BII-S-4-NEW", "BII-S-4");
+        testData.put("BII-S-4", "BII-S-4");
 
         return testData;
 

@@ -109,7 +109,7 @@ public class StudyMappingTest {
 		// Invoke the mapper
 		//
 		OldStudyTabMapper mapper = new OldStudyTabMapper(new BIIObjectStore(), sectionInstance);
-		Study study = (Study) mapper.map(0);
+		Study study = mapper.map(0);
 		assertNotNull("Couldn't get any mapped object!", study);
 
 		out.println("___ RESULTS: ___");

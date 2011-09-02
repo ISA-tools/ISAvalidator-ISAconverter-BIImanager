@@ -135,7 +135,7 @@ public class FactorTabMapper extends ClassTabMapper<FactorTypeHelper> implements
     }
 
 
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 

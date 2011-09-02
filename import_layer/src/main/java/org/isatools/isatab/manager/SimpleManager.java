@@ -48,30 +48,17 @@
 
 package org.isatools.isatab.manager;
 
-import com.sun.tools.javac.util.Log;
 import org.apache.log4j.Logger;
-import org.apache.log4j.lf5.LogLevel;
 import org.isatools.isatab.gui_invokers.*;
 import org.isatools.isatab.isaconfigurator.ISAConfigurationSet;
-import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import uk.ac.ebi.bioinvindex.model.Study;
 import uk.ac.ebi.bioinvindex.model.VisibilityStatus;
 import uk.ac.ebi.bioinvindex.model.security.User;
 
 import javax.persistence.EntityTransaction;
-import javax.swing.*;
 import java.io.File;
 import java.util.*;
 
-
-/**
- * Created by the ISA team
- *
- * @author Eamonn Maguire (eamonnmag@gmail.com)
- *         <p/>
- *         Date: 13/04/2011
- *         Time: 11:32
- */
 public class SimpleManager {
 
     private static Logger log = Logger.getLogger(SimpleManager.class.getName());
@@ -121,14 +108,43 @@ public class SimpleManager {
 
     }
 
+    protected Collection<Study> loadStudiesFromDatabase() {
+
+        GUIISATABUnloader unloaderUtil = new GUIISATABUnloader();
+        // get study accessions!
+        if (unloaderUtil.loadStudiesFromDB() == GUIInvokerResult.SUCCESS) {
+            return unloaderUtil.getRetrievedStudies();
+        } else {
+            return null;
+        }
+    }
+
     public void reindexDatabase() {
         GUIBIIReindex reindexer = new GUIBIIReindex();
+//        int reindexThreshold = 10;
+//        int reindexCount = 0;
+//        for (Study study : loadStudiesFromDatabase()) {
+//
+//            System.out.println("Reindexing database");
+//            if (reindexer.reindexSelectedStudies(Collections.singleton(study.getAcc())) == GUIInvokerResult.SUCCESS) {
+//                log.info("Successfully reindexed database...");
+//                reindexCount++;
+//            } else {
+//                log.info("Reindexing has failed. Please see log for errors");
+//            }
+//
+//            if(reindexCount == reindexThreshold) {
+//
+//                reindexCount = 0;
+//
+//            }
+//        }
 
-        if (reindexer.reindexDatabase() == GUIInvokerResult.SUCCESS) {
-            log.info("Successfully reindexed database...");
-        } else {
-            log.info("Reindexing has failed. Please see log for errors");
-        }
+        System.out.println("Reindexing database");
+
+        reindexer.reindexDatabase();
+
+        System.out.println("Finished reindexing database");
     }
 
     public void reindexStudies(Set<String> studyIds) {

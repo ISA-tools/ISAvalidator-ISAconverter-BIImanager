@@ -165,7 +165,7 @@ public class StudyContactTabMapper extends ClassTabMapper<Contact> implements St
     /**
      * Set the study before doing the mapping and the contact will be attached to it
      */
-    public void setMappedStudy(Study mappedStudy) {
+    public void setMappedInvestigation(Study mappedStudy) {
         this.mappedStudy = mappedStudy;
     }
 
