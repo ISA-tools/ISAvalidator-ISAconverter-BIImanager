@@ -20,7 +20,7 @@
         <version>1.4</version>
 
         <!-- TODO: will we need to move the import layer under the BII hat? -->
-        <relativePath>../../bii/pom.xml</relativePath>
+        <!-- relativePath>../../bii/pom.xml</relativePath -->
     </parent>
 
     <properties>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>org.isatools</groupId>
             <artifactId>graph2tab</artifactId>
-            <version>3.0</version>
+            <version>4.0</version>
         </dependency>
 
         <dependency>
