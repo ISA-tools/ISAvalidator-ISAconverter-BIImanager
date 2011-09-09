@@ -1,7 +1,7 @@
 # ISAvalidator, ISAconverter and BII Data Management tool
 
 <p align="center">
-<img src="http://isatools.files.wordpress.com/2011/09/isavaletc.png" align="center" alt="ISAcreator"/>
+<img src="http://isatools.files.wordpress.com/2011/09/isavaletc1.png" align="center" alt="ISAcreator"/>
 </p>
 
 - General info: <http://isa-tools.org>
