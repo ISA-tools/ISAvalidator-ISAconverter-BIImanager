@@ -14,8 +14,9 @@
 ## Development
 
 **Build dependencies:**
- 1. Maven 2.2.1 <http://maven.apache.org/download.html> (not 3+)
- 2. All Java dependencies etc are all managed by Maven <http://maven.apache.org/>. You'll just need to install it and then let maven handle everything else 
+
+1. Maven 2.2.1 <http://maven.apache.org/download.html> (not 3+)
+2. All Java dependencies etc are all managed by Maven <http://maven.apache.org/>. You'll just need to install it and then let maven handle everything else 
 
 ### Refreshing your clone
 
