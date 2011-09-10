@@ -13,19 +13,9 @@
 
 ## Development
 
-**Get the source:**
-
-You should ***fork*** the ISAvalidator, ISAconverter and BII Data Management tool project to your own GitHub "repository". Then clone this forked repository and start developing. When you make changes to the ISAvalidator, ISAconverter and BII Data Management tool code, we can see the changes you made, review the code and merge with the main repository code base.
-
 **Build dependencies:**
-Dependencies are managed by Apache Maven. Please use version 2.1. 
-
-You also need to clone and install the graph2tab module available here <https://github.com/ISA-tools/graph2tab>. Follow these commands to do so:
-'git clone git@github.com:ISA-tools/graph2tab.git'
-'cd graph2tab'
-'mvn clean install' <- this will compile and install the graph2tab module to you local maven repository so that it is made available to the ISAvalidator, ISAconverter and BII Data Management tool package.
-    
-
+1. Maven 2.2.1 <http://maven.apache.org/download.html> (not 3+)
+2. All Java dependencies etc are all managed by Maven <http://maven.apache.org/>. You'll just need to install it and then let maven handle everything else 
 
 ### Refreshing your clone
 
@@ -33,9 +23,16 @@ A simple `git pull` will suffice!
 
 ### Contributing
 
-The main ISAvalidator-ISAconverter-BIImanager source tree is hosted on git (a popular [DVCS](http://en.wikipedia.org/wiki/Distributed_revision_control)), thus you should create a fork of the repository in which you perform development. See <http://help.github.com/forking/>.
+You should read this article about Git Flow: <http://scottchacon.com/2011/08/31/github-flow.html>. It's a really useful tutorial on how to use Git for collaborative development.
 
-We prefer that you send a [*pull request* here on GitHub](http://help.github.com/pull-requests/) which will then be merged into the official main line repository. You need to sign the ISAtools CLA to be able to contribute (see below).
+1. Fork it.
+2. Create a branch (`git checkout -b my-branch-name`)
+3. Make your changes
+4. Run the tests, from the import layer (`./run_tests.sh`)
+5. Commit your changes (`git commit -am "Added something useful"`)
+6. Push to the branch (`git push origin mybii`)
+7. Create a [Pull Request](http://help.github.com/pull-requests/) from your branch.
+8. Promote it. Get others to drop in and +1 it.
 
 #### Contributor License Agreement
 
