@@ -87,56 +87,6 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         super(store, sourcePath, exportPath);
     }
 
-// TODO: remove
-//	/**
-//	 * Builds the SRA sample that is directly associated to the ISATAB assay. This means that the sample must be linked to
-//	 * an SRA experiment.
-//	 * 
-//	 * Exactly one ISATAB sample must be directly associated to the assay. If that is not the case, this method will show a
-//	 * warning and return null. SRA export for the assay that falls under that case should be canceled.
-//	 * 
-//	 * This method will call {@link #buildExportedSample(MaterialNode, SAMPLESET)} to pull up both the material the assay
-//	 * directly derives from and all the samples in the downstream pipeline that leads to the assay.
-//	 * 
-//	 *  
-//	 * @param assay the ISATAB assay.
-//	 * @param sampleSet the SRA SAMPLESET element, to which the resulting sample will be added.
-//	 * 
-//	 * @return the descriptor about the newly created sample. This structure contains the sample reference too, which can be
-//	 * used in a SRA experiment.
-//	 * 
-//	 */
-//	protected SAMPLEDESCRIPTOR buildExportedAssaySample ( Assay assay, SAMPLESET sampleSet ) 
-//	{
-//		Material material = assay.getMaterial ();
-//		MaterialNode materialNode = material.getMaterialNode ();
-//		
-//		Collection<MaterialNode> sampleNodes = ProcessingUtils.findBackwardMaterialNodes ( materialNode, "", true );
-//		if ( sampleNodes.size () != 1 ) 
-//		{
-//			String msg = MessageFormat.format ( 
-//				"The assay file of type {0} / {1} for study {2} has at least one assay with {3} input samples." + 
-//				"This assays are ignored. You need {4}",
-//				assay.getMeasurement ().getName (), 
-//				assay.getTechnologyName (),
-//				assay.getStudy ().getAcc (),
-//				sampleNodes.size () == 0 ? "no" : "too many", 
-//				sampleNodes.size () == 0 ? "to create at least one sample for the assay" : "to pool the samples"
-//			);
-//			nonRepeatedMessages.add ( msg );
-//			log.trace ( msg + ". Assay is: " + assay.getAcc () );
-//			return null;
-//		}
-//		
-//		MaterialNode sampleNode = sampleNodes.iterator ().next ();
-//		SampleType xsample = buildExportedSample ( sampleNode, sampleSet );
-//		
-//		// Finally create a descriptor from the sample and pass it back
-//		SAMPLEDESCRIPTOR xsampleRef = SAMPLEDESCRIPTOR.Factory.newInstance ();
-//		xsampleRef.setRefname ( xsample.getAlias () );
-//		return xsampleRef;
-//	}
-
     /**
      * <p>Builds the sample descriptor for this assay. It populates the sample set at the same time.
      * The method also checks that we have an SRA-compatible structure in the ISATAB file. That is:</p>
@@ -224,55 +174,6 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         } // while
     }
 
-// TODO: Remove
-//	/**
-//	 * Builds an SRA sample, from one of the samples in the ISATAB pipeline. This method works recursively, at each call it
-//	 * builds the current sample by calling {@link #buildSingleExportedSample(MaterialNode)} over itself and all the samples
-//	 * the current sample derives from. This way, references are obtained that are placed into the MEMBERS section of the 
-//	 * created sample.  
-//	 * 
-//	 * @param sampleNode the ISATAB node about a biomaterial that need to be exported. All the ISATAB material types are considered SRA samples
-//	 * (there is a tag "Material Role" that have values like bio-source,sample, extract, etc.)
-//
-//	 * 
-//	 * @param sampleSet the SRA sample set, to which the newly created sample will be added.
-//	 * 
-//	 * @return the SRA {@link SampleType}, i.e.: the SRA representation of the ISATAB sample. 
-//	 * 
-//	 */
-//	private SampleType buildExportedSample ( MaterialNode sampleNode, SAMPLESET sampleSet )
-//	{
-//		SampleType xsample = buildSingleExportedSample ( sampleNode );
-//		
-//		// Add backward samples as members
-//		Collection<MaterialNode> backwardSampleNodes = ProcessingUtils.findBackwardMaterialNodes ( sampleNode, "", true );
-//    MEMBERS xpooledSampleRefs = MEMBERS.Factory.newInstance ();
-//		
-//		for ( MaterialNode pooledSampleNode: backwardSampleNodes ) 
-//		{
-//			// Do the same for the pooled sample
-//			SampleType xpooledSample = buildExportedSample ( pooledSampleNode, sampleSet );
-//			
-//			// Link to the xsample as member
-//			MEMBER xpooledSampleRef = MEMBER.Factory.newInstance ();
-//			
-//			// TODO: Does it work?! Read the real barcode (from material comment)
-//			xpooledSampleRef.setBarcodeSeqence ( "NA" );
-//			xpooledSampleRef.setSampleRef ( xpooledSample.getAlias () );
-//			xpooledSampleRefs.addNewMEMBER ();
-//			xpooledSampleRefs.setMEMBERArray ( xpooledSampleRefs.sizeOfMEMBERArray () - 1, xpooledSampleRef );
-//		}
-//		
-//		if ( xpooledSampleRefs.sizeOfMEMBERArray () > 0 )
-//			xsample.setMEMBERS ( xpooledSampleRefs );
-//
-//		sampleSet.addNewSAMPLE ();
-//		sampleSet.setSAMPLEArray ( sampleSet.sizeOfSAMPLEArray () - 1, xsample );
-//		
-//		return xsample;	
-//	}
-
-
     /**
      * Builds a single SRA sample, working only on the sample description and attributes. This is used by
      * {@link #buildSingleExportedSample(MaterialNode)}.
@@ -325,12 +226,6 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
                 String sampleName = StringUtils.trimToNull(backwardMaterial.getName());
                 if (sampleName != null) {
-                    // TODO: Common name is a GeneBank identifier and not supported for the moment
-                    // xsampleName.setCOMMONNAME ( sampleName );
-//					sampleAttrs.addNewSAMPLEATTRIBUTE ();
-//					sampleAttrs.setSAMPLEATTRIBUTEArray ( sampleAttrs.sizeOfSAMPLEATTRIBUTEArray () - 1, 
-//						buildSampleAttribute ( "Material Name", sampleName, null )
-//					);
                     xsample.setTITLE(sampleName);
                 }
             }

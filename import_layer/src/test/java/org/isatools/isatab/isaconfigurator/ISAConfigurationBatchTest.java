@@ -5,7 +5,7 @@ import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import org.junit.Test;
-import uk.ac.ebi.utils.collections.ISAPair;
+import uk.ac.ebi.utils.collections.Pair;
 
 import java.io.File;
 import java.util.*;
@@ -34,7 +34,7 @@ public class ISAConfigurationBatchTest {
 
         File[] isatabFiles = isatabDirectory.listFiles();
 
-        Map<ISAPair<File, GUIInvokerResult>, Set<String>> summaryReport = new HashMap<ISAPair<File, GUIInvokerResult>, Set<String>>();
+        Map<Pair<File, GUIInvokerResult>, Set<String>> summaryReport = new HashMap<Pair<File, GUIInvokerResult>, Set<String>>();
 
         out.println("These files will be tested:");
 
@@ -47,7 +47,7 @@ public class ISAConfigurationBatchTest {
                 out.println("-- TESTING | " + isatab.getName() + " --");
                 GUIISATABValidator validator = new GUIISATABValidator();
                 GUIInvokerResult result = validator.validate(isatab.getAbsolutePath());
-                summaryReport.put(new ISAPair(isatab, result), getValidatorReport(validator.getLog()));
+                summaryReport.put(new Pair(isatab, result), getValidatorReport(validator.getLog()));
             } else {
                 out.println(isatab.getName() + " is not a directory");
             }
@@ -55,7 +55,7 @@ public class ISAConfigurationBatchTest {
 
         System.out.println("Summary");
 
-        for (ISAPair<File, GUIInvokerResult> file : summaryReport.keySet()) {
+        for (Pair<File, GUIInvokerResult> file : summaryReport.keySet()) {
             System.out.println(file.fst.getName() + " " + (file.snd == GUIInvokerResult.SUCCESS ? " Passed" : "Failed") + " validation!");
             Set<String> messages = summaryReport.get(file);
             if (messages.size() > 0) {
