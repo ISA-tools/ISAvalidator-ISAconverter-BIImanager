@@ -97,7 +97,7 @@ public class ISATABUnloader {
     }
 
 
-    public void unload() {
+    public EntityManager unload() {
         List<Study> studies = new LinkedList<Study>();
 
         EntityManager emgr = daoFactory.getEntityManager();
@@ -109,7 +109,7 @@ public class ISATABUnloader {
             Study study = dao.getByAcc(studyAcc);
             if (study == null) {
                 log.warn("Study with accession '" + studyAcc + "' not found, no undeletion performed.");
-                return;
+                return null;
             }
             studies.add(study);
 
@@ -140,6 +140,8 @@ public class ISATABUnloader {
 
         DataFilesDispatcher fileDispatcher = new DataFilesDispatcher(daoFactory.getEntityManager());
         fileDispatcher.undispatch(studies);
+
+        return emgr;
     }
 
     public Set<String> getMessages() {

@@ -80,26 +80,37 @@ public class GUIISATABLoader extends AbstractGUIInvoker {
         super();
     }
 
-
-    /**
-     * Persist the store, assuming it has already been loaded.
-     */
     public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath) {
         Properties hibProps = AbstractImportLayerShellCommand.getHibernateProperties();
         hibProps.setProperty("hibernate.search.indexing_strategy", "manual");
         hibProps.setProperty("hbm2ddl.drop", "false");
         hibProps.setProperty("hibernate.hbm2ddl.auto", "update");
 
-        return persist(store, isatabSubmissionPath, hibProps);
+        return persist(store, isatabSubmissionPath, null);
     }
 
-    public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath, Properties hibProps) {
+
+    /**
+     * Persist the store, assuming it has already been loaded.
+     */
+    public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath, EntityManager manager) {
+        Properties hibProps = AbstractImportLayerShellCommand.getHibernateProperties();
+        hibProps.setProperty("hibernate.search.indexing_strategy", "manual");
+        hibProps.setProperty("hbm2ddl.drop", "false");
+        hibProps.setProperty("hibernate.hbm2ddl.auto", "update");
+
+        if (manager == null) {
+            EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("BIIEntityManager", hibProps);
+            manager = entityManagerFactory.createEntityManager();
+        }
+
+        return persist(store, isatabSubmissionPath, manager, hibProps);
+    }
+
+    public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath, EntityManager entityManager, Properties hibProps) {
         try {
             vlog.info("Persisting " + store.size() + " object(s)");
 
-
-            EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("BIIEntityManager", hibProps);
-            EntityManager entityManager = entityManagerFactory.createEntityManager();
             ISATABPersister persister = new ISATABPersister(store, DaoFactory.getInstance(entityManager));
 
             EntityTransaction transaction = entityManager.getTransaction();

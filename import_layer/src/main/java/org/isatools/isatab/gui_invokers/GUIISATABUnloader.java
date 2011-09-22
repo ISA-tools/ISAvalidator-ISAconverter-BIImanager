@@ -53,6 +53,7 @@ import org.isatools.isatab.commandline.AbstractImportLayerShellCommand;
 import uk.ac.ebi.bioinvindex.dao.ejb3.DaoFactory;
 import uk.ac.ebi.bioinvindex.model.Study;
 
+import javax.persistence.EntityManager;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -112,6 +113,10 @@ public class GUIISATABUnloader extends AbstractGUIInvokerWithStudySelection {
             vlog.error(e.getMessage(), e);
             return GUIInvokerResult.ERROR;
         }
+    }
+
+    public EntityManager getCurrentEntityManager() {
+        return entityManager;
     }
 
 }
