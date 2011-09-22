@@ -121,13 +121,9 @@ public class SimpleManager {
      */
     public void reloadISAtab(String studyId, String isatabFile, String configurationDirectory, String userName) {
 
-        // unload and keep the entity manager.
-        sharedEntityManager = unLoadISAtab(Collections.singleton(studyId));
+        loadConfiguration(configurationDirectory);
 
-        if(sharedEntityManager != null) {
-            // continue
-            loadISAtab(isatabFile, configurationDirectory, userName);
-        }
+        reloadISAtab(studyId, isatabFile, userName);
 
     }
 
