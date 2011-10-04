@@ -44,8 +44,8 @@
 package org.isatools.isatab.export.isatab.pipeline.wrapper_nodes;
 
 import org.isatools.tablib.exceptions.TabInternalErrorException;
-import org.isatools.tablib.export.graph_algorithm.AbstractNodeFactory;
-import org.isatools.tablib.export.graph_algorithm.Node;
+import org.isatools.tablib.export.graph2tab.AbstractNodeFactory;
+import org.isatools.tablib.export.graph2tab.Node;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.processing.DataNode;
 import uk.ac.ebi.bioinvindex.model.processing.GraphElement;
@@ -87,7 +87,7 @@ public class WrapperNodesFactory extends AbstractNodeFactory<GraphElementWrapper
 	/**
 	 * This manages the creation of the wrappers for the different {@link GraphElement} objets.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings ( "rawtypes" )
 	@Override
 	protected Node createNewNode(GraphElement base) {
 		if (base instanceof MaterialNode) {

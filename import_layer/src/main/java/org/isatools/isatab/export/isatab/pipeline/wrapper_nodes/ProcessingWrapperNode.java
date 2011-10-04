@@ -48,8 +48,8 @@
 
 package org.isatools.isatab.export.isatab.pipeline.wrapper_nodes;
 
-import org.isatools.tablib.export.graph_algorithm.DefaultTabValueGroup;
-import org.isatools.tablib.export.graph_algorithm.Node;
+import org.isatools.tablib.export.graph2tab.DefaultTabValueGroup;
+import org.isatools.tablib.export.graph2tab.Node;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Protocol;
 import uk.ac.ebi.bioinvindex.model.processing.Processing;
@@ -65,9 +65,9 @@ import java.util.*;
  * @author brandizi
  *         <b>date</b>: Mar 12, 2010
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class ProcessingWrapperNode extends GraphElementWrapperNode {
-    private Processing processing;
+		private Processing processing;
 
     /**
      * Used by {@link WrapperNodesFactory}.
@@ -79,15 +79,7 @@ public class ProcessingWrapperNode extends GraphElementWrapperNode {
     }
 
     /**
-     * Used by {@link #createIsolatedClone()}.
-     */
-    protected ProcessingWrapperNode(ProcessingWrapperNode original) {
-        super(original);
-        this.processing = original.processing;
-    }
-
-    /**
-     * Initializes the values returned by {@link GraphElementWrapperNode#getTabValues()}.
+     * Initialises the values returned by {@link GraphElementWrapperNode#getTabValues()}.
      */
     private void init() {
         SortedMap<Integer, ProtocolApplication> mpapps = new TreeMap<Integer, ProtocolApplication>();
@@ -136,9 +128,6 @@ public class ProcessingWrapperNode extends GraphElementWrapperNode {
         );
     }
 
-    public Node createIsolatedClone() {
-        return new ProcessingWrapperNode(this);
-    }
 
     /**
      * If it's not a {@link NodeType#CLONE} node returns all the inputs for this processing.

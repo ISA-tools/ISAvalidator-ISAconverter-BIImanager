@@ -43,7 +43,7 @@
 
 package org.isatools.isatab.export.isatab.pipeline.wrapper_nodes;
 
-import org.isatools.tablib.export.graph_algorithm.Node;
+import org.isatools.tablib.export.graph2tab.Node;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.processing.MaterialNode;
 import uk.ac.ebi.bioinvindex.model.processing.Processing;
@@ -63,7 +63,7 @@ import java.util.TreeSet;
  * @author brandizi
  * @param <NT>
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class PipelineWrapperNode<NT extends uk.ac.ebi.bioinvindex.model.processing.Node>
 		extends GraphElementWrapperNode {
 
@@ -75,14 +75,6 @@ public abstract class PipelineWrapperNode<NT extends uk.ac.ebi.bioinvindex.model
 	protected PipelineWrapperNode(BIIObjectStore store, NT node, String assayFileId) {
 		super(store, assayFileId);
 		this.node = node;
-	}
-
-	/**
-	 * Used by {@link #createIsolatedClone()}.
-	 */
-	protected PipelineWrapperNode(PipelineWrapperNode original) {
-		super(original);
-		this.node = (NT) original.node;
 	}
 
 	/**
