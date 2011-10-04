@@ -55,6 +55,7 @@ import uk.ac.ebi.bioinvindex.model.Study;
 import uk.ac.ebi.bioinvindex.model.VisibilityStatus;
 import uk.ac.ebi.bioinvindex.model.security.User;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.io.File;
 import java.util.*;
@@ -62,6 +63,8 @@ import java.util.*;
 public class SimpleManager {
 
     private static Logger log = Logger.getLogger(SimpleManager.class.getName());
+
+    private EntityManager sharedEntityManager;
 
     public SimpleManager() {
     }
@@ -84,8 +87,9 @@ public class SimpleManager {
         if (validationResult == GUIInvokerResult.SUCCESS) {
             GUIISATABLoader loader = new GUIISATABLoader();
             log.info("Validation successful, now proceeding to load ISAtab into the BII...");
-            GUIInvokerResult loadingResult = loader.persist(isatabValidator.getStore(), isatabFile);
 
+            // even if the shared entitymanager is null, it will be generated in anycase by the loader code.
+            GUIInvokerResult loadingResult = loader.persist(isatabValidator.getStore(), isatabFile, sharedEntityManager);
 
             if (loadingResult == GUIInvokerResult.SUCCESS) {
 
@@ -98,12 +102,45 @@ public class SimpleManager {
                     accessions.add(study.getAcc());
                 }
 
-                changeStudyPermissions(VisibilityStatus.PUBLIC, userName, accessions.toArray(new String[accessions.size()]));
+                changeStudyPermissions(VisibilityStatus.PUBLIC, userName,
+                        accessions.toArray(new String[accessions.size()]));
+
                 log.info("Loading completed and reindexing performed");
             }
-
         } else {
             log.error("Loading failed. See log for details.");
+        }
+
+    }
+
+     /**
+     * Initial version of ISAtab reloading code. Can be extended to take in the configuration directory as well
+     * @param studyId  - ID of study to unload
+     * @param isatabFile - directory for ISAtab to be reloaded
+     * @param userName - username of submitter to be assigned as the owner of the submission
+     */
+    public void reloadISAtab(String studyId, String isatabFile, String configurationDirectory, String userName) {
+
+        loadConfiguration(configurationDirectory);
+
+        reloadISAtab(studyId, isatabFile, userName);
+
+    }
+
+    /**
+     * Initial version of ISAtab reloading code. Can be extended to take in the configuration directory as well
+     * @param studyId  - ID of study to unload
+     * @param isatabFile - directory for ISAtab to be reloaded
+     * @param userName - username of submitter to be assigned as the owner of the submission
+     */
+    public void reloadISAtab(String studyId, String isatabFile, String userName) {
+
+        // unload and keep the entity manager.
+        sharedEntityManager = unLoadISAtab(Collections.singleton(studyId));
+
+        if(sharedEntityManager != null) {
+            // continue
+            loadISAtab(isatabFile, userName);
         }
 
     }
@@ -121,24 +158,6 @@ public class SimpleManager {
 
     public void reindexDatabase() {
         GUIBIIReindex reindexer = new GUIBIIReindex();
-//        int reindexThreshold = 10;
-//        int reindexCount = 0;
-//        for (Study study : loadStudiesFromDatabase()) {
-//
-//            System.out.println("Reindexing database");
-//            if (reindexer.reindexSelectedStudies(Collections.singleton(study.getAcc())) == GUIInvokerResult.SUCCESS) {
-//                log.info("Successfully reindexed database...");
-//                reindexCount++;
-//            } else {
-//                log.info("Reindexing has failed. Please see log for errors");
-//            }
-//
-//            if(reindexCount == reindexThreshold) {
-//
-//                reindexCount = 0;
-//
-//            }
-//        }
 
         System.out.println("Reindexing database");
 
@@ -195,7 +214,7 @@ public class SimpleManager {
     }
 
 
-    public void unLoadISAtab(Set<String> toUnload) {
+    public EntityManager unLoadISAtab(Set<String> toUnload) {
 
         GUIISATABUnloader unloaderUtil = new GUIISATABUnloader();
 
@@ -206,10 +225,13 @@ public class SimpleManager {
         if (result == GUIInvokerResult.SUCCESS) {
             // fire updates back to the listener(s)
             log.info("Unloading complete. Unloaded " + toUnload.size() + " studies");
-
+            return unloaderUtil.getCurrentEntityManager();
         } else {
             log.info("Some problems were encountered when loading");
+            return null;
         }
+
+
 
     }
 

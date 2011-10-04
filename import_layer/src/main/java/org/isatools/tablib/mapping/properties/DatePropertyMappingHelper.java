@@ -59,6 +59,7 @@ import uk.ac.ebi.bioinvindex.model.Identifiable;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -108,6 +109,9 @@ public class DatePropertyMappingHelper<T extends Identifiable>
         Date result = null;
         try {
             result = DateUtils.parseDate(dates, VALID_FORMATS);
+            // required to fix problems with day light savings times, particulary BST.
+            // If you don't round, dates like 30th September 2011 are converted to 29th September 2011 at 23:00.
+            result = DateUtils.round(result, Calendar.HOUR_OF_DAY);
         } catch (ParseException e) {
             log.warn(i18n.msg("invalid_date_format", dates, sectionInstance.getField(getFieldIndex()).getId()));
         }
@@ -130,8 +134,7 @@ public class DatePropertyMappingHelper<T extends Identifiable>
 
         try {
             PropertyUtils.setProperty(mappedObject, getPropertyName(), propertyValue);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new TabInternalErrorException(
                     String.format("Problem while mapping property '%s' from class '%s': %s",
                             getPropertyName(), mappedObject.getClass().getSimpleName(), ex.getMessage()
