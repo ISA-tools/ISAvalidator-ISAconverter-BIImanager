@@ -53,20 +53,18 @@ import org.apache.log4j.Logger;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.export.TabExportUtils;
 import org.isatools.tablib.export.TabExportUtils.OEString;
-import org.isatools.tablib.export.graph_algorithm.DefaultAbstractNode;
-import org.isatools.tablib.export.graph_algorithm.DefaultTabValueGroup;
-import org.isatools.tablib.export.graph_algorithm.Node;
-import org.isatools.tablib.export.graph_algorithm.TabValueGroup;
+import org.isatools.tablib.export.graph2tab.DefaultAbstractNode;
+import org.isatools.tablib.export.graph2tab.DefaultTabValueGroup;
+import org.isatools.tablib.export.graph2tab.Node;
+import org.isatools.tablib.export.graph2tab.TabValueGroup;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Annotatable;
 import uk.ac.ebi.bioinvindex.model.Annotation;
 import uk.ac.ebi.bioinvindex.model.processing.GraphElement;
 import uk.ac.ebi.bioinvindex.model.term.*;
-import uk.ac.ebi.utils.string.StringSearchUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 /**
  * The {@link Node} implementation of {@link Node}, that allows to export a BII-based study to ISATAB spreadsheets
@@ -95,14 +93,6 @@ public abstract class GraphElementWrapperNode extends DefaultAbstractNode
 		REGULAR,
 
 		/**
-		 * The node was duplicated from a regular node by the table builder algorithm, using
-		 * {@link Node#createIsolatedClone()}. We need to recognise this case, so that {@link Node#getInputs()} and
-		 * {@link Node#getOutputs()} don't generate nodes from the underline BII pipeline, but only those that are
-		 * explicitly attached by the table building procedure.
-		 */
-		CLONE,
-
-		/**
 		 * Using the assayFileId and the annotations in the BII model, the node was recognized as a start node
 		 */
 		START,
@@ -121,19 +111,6 @@ public abstract class GraphElementWrapperNode extends DefaultAbstractNode
 		super ();
 		this.store = store;
 		this.assayFileId = assayFileId;
-	}
-
-	/**
-	 * This should be used by the implementation of {@link Node#createIsolatedClone()}, to create a clone from the
-	 * original parameter.
-	 */
-	protected GraphElementWrapperNode ( GraphElementWrapperNode original )
-	{
-		this ( original.store, original.assayFileId );
-		this.nodeType = NodeType.CLONE;
-		this.tabValues = original.tabValues;
-		this.inputs = new TreeSet<Node> ();
-		this.outputs = new TreeSet<Node> ();
 	}
 
 	/**
@@ -186,11 +163,18 @@ public abstract class GraphElementWrapperNode extends DefaultAbstractNode
 	 */
 	protected void initAnnotations ( Annotatable source, String annType, String header )
 	{
+		DefaultTabValueGroup tbv = null;
 		for ( String annv: source.getAnnotationValues ( annType ) )
 		{
-			tabValues.add ( new DefaultTabValueGroup ( header, StringUtils.trimToNull ( annv ) ) );
+			// Use the first value as the one that keep it all together
+			if ( tbv == null )
+				tbv = new DefaultTabValueGroup ( header, StringUtils.trimToNull ( annv ) );
+			else
+				tbv.append ( new DefaultTabValueGroup ( header, StringUtils.trimToNull ( annv ) ) );
 		}
+		if ( tbv != null ) tabValues.add ( tbv );
 	}
+
 
 	/**
 	 * A wrapper that calls {@link #initAnnotations(Annotatable, String, String)} for every pair of annotation type /
@@ -202,14 +186,10 @@ public abstract class GraphElementWrapperNode extends DefaultAbstractNode
 	protected void initAnnotations ( Annotatable source, String ... annTypeAndHeaders )
 	{
 		if ( annTypeAndHeaders.length < 2 )
-		{
 			throw new TabInternalErrorException ( "I need at least one pair of annotation-type and header" );
-		}
 
 		for ( int i = 0; i < annTypeAndHeaders.length; i++ )
-		{
 			initAnnotations ( source, annTypeAndHeaders[i], annTypeAndHeaders[++i] );
-		}
 	}
 
 	/**
@@ -223,31 +203,6 @@ public abstract class GraphElementWrapperNode extends DefaultAbstractNode
 			String ctype = atype.getValue ().substring ( AnnotationType.COMMENT_PREFX_LEN );
 			tabValues.add ( new DefaultTabValueGroup ( "Comment [" + ctype + "]", ann.getText () ) );
 		}
-	}
-
-	/**
-	 * Tells if the string contains one of the matches. This is often used to detect which type of material/data one has.
-	 * TODO: Was moved to {@link StringSearchUtils}, replace it.
-	 */
-	@Deprecated
-	protected static boolean containsOne ( String target, String ... matches )
-	{
-		if ( target == null )
-		{
-			throw new TabInternalErrorException ( "containsOne(): target is null!" );
-		}
-		if ( matches == null || matches.length == 0 )
-		{
-			throw new TabInternalErrorException ( "containsOne(): target is null!" );
-		}
-		for ( String match: matches )
-		{
-			if ( StringUtils.containsIgnoreCase ( target, match ) )
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public List<TabValueGroup> getTabValues ()

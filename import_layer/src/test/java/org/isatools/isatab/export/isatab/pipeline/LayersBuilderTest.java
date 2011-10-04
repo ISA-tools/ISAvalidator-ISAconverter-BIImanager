@@ -1,3 +1,5 @@
+// TODO: Remove
+
 ///**
 //
 // The ISAconverter, ISAvalidator & BII Management Tool are components of the ISA software suite (http://www.isa-tools.org)
