@@ -50,12 +50,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.google.collections</groupId>
-            <artifactId>google-collections</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.isatools</groupId>
             <artifactId>graph2tab</artifactId>
             <version>3.0</version>
@@ -97,7 +91,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
+            <version>1.2.16</version>
         </dependency>
 
         <dependency>
@@ -117,15 +111,6 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.7.0</version>
         </dependency>
-
-        <!-- __________________ DBMS, TODO: needed for command-line tools? ___________________ -->
-
-
-        <!--  dependency>
-                    <groupId>${jdbc.groupId}</groupId>
-                    <artifactId>${jdbc.artifactId}</artifactId>
-                    <version>${jdbc.version}</version>
-                </dependency  -->
 
         <dependency>
             <groupId>p6spy</groupId>
