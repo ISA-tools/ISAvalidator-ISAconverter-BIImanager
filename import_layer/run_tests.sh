@@ -7,6 +7,7 @@ fi
 
 $MVN clean test -DargLine="-Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=512m" \
     -Dsurefire.useFile=true \
-    -Ph2,test
+     -Dtest=SRAExportTest
 
-$MVN surefire-report:report-only
+#$MVN surefire-report:report-only
+#   -Ph2,test \
