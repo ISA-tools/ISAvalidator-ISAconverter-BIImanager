@@ -54,6 +54,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.isatools.isatab.export.sra.templateutil.SRAUtils;
 import org.isatools.isatab.mapping.AssayTypeEntries;
 import org.isatools.tablib.exceptions.TabIOException;
+import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.exceptions.TabInvalidValueException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.utils.BIIObjectStore;
@@ -80,10 +81,12 @@ import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS.CONTACT;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES.FILE;
+import uk.ac.ebi.utils.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -159,7 +162,8 @@ public class SraExporter extends SraExportPipelineComponent {
                         study.getAcc()
                 ));
             } else {
-                xsubmission.setSubmissionId(submissionId);
+                xsubmission.setAccession(submissionId);
+                xsubmission.setAlias(studyAcc);
             }
 
             brokerName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Broker Name"));
@@ -243,10 +247,13 @@ public class SraExporter extends SraExportPipelineComponent {
                     ));
                 } else {
                     try {
-                        xsubmission.setFILES(xsubFiles);
+
+                          xsubmission.setFILES(xsubFiles);
 
                         String xSubmissionPath = exportPath + "/" + DataLocationManager.accession2FileName(studyAcc);
+
                         File xsubmissionDir = new File(xSubmissionPath);
+
                         if (!xsubmissionDir.exists()) {
                             FileUtils.forceMkdir(xsubmissionDir);
                         }
@@ -278,6 +285,46 @@ public class SraExporter extends SraExportPipelineComponent {
                         for (int i = 4; i < xfileSz; i++) {
                             FILE xfile = xsubFiles.getFILEArray(i);
                             String fileName = xfile.getFilename();
+
+                            xfile.setChecksumMethod(FILE.ChecksumMethod.MD_5);
+
+                            String md5;
+
+                            if (!fileToMD5.containsKey(fileName)) {
+
+                                try {
+                                    md5 = IOUtils.getMD5(new File(this.sourcePath + "/" + fileName));
+                                    fileToMD5.put(fileName, md5);
+
+                                    xfile.setChecksum(md5);
+                                    System.out.println("MD5@submission: " + md5 + xsubFiles.getFILEArray(i).getChecksum());
+
+                                } catch (NoSuchAlgorithmException e) {
+                                    throw new TabInternalErrorException(
+                                            "Problem while trying to compute the MD5 for '" + fileName + "': " + e.getMessage(), e
+                                    );
+                                } catch (IOException e) {
+                                    throw new TabIOException(
+                                            "I/O problem while trying to compute the MD5 for '" + fileName + "': " + e.getMessage(), e
+                                    );
+
+                                }
+                            }
+
+                            else {
+
+                                String checksum = fileToMD5.get(fileName);
+                                xfile.setChecksum(checksum);
+
+                                System.out.println("SUBMISSION@MD5checksum: " + fileToMD5.get(fileName));
+                                System.out.println(xfile.getChecksum());
+                            }
+
+
+                            xsubmission.setFILES(xsubFiles);
+
+
+
                             String filePath = sourcePath + "/" + fileName;
                             File srcFile = new File(filePath);
                             if (!srcFile.exists()) {
@@ -500,7 +547,6 @@ public class SraExporter extends SraExportPipelineComponent {
     /**
      * Export an ISATAB Investigation/Study publication as a SRA study attribute.
      *
-     * @param the             ISATAB contact
      * @param xattrs          the study attributes, to which new entries about this publication are added.
      * @param isInvestigation use an appropriate tag depending on the fact this contact is for the study or
      *                        its investigation.
