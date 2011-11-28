@@ -368,7 +368,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
         String  targetTaxon="";
 
-                targetTaxon = getParameterValue(assay, papp, "target_taxon", true);
+                targetTaxon = getParameterValue(assay, papp, "target_taxon", false);
             if (targetTaxon != null) {
                 xlib.setLIBRARYNAME(assay.getAcc()+"_"+targetTaxon) ;
                // protocol.append("\n target_taxon: ").append(targetTaxon);
@@ -511,7 +511,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 protocol.append("\n url: ").append(pUrl);
             }
 
-            //String targetTaxon = getParameterValue(assay, papp, "target taxon", true);
+            //String targetTaxon = getParameterValue(assay, papp, "target taxon", false);
             if (targetTaxon != null) {
                 protocol.append("\n target_taxon: ").append(targetTaxon);
             }
