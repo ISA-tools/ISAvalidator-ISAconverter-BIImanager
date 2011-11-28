@@ -49,8 +49,8 @@
 package org.isatools.isatab.export.isatab.pipeline;
 
 import org.isatools.isatab.export.isatab.pipeline.wrapper_nodes.WrapperNodesFactory;
-import org.isatools.tablib.export.graph_algorithm.Node;
-import org.isatools.tablib.export.graph_algorithm.TableBuilder;
+import org.isatools.tablib.export.graph2tab.Node;
+import org.isatools.tablib.export.graph2tab.TableBuilder;
 import org.isatools.tablib.mapping.pipeline.ProcessingEntityTabMapper;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Material;
@@ -105,8 +105,8 @@ public class IsaTabTableBuilder extends TableBuilder {
      * Prepares the nodes to be exported by starting from the study's assays and going back to either the sources or the 
      * left-most nodes belonging to assay files.
      */
-    @SuppressWarnings("unchecked")
-    @Override
+    @SuppressWarnings ( "rawtypes" )
+		@Override
     public List<List<String>> getTable() {
         if (table != null) {
             return table;
@@ -116,6 +116,9 @@ public class IsaTabTableBuilder extends TableBuilder {
         nodes = new HashSet<Node>();
 
         if (assayFileId == null) {
+        	  
+        		// Export the sample file
+        	  // 
             for (Assay assay : study.getAssays()) {
                 Material am = assay.getMaterial();
                 if (am == null) {
@@ -137,6 +140,11 @@ public class IsaTabTableBuilder extends TableBuilder {
                 }
             }
         } else {
+
+	        	// Export the assay file, use the assay nodes coming from the current file to be exported as  
+	      	  // starting points
+        		//
+
             for (Assay assay : study.getAssays()) {
                 Material am = assay.getMaterial();
                 if (am == null) {
@@ -157,10 +165,6 @@ public class IsaTabTableBuilder extends TableBuilder {
         return super.getTable();
     }
 
-
-//	public boolean wantSample () {
-//		return assayFileId == null;
-//	}
     
     public String getSampleFileId() {
         return

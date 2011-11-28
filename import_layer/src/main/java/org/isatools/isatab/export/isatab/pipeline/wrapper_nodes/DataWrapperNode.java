@@ -49,13 +49,14 @@
 package org.isatools.isatab.export.isatab.pipeline.wrapper_nodes;
 
 import org.apache.commons.lang.StringUtils;
-import org.isatools.tablib.export.graph_algorithm.DefaultTabValueGroup;
-import org.isatools.tablib.export.graph_algorithm.Node;
+import org.isatools.tablib.export.graph2tab.DefaultTabValueGroup;
+import org.isatools.tablib.export.graph2tab.Node;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Data;
 import uk.ac.ebi.bioinvindex.model.processing.DataNode;
 import uk.ac.ebi.bioinvindex.model.term.DataType;
 import uk.ac.ebi.bioinvindex.model.term.FactorValue;
+import uk.ac.ebi.utils.string.StringSearchUtils;
 
 import java.util.Comparator;
 import java.util.SortedSet;
@@ -70,13 +71,6 @@ import java.util.TreeSet;
 public class DataWrapperNode extends PipelineWrapperNode<DataNode> {
 
     /**
-     * Used by {@link #createIsolatedClone()}.
-     */
-    protected DataWrapperNode(DataWrapperNode original) {
-        super(original);
-    }
-
-    /**
      * Used by {@link WrapperNodesFactory}.
      */
     DataWrapperNode(BIIObjectStore store, DataNode dataNode, String assayFileId) {
@@ -85,7 +79,7 @@ public class DataWrapperNode extends PipelineWrapperNode<DataNode> {
     }
 
     /**
-     * Initializes the values returned by {@link GraphElementWrapperNode#getTabValues()}.
+     * Initialises the values returned by {@link GraphElementWrapperNode#getTabValues()}.
      */
     private void init() {
         Data data = node.getData();
@@ -94,40 +88,40 @@ public class DataWrapperNode extends PipelineWrapperNode<DataNode> {
         String dtypeAcc = dtype.getAcc();
         String dh = null, dhurl = null, dhmurl = null;
 
-        if (containsOne(dtypeAcc, "generic_assay_raw_data")) {
+        if (StringSearchUtils.containsOneOf(dtypeAcc, "generic_assay_raw_data")) {
             dhurl = "Raw Data File";
-        } else if (containsOne(dtypeAcc, "gel_electrophoresis_raw_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "gel_electrophoresis_raw_data")) {
             dh = "Scan Name";
             dhurl = "Raw Data File";
-        } else if (containsOne(dtypeAcc, "microarray_raw_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "microarray_raw_data")) {
             dh = "Scan Name";
             dhurl = "Array Data File";
             dhmurl = "Array Data Matrix File";
-        } else if (containsOne(dtypeAcc, "ms_spec_raw_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "ms_spec_raw_data")) {
             dhurl = "Raw Spectral Data File";
-        } else if (containsOne(dtypeAcc, "nmr_spec_raw_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "nmr_spec_raw_data")) {
             dhurl = "Free Induction Decay Data File";
-        } else if (containsOne(dtypeAcc, "generic_assay_normalized_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "generic_assay_normalized_data")) {
             dh = "Normalization Name";
             dhurl = "Derived Data File";
-        } else if (containsOne(dtypeAcc, "ms_spec_normalized_data", "nmr_spec_normalized_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "ms_spec_normalized_data", "nmr_spec_normalized_data")) {
             dh = "Normalization Name";
             dhurl = "Derived Spectral Data File";
-        } else if (containsOne(dtypeAcc, "gel_normalized_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "gel_normalized_data")) {
             dh = "Normalization Name";
             dhurl = "Derived Data File";
-        } else if (containsOne(dtypeAcc, "microarray_normalized_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "microarray_normalized_data")) {
             dh = "Normalization Name";
             dhurl = "Derived Array Data File";
             dhmurl = "Derived Array Data Matrix File";
-        } else if (containsOne(dtypeAcc, "microarray_derived_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "microarray_derived_data")) {
             dh = "Data Transformation Name";
             dhurl = "Derived Array Data File";
             dhmurl = "Derived Array Data Matrix File";
-        } else if (containsOne(dtypeAcc, "ms_spec_derived_data", "nmr_spec_derived_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "ms_spec_derived_data", "nmr_spec_derived_data")) {
             dh = "Data Transformation Name";
             dhurl = "Derived Spectral Data File";
-        } else if (containsOne(dtypeAcc, "gel_derived_data", "generic_assay_derived_data")) {
+        } else if (StringSearchUtils.containsOneOf(dtypeAcc, "gel_derived_data", "generic_assay_derived_data")) {
             dh = "Data Transformation Name";
             dhurl = "Derived Data File";
         } else {
@@ -184,10 +178,6 @@ public class DataWrapperNode extends PipelineWrapperNode<DataNode> {
                 "metaboliteFile", "Metabolite Assignment File"
         );
 
-    }
-
-    public Node createIsolatedClone() {
-        return new DataWrapperNode(this);
     }
 
 }

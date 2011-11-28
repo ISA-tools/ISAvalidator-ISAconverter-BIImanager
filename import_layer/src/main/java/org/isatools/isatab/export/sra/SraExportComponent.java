@@ -52,7 +52,9 @@ import org.apache.log4j.Logger;
 import org.isatools.tablib.utils.BIIObjectStore;
 import org.isatools.tablib.utils.logging.TabNDC;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -72,6 +74,8 @@ abstract class SraExportComponent {
     protected final BIIObjectStore store;
     protected final String sourcePath;
     protected final String exportPath;
+
+    protected Map<String, String> fileToMD5;
     /**
      * All the SRA documents are headed with these
      */
@@ -97,6 +101,8 @@ abstract class SraExportComponent {
         this.store = store;
         this.sourcePath = sourcePath;
         this.exportPath = exportPath + "/sra";
+
+        fileToMD5 = new HashMap<String, String>();
     }
 
 }
