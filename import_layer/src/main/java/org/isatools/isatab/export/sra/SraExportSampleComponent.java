@@ -59,9 +59,9 @@ import uk.ac.ebi.bioinvindex.model.term.OntologyTerm;
 import uk.ac.ebi.bioinvindex.model.xref.ReferenceSource;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
 import uk.ac.ebi.embl.era.sra.xml.AttributeType;
-import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.SAMPLEDESCRIPTOR;
-import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.SAMPLEDESCRIPTOR.POOL;
-import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN.SAMPLEDESCRIPTOR.POOL.MEMBER;
+import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType;
+import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType.*;
+import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType.POOL.MEMBER;
 import uk.ac.ebi.embl.era.sra.xml.SampleSetType;
 import uk.ac.ebi.embl.era.sra.xml.SampleType;
 import uk.ac.ebi.embl.era.sra.xml.SampleType.SAMPLEATTRIBUTES;
@@ -100,7 +100,8 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
      * merged with the latter and a unique SRA sample is built this way. This solution is one of the most compatible with
      * SRA.</p>
      */
-    protected SAMPLEDESCRIPTOR buildExportedAssaySample(Assay assay, SampleSetType sampleSet) {
+    protected SampleDescriptorType buildExportedAssaySample(Assay assay, SampleSetType sampleSet) {
+
         Material material = assay.getMaterial();
         MaterialNode materialNode = material.getMaterialNode();
 
@@ -147,8 +148,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
                 // Cool, it has a valid structure too, let's build the SRA representation, by merging all
                 // the properties and cascaded properties
-                //
-                SAMPLEDESCRIPTOR xSampledescriptor = SAMPLEDESCRIPTOR.Factory.newInstance();
+                SampleDescriptorType xSampledescriptor = SampleDescriptorType.Factory.newInstance();
                 xSampledescriptor.setRefname(xsample.getAlias());
 
                 sampleSet.addNewSAMPLE();
