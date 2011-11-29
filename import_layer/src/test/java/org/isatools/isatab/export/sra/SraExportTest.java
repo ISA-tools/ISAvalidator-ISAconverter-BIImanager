@@ -138,8 +138,8 @@ public class SraExportTest {
     private Map<String, String> getTestData() {
         Map<String, String> testData = new HashMap<String, String>();
 
-        //testData.put("BII-S-4", "BII-S-4");
-        testData.put("TEST", "TEST");
+        testData.put("BII-S-4", "BII-S-4");
+        //testData.put("TEST", "TEST");
 
         return testData;
 
