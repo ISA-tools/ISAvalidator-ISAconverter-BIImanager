@@ -6,14 +6,14 @@
     <groupId>org.isatools</groupId>
     <artifactId>val_conv_manager</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.3</version>
+    <version>1.4</version>
 
     <name>ISAvalidator, ISAconverter and BII Data Management tool</name>
     <url>http://isa-tools.org/</url>
     <description>ISAvalidator, ISAconverter and BII Data Management tools</description>
 
     <properties>
-        <isatools.version>1.3.3</isatools.version>
+        <isatools.version>1.4</isatools.version>
     </properties>
 
     <modules>
