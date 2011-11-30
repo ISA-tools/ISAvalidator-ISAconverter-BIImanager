@@ -6,8 +6,4 @@ fi
 #MVN="mvn2 -s $HOME/.m2_old/settings.xml -Dmaven.repo.local=$HOME/.m2_old/repository"
 
 $MVN clean test -DargLine="-Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=512m" \
-    -Dsurefire.useFile=true \
-     -Dtest=SRAExportTest
-
-#$MVN surefire-report:report-only
-#   -Ph2,test \
+    -Dsurefire.useFile=true -Ph2,test
