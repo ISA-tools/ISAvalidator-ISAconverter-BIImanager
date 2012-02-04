@@ -53,47 +53,39 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-//testing to see whether it pulls md5
-import org.isatools.isatab.export.sra.SraExportUtils;
 import org.isatools.isatab.export.sra.templateutil.*;
+import org.isatools.tablib.exceptions.TabIOException;
+import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.exceptions.TabInvalidValueException;
-import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.*;
 import uk.ac.ebi.bioinvindex.model.processing.Assay;
 import uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication;
-import uk.ac.ebi.bioinvindex.model.term.OntologyTerm;
-import uk.ac.ebi.bioinvindex.model.term.ProtocolComponent;
 import uk.ac.ebi.bioinvindex.model.xref.Xref;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
-
 import uk.ac.ebi.embl.era.sra.xml.*;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.PROCESSING;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.STUDYREF;
-
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK;
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK.FILES;
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK.FILES.FILE;
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK.FILES.FILE.ChecksumMethod;
 import uk.ac.ebi.embl.era.sra.xml.RunType.EXPERIMENTREF;
+import uk.ac.ebi.utils.io.IOUtils;
 
 import java.io.File;
-import java.lang.String;
-
-import uk.ac.ebi.utils.io.IOUtils;
-import org.isatools.tablib.exceptions.TabIOException;
-import org.isatools.tablib.exceptions.TabInternalErrorException;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.security.NoSuchAlgorithmException;
-
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+//testing to see whether it pulls md5
 
 /**
  * SRA-exporter, functions related to the ISATAB experimental pipeline. See {@link SraExportComponent} for further
@@ -131,8 +123,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      *
      * @return true if it could successfully build the exported items.
      */
-    protected boolean buildExportedAssay(
-            Assay assay, SubmissionType.FILES xsubFiles, RunSetType xrunSet, ExperimentSetType xexperimentSet, SampleSetType xsampleSet) {
+    protected boolean buildExportedAssay(Assay assay, SubmissionType.FILES xsubFiles, RunSetType xrunSet, ExperimentSetType xexperimentSet, SampleSetType xsampleSet) {
 
 
         String assayAcc = assay.getAcc();
@@ -687,8 +678,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             XmlOptions xmlOptions = new XmlOptions();
             xmlOptions.setDocumentType(SpotDescriptorType.Factory.newInstance().schemaType());
 
-            XmlObject parsedAttr =
-                    XmlObject.Factory.parse(sraTemplate, xmlOptions);
+            XmlObject parsedAttr = XmlObject.Factory.parse(sraTemplate, xmlOptions);
 
             xspotd.set(parsedAttr);
 

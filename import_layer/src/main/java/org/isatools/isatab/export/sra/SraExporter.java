@@ -144,6 +144,8 @@ public class SraExporter extends SraExportPipelineComponent {
             log.trace("SraExporter, Working on study " + studyAcc);
 
             // Prepare the submission
+
+
             SubmissionType xsubmission = SubmissionType.Factory.newInstance();
 
             centerName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Center Name"));
@@ -247,43 +249,12 @@ public class SraExporter extends SraExportPipelineComponent {
                     ));
                 } else {
                     try {
-
-                          xsubmission.setFILES(xsubFiles);
-
                         String xSubmissionPath = exportPath + "/" + DataLocationManager.accession2FileName(studyAcc);
 
-                        File xsubmissionDir = new File(xSubmissionPath);
-
-                        if (!xsubmissionDir.exists()) {
-                            FileUtils.forceMkdir(xsubmissionDir);
-                        }
-
-                        log.debug("SRA exporter: writing SRA XML files for study " + studyAcc);
-                        SUBMISSIONDocument xsubmissionDoc = SUBMISSIONDocument.Factory.newInstance();
-                        xsubmissionDoc.setSUBMISSION(xsubmission);
-
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/submission.xml"), xsubmissionDoc.toString());
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/study.xml"), xstudyDoc.toString());
-
-                        EXPERIMENTSETDocument expSetDoc = EXPERIMENTSETDocument.Factory.newInstance();
-                        expSetDoc.setEXPERIMENTSET(expSet);
-
-                        // A modification is made on the XML to be output to remove any tags required for injection of elements into
-                        // the DOM during conversion. These tags are usually found as <INJECTED_TAG>. The SRAUtils.removeInjectedTags method
-                        // finds and replaces these tags with empty spaces.
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/experiment_set.xml"), SRAUtils.removeInjectedTags(expSetDoc.toString()));
-
-                        RUNSETDocument runSetDoc = RUNSETDocument.Factory.newInstance();
-                        runSetDoc.setRUNSET(runSet);
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/run_set.xml"), runSetDoc.toString());
-
-                        SAMPLESETDocument sampleSetDoc = SAMPLESETDocument.Factory.newInstance();
-                        sampleSetDoc.setSAMPLESET(sampleSet);
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/sample_set.xml"), sampleSetDoc.toString());
 
                         log.debug("SRA exporter: copying SRA data files for study " + studyAcc);
-                        for (int i = 4; i < xfileSz; i++) {
-                            FILE xfile = xsubFiles.getFILEArray(i);
+                        for (int fileCount = 0; fileCount < xfileSz; fileCount++) {
+                            FILE xfile = xsubFiles.getFILEArray(fileCount);
                             String fileName = xfile.getFilename();
 
                             xfile.setChecksumMethod(FILE.ChecksumMethod.MD_5);
@@ -296,8 +267,9 @@ public class SraExporter extends SraExportPipelineComponent {
                                     md5 = IOUtils.getMD5(new File(this.sourcePath + "/" + fileName));
                                     fileToMD5.put(fileName, md5);
 
+
                                     xfile.setChecksum(md5);
-                                    System.out.println("MD5@submission: " + md5 + xsubFiles.getFILEArray(i).getChecksum());
+                                    System.out.println("MD5@submission: " + md5 + xsubFiles.getFILEArray(fileCount).getChecksum());
 
                                 } catch (NoSuchAlgorithmException e) {
                                     throw new TabInternalErrorException(
@@ -339,6 +311,41 @@ public class SraExporter extends SraExportPipelineComponent {
                             targetFile.setLastModified(srcFile.lastModified());
                             log.trace("...done");
                         }
+
+                        xsubmission.setFILES(xsubFiles);
+
+
+
+                        File xsubmissionDir = new File(xSubmissionPath);
+
+                        if (!xsubmissionDir.exists()) {
+                            FileUtils.forceMkdir(xsubmissionDir);
+                        }
+
+                        log.debug("SRA exporter: writing SRA XML files for study " + studyAcc);
+                        SUBMISSIONDocument xsubmissionDoc = SUBMISSIONDocument.Factory.newInstance();
+                        xsubmissionDoc.setSUBMISSION(xsubmission);
+
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/submission.xml"), xsubmissionDoc.toString());
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/study.xml"), xstudyDoc.toString());
+
+                        EXPERIMENTSETDocument expSetDoc = EXPERIMENTSETDocument.Factory.newInstance();
+                        expSetDoc.setEXPERIMENTSET(expSet);
+
+                        // A modification is made on the XML to be output to remove any tags required for injection of elements into
+                        // the DOM during conversion. These tags are usually found as <INJECTED_TAG>. The SRAUtils.removeInjectedTags method
+                        // finds and replaces these tags with empty spaces.
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/experiment_set.xml"), SRAUtils.removeInjectedTags(expSetDoc.toString()));
+
+                        RUNSETDocument runSetDoc = RUNSETDocument.Factory.newInstance();
+                        runSetDoc.setRUNSET(runSet);
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/run_set.xml"), runSetDoc.toString());
+
+                        SAMPLESETDocument sampleSetDoc = SAMPLESETDocument.Factory.newInstance();
+                        sampleSetDoc.setSAMPLESET(sampleSet);
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/sample_set.xml"), sampleSetDoc.toString());
+
+
                     } catch (IOException ex) {
                         throw new TabIOException(MessageFormat.format("Error during SRA export of study {0}: {1}", studyAcc, ex.getMessage()), ex);
                     }
@@ -692,10 +699,10 @@ public class SraExporter extends SraExportPipelineComponent {
             if ("VALIDATE".equalsIgnoreCase(action)) {
                 // If it is validate, let's validate all.
                 //
-                final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set", "analysis"};
+                final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};    //, "analysis" could be added when needed
                 final VALIDATE.Schema.Enum[] schemas = new VALIDATE.Schema.Enum[]{
-                        VALIDATE.Schema.STUDY, VALIDATE.Schema.SAMPLE, VALIDATE.Schema.EXPERIMENT, VALIDATE.Schema.RUN,
-                        VALIDATE.Schema.ANALYSIS
+                        VALIDATE.Schema.STUDY, VALIDATE.Schema.SAMPLE, VALIDATE.Schema.EXPERIMENT, VALIDATE.Schema.RUN
+                        //,VALIDATE.Schema.ANALYSIS
                 };
 
                 for (int i = 0; i < schemas.length; i++) {
@@ -708,10 +715,10 @@ public class SraExporter extends SraExportPipelineComponent {
 
             } else if ("ADD".equalsIgnoreCase(action)) {
                 // TODO: What the hell is analysis?
-                final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set", "analysis"};
+                final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};//, "analysis" could be added when needed
                 final ADD.Schema.Enum[] schemas = new ADD.Schema.Enum[]{
-                        ADD.Schema.STUDY, ADD.Schema.SAMPLE, ADD.Schema.EXPERIMENT, ADD.Schema.RUN,
-                        ADD.Schema.ANALYSIS
+                        ADD.Schema.STUDY, ADD.Schema.SAMPLE, ADD.Schema.EXPERIMENT, ADD.Schema.RUN
+                        //,ADD.Schema.ANALYSIS
                 };
 
                 for (int i = 0; i < schemas.length; i++) {
