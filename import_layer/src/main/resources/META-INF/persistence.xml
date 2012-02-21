@@ -21,6 +21,7 @@
         <class>uk.ac.ebi.bioinvindex.model.Investigation</class>
         <class>uk.ac.ebi.bioinvindex.model.Material</class>
         <class>uk.ac.ebi.bioinvindex.model.Protocol</class>
+        <class>uk.ac.ebi.bioinvindex.model.BioEntity</class>
         <class>uk.ac.ebi.bioinvindex.model.Publication</class>
         <class>uk.ac.ebi.bioinvindex.model.Study</class>
         <class>uk.ac.ebi.bioinvindex.model.processing.Assay</class>
