@@ -56,8 +56,8 @@ import java.awt.geom.GeneralPath;
 public abstract class GenericPanel extends JPanel {
     protected RenderingHints hints;
     protected int counter = 0;
-    protected Color start = new Color(51, 51, 51, 200);
-    protected Color end = new Color(153, 153, 153, 0);
+    protected Color start = new Color(0, 104, 56, 200);
+    protected Color end = new Color(141, 198, 63, 0);
 
 
     public GenericPanel() {

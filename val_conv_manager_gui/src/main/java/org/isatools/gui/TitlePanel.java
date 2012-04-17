@@ -62,7 +62,7 @@ public abstract class TitlePanel extends JComponent {
     private JButton closeButton;
     private JButton iconifyButton;
 
-    private int preferredHeight = 26;
+    private int preferredHeight = 24;
     private Image backgroundGradient = new ImageIcon(getClass().getResource("/images/titlebar/title-background.png")).getImage();
     private Image backgroundGradientInactive = new ImageIcon(getClass().getResource("/images/titlebar/title-background-inactive.png")).getImage();
 

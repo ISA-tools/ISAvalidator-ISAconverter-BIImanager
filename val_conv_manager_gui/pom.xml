@@ -113,13 +113,11 @@
             <version>1.3.150</version>
         </dependency>
 
-
-        <!-- TODO: This must not be included in the binary packages (legal reasons)! -->
-        <!--        <dependency>-->
-        <!--            <groupId>com.oracle</groupId>-->
-        <!--            <artifactId>ojdbc5</artifactId>-->
-        <!--            <version>11.1.0.7.0</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.isatools</groupId>
+            <artifactId>ISAtabErrorReporter</artifactId>
+            <version>0.3</version>
+        </dependency>
 
         <dependency>
             <groupId>net.sourceforge.collections</groupId>

@@ -48,35 +48,23 @@
 
 package org.isatools.gui.datamanager;
 
+import org.isatools.effects.SmallLoader;
 import org.isatools.gui.*;
 import org.isatools.gui.datamanager.exportisa.ExportISAGUI;
-import org.isatools.gui.datamanager.exportisa.SuccessOrFailureGUI;
 import org.isatools.gui.datamanager.studyaccess.*;
-import org.isatools.gui.errorprocessing.ErrorReport;
-import org.isatools.isatab.gui_invokers.GUIBIIReindex;
-import org.isatools.isatab.gui_invokers.GUIISATABExporter;
-import org.isatools.isatab.gui_invokers.GUIISATABLoader;
-import org.isatools.isatab.gui_invokers.GUIInvokerResult;
-import org.isatools.isatab.manager.UserManagementControl;
 import org.isatools.tablib.exceptions.TabException;
 import org.isatools.tablib.utils.BIIObjectStore;
-import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
 import uk.ac.ebi.bioinvindex.model.Study;
-import uk.ac.ebi.bioinvindex.model.VisibilityStatus;
-import uk.ac.ebi.bioinvindex.model.security.User;
 
-import javax.persistence.EntityTransaction;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.*;
-import java.util.List;
 
 /**
  * InterfaceUtils
@@ -89,15 +77,16 @@ import java.util.List;
 public class DataManagerToolUI extends CommonUI {
 
     @InjectedResource
-    private ImageIcon exportFailureImage, unloadingSuccess, unloadingFailure, loadButton,
-            loadButtonOver;
+    private ImageIcon unloadingSuccess, unloadingFailure, loadButton, loadButtonOver;
 
     private StudyAccessionGUI studyAccessionGUI;
     private StudyAccessibilityModificationUI studyPermissionManagement;
-    private ExportISAGUI exportISAGUI;
+
     private JPanel loaderMenu;
-    // TODO: remove, we cannot have this over multiple operations, Hibernate problems
-    // private UserManagementControl umControl;
+    private final Reindexer reindexer = new Reindexer(this);
+    private final DBLoader dbLoader = new DBLoader(this);
+    private final PermissionManagement permissionManagement = new PermissionManagement(this);
+    private final ExportISATab exportISATab = new ExportISATab(this);
 
     public DataManagerToolUI(final AppContainer appContainer, ApplicationType useAs, String[] options) {
         super(appContainer, useAs, options);
@@ -125,8 +114,6 @@ public class DataManagerToolUI extends CommonUI {
         final JLabel reindexButton = new JLabel(Globals.REINDEX);
         reindexButton.setToolTipText("<html><strong>Reindex database</strong>" +
                 "<p>Recreate the Lucene index from the database contents</p></html>");
-        final JLabel mibbiButton = new JLabel(Globals.MIBBI_CHECKLIST);
-        mibbiButton.setToolTipText("<html><strong>Set Minimum Information Compliance</strong><p>Set which studies meet which reporting standards.</p><p>See <a href=\"http://mibbi.org\">MIBBI</a> more information.</p></html>");
 
         MouseAdapter buttonMouseListener = new MouseAdapter() {
 
@@ -144,7 +131,7 @@ public class DataManagerToolUI extends CommonUI {
                     });
 
                 } else if (mouseEvent.getSource() == unloadStudyButton) {
-                    // todo change unload study UI to use same tree view as in export ISA UI
+
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             unloadStudyButton.setIcon(Globals.UNLOAD_STUDY);
@@ -183,18 +170,14 @@ public class DataManagerToolUI extends CommonUI {
 
                 } else if (mouseEvent.getSource() == securityButton) {
                     securityButton.setIcon(Globals.SECURITY);
-                    createSecurityChangeInterface();
+                    permissionManagement.createSecurityChangeInterface();
 
                 } else if (mouseEvent.getSource() == exportISAtabButton) {
                     exportISAtabButton.setIcon(Globals.EXPORT_ISA);
-                    createExportISATabInterface();
+                    exportISATab.createExportISATabInterface();
                 } else if (mouseEvent.getSource() == reindexButton) {
                     reindexButton.setIcon(Globals.REINDEX);
-                    performReindexing();
-
-                } else if (mouseEvent.getSource() == mibbiButton) {
-                    // todo: update mibbi checklists and then show similar interface to the security
-                    // interface
+                    reindexer.performReindexing();
 
                 }
             }
@@ -210,9 +193,6 @@ public class DataManagerToolUI extends CommonUI {
                     exportISAtabButton.setIcon(Globals.EXPORT_ISA_OVER);
                 } else if (mouseEvent.getSource() == reindexButton) {
                     reindexButton.setIcon(Globals.REINDEX_OVER);
-                } else if (mouseEvent.getSource() == mibbiButton) {
-                    mibbiButton.setIcon(Globals.MIBBI_CHECKLIST_OVER);
-
                 }
             }
 
@@ -227,8 +207,6 @@ public class DataManagerToolUI extends CommonUI {
                     exportISAtabButton.setIcon(Globals.EXPORT_ISA);
                 } else if (mouseEvent.getSource() == reindexButton) {
                     reindexButton.setIcon(Globals.REINDEX);
-                } else if (mouseEvent.getSource() == mibbiButton) {
-                    mibbiButton.setIcon(Globals.MIBBI_CHECKLIST);
                 }
             }
 
@@ -239,7 +217,6 @@ public class DataManagerToolUI extends CommonUI {
         securityButton.addMouseListener(buttonMouseListener);
         exportISAtabButton.addMouseListener(buttonMouseListener);
         reindexButton.addMouseListener(buttonMouseListener);
-        mibbiButton.addMouseListener(buttonMouseListener);
 
         Box topMenu = Box.createHorizontalBox();
 
@@ -251,404 +228,15 @@ public class DataManagerToolUI extends CommonUI {
 
         Box bottomMenu = Box.createHorizontalBox();
 
+        bottomMenu.add(Box.createHorizontalStrut(45));
         bottomMenu.add(reindexButton);
         bottomMenu.add(Box.createHorizontalStrut(5));
-        bottomMenu.add(mibbiButton);
-        bottomMenu.add(Box.createHorizontalStrut(5));
         bottomMenu.add(exportISAtabButton);
+        bottomMenu.add(Box.createHorizontalStrut(45));
 
         loaderMenu.add(topMenu);
         loaderMenu.add(bottomMenu);
 
-    }
-
-    private void performReindexing() {
-        final Thread[] threads = new Thread[1];
-        threads[0] = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            appContainer.setGlassPanelContents(createProgressScreen("reindexing..."));
-                            appContainer.validate();
-                            progressIndicator.start();
-                        }
-                    });
-
-                    GUIBIIReindex reindexer = new GUIBIIReindex();
-
-                    final SuccessOrFailureGUI successOrFailGUI;
-
-                    if (reindexer.reindexDatabase() == GUIInvokerResult.SUCCESS) {
-                        successOrFailGUI = new SuccessOrFailureGUI(appContainer, SuccessOrFailureGUI.INDEX_SUCCESS,
-                                "<html>Reindexing of the BII database has completed successfully!</html>");
-
-                    } else {
-                        successOrFailGUI = new SuccessOrFailureGUI(appContainer, SuccessOrFailureGUI.INDEX_FAILURE, null);
-                    }
-
-                    successOrFailGUI.addPropertyChangeListener("toMenu", new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                            appContainer.setGlassPanelContents(loaderMenu);
-                            appContainer.validate();
-                        }
-                    });
-
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            appContainer.setGlassPanelContents(successOrFailGUI);
-                            progressIndicator.stop();
-                            appContainer.validate();
-                        }
-                    });
-
-
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            SuccessOrFailureGUI successOrFailGUI = new SuccessOrFailureGUI(appContainer, SuccessOrFailureGUI.INDEX_FAILURE,
-                                    e.getMessage());
-                            appContainer.setGlassPanelContents(successOrFailGUI);
-                            progressIndicator.stop();
-                            appContainer.validate();
-                        }
-                    });
-                }
-            }
-        });
-
-        threads[0].start();
-    }
-
-    private void createSecurityChangeInterface() {
-
-        final Thread[] threads = new Thread[1];
-        threads[0] = new Thread(new Runnable() {
-            public void run() {
-                try {
-
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            appContainer.setGlassPanelContents(createProgressScreen("finding studies & users"));
-                            appContainer.validate();
-                            progressIndicator.start();
-
-                        }
-                    });
-
-                    final UserManagementControl umControl = new UserManagementControl();
-
-                    List<User> users = umControl.getUsers();
-                    Set<String> studies = umControl.getAllStudies();
-                    Map<String, VisibilityStatus> studyToVisability = umControl.getAllStudyVisibilityStatus();
-
-                    studyPermissionManagement = new StudyAccessibilityModificationUI(appContainer,
-                            studies.toArray(new String[studies.size()]),
-                            umControl.extractUserNamesFromUserList(users));
-
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            studyPermissionManagement.createGUI(true);
-                        }
-                    });
-
-                    // setting study to users here.
-                    studyPermissionManagement.getStudyOwnership()
-                            .setStudyToUser(new HashMap<String, Set<String>>(umControl.getStudiesAndAssociatedUsers()));
-                    studyPermissionManagement.getStudyPrivacy().setStudyPrivacySelections(studyToVisability);
-
-                    studyPermissionManagement.addPropertyChangeListener("doPrivacySettings", new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    final Thread[] threads = new Thread[1];
-                                    threads[0] = new Thread(new Runnable() {
-                                        public void run() {
-                                            appContainer.setGlassPanelContents(createProgressScreen("applying settings..."));
-                                            appContainer.validate();
-                                            progressIndicator.start();
-                                            // perform associations and then show a screen telling the users what has been done :D
-                                            try {
-                                                modifyPrivacyAndAccessibility(umControl.getStudiesAndAssociatedUsers());
-                                            } catch (final Exception e) {
-                                                SwingUtilities.invokeLater(new Runnable() {
-                                                    public void run() {
-                                                        appContainer.setGlassPanelContents(createResultPanel(Globals.PRIVACY_MOD_FAILED, Globals.BACK_MAIN,
-                                                                Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, e.getMessage()));
-                                                        progressIndicator.stop();
-                                                        appContainer.validate();
-                                                    }
-                                                });
-                                            }
-
-                                        }
-                                    });
-                                    threads[0].start();
-                                }
-                            });
-                        }
-                    });
-
-                    studyPermissionManagement.addPropertyChangeListener("doShowMenu", new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    appContainer.setGlassPanelContents(loaderMenu);
-                                    appContainer.validate();
-                                }
-                            });
-                        }
-                    });
-
-                    progressIndicator.stop();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            appContainer.setGlassPanelContents(studyPermissionManagement);
-                            appContainer.validate();
-                        }
-                    });
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            appContainer.setGlassPanelContents(createResultPanel(Globals.PRIVACY_MOD_FAILED, Globals.BACK_MAIN,
-                                    Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, e.getMessage()));
-                            progressIndicator.stop();
-                            appContainer.validate();
-                        }
-                    });
-                }
-            }
-        }
-
-        );
-        threads[0].start();
-    }
-
-    private void createExportISATabInterface() {
-        final Thread[] threads = new Thread[1];
-        threads[0] = new Thread(new Runnable() {
-            public void run() {
-                try {
-
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            appContainer.setGlassPanelContents(createProgressScreen("finding studies..."));
-                            appContainer.validate();
-                            progressIndicator.start();
-                        }
-                    });
-
-                    exportISAGUI = new ExportISAGUI(appContainer);
-
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            exportISAGUI.createGUI();
-                        }
-                    });
-
-                    exportISAGUI.addPropertyChangeListener("toMenu", new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                            appContainer.setGlassPanelContents(loaderMenu);
-                            appContainer.validate();
-                        }
-                    });
-
-                    exportISAGUI.addPropertyChangeListener("doISATabExport", new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                            final Collection<Study> toExport = exportISAGUI.getSelectedStudiesForExport();
-
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    final Thread[] threads = new Thread[1];
-                                    threads[0] = new Thread(new Runnable() {
-                                        public void run() {
-                                            appContainer.setGlassPanelContents(createProgressScreen("exporting ISATab..."));
-                                            appContainer.validate();
-                                            progressIndicator.start();
-                                            // perform associations and then show a screen telling the users what has been done :D
-                                            try {
-                                                if (exportISAGUI.exportToRepository()) {
-                                                    exportSelectedStudiesToISATab(
-                                                            toExport,
-                                                            exportISAGUI.exportDataFiles());
-                                                } else {
-                                                    exportSelectedStudiesToISATab(
-                                                            toExport,
-                                                            exportISAGUI.getLocalFileDirectory(),
-                                                            exportISAGUI.exportDataFiles());
-                                                }
-                                            } catch (final Exception e) {
-                                                SwingUtilities.invokeLater(new Runnable() {
-                                                    public void run() {
-                                                        appContainer.setGlassPanelContents(createResultPanel(Globals.PRIVACY_MOD_FAILED, Globals.BACK_MAIN,
-                                                                Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, e.getMessage()));
-                                                        progressIndicator.stop();
-                                                        appContainer.validate();
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    });
-                                    threads[0].start();
-                                }
-                            });
-                        }
-                    });
-
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            progressIndicator.stop();
-                            appContainer.setGlassPanelContents(exportISAGUI);
-                            appContainer.validate();
-                        }
-                    });
-
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            appContainer.setGlassPanelContents(createResultPanel(Globals.PRIVACY_MOD_FAILED, Globals.BACK_MAIN,
-                                    Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, e.getMessage()));
-                            progressIndicator.stop();
-                            appContainer.validate();
-                        }
-                    });
-                }
-            }
-        });
-        threads[0].start();
-    }
-
-    private void exportSelectedStudiesToISATab(Collection<Study> studies, boolean exportDataFiles) {
-        exportSelectedStudiesToISATab(studies, null, exportDataFiles);
-    }
-
-    private void exportSelectedStudiesToISATab(Collection<Study> studies, String exportFileLocation, boolean exportDataFiles) {
-        // show an export successful window telling the users which studies have been output and where they have
-        // been output to.
-        GUIISATABExporter exporter = new GUIISATABExporter();
-        try {
-            GUIInvokerResult result;
-            if (exportFileLocation == null) {
-                result = exporter.isatabExportToRepository(studies, !exportDataFiles);
-            } else {
-                result = exporter.isatabExportToPath(studies, exportFileLocation, !exportDataFiles);
-            }
-
-            if (result == GUIInvokerResult.ERROR) {
-                createResultPanel(exportFailureImage, Globals.BACK_MAIN, Globals.BACK_MAIN_OVER, Globals.EXIT,
-                        Globals.EXIT_OVER, null, new ErrorReport(exporter.getLog(), getAllowedLogLevels()));
-            } else {
-                SuccessOrFailureGUI successGUI = new SuccessOrFailureGUI(appContainer, SuccessOrFailureGUI.EXPORT_SUCCESS,
-                        exportISAGUI.generateExportSuccessMessage());
-
-                successGUI.addPropertyChangeListener("toMenu", new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                        appContainer.setGlassPanelContents(loaderMenu);
-                        appContainer.validate();
-                    }
-                });
-
-                appContainer.setGlassPanelContents(successGUI);
-                progressIndicator.stop();
-                appContainer.validate();
-
-            }
-
-        } catch (Exception e) {
-            SuccessOrFailureGUI failureGUI = new SuccessOrFailureGUI(appContainer, SuccessOrFailureGUI.EXPORT_FAILURE,
-                    exportISAGUI.generateExportErrorMessage(e));
-
-            failureGUI.addPropertyChangeListener("toMenu", new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                    appContainer.setGlassPanelContents(loaderMenu);
-                    appContainer.validate();
-                }
-            });
-
-            appContainer.setGlassPanelContents(failureGUI);
-            progressIndicator.stop();
-            appContainer.validate();
-        }
-    }
-
-
-    private void modifyPrivacyAndAccessibility(Map<String, Set<String>> originalOwnership) {
-        EntityTransaction transaction = null;
-        UserManagementControl umControl = null;
-
-        try {
-            umControl = new UserManagementControl();
-            transaction = umControl.getEntityManager().getTransaction();
-            transaction.begin();
-
-            // do visibility changes
-            Map<String, VisibilityStatus> studyToVisability =
-                    studyPermissionManagement.getStudyPrivacy().getStudyPrivacySelections();
-
-            for (String studyAcc : studyToVisability.keySet()) {
-                umControl.changeStudyVisability(studyAcc, studyToVisability.get(studyAcc));
-            }
-
-            // do ownership modifications
-            Map<String, Set<String>> addedUsers = getAddedItems(originalOwnership,
-                    studyPermissionManagement.getStudyOwnership().getStudyToUser());
-
-
-            Map<String, Set<String>> removedUsers = getRemovedItems(originalOwnership,
-                    studyPermissionManagement.getStudyOwnership().getStudyToUser());
-
-            for (String studyAcc : addedUsers.keySet()) {
-                for (String username : addedUsers.get(studyAcc)) {
-                    umControl.addUserToStudy(studyAcc, umControl.getUserByUsername(username));
-                }
-            }
-
-            for (String studyAcc : removedUsers.keySet()) {
-                for (String username : removedUsers.get(studyAcc)) {
-                    User u = umControl.getUserByUsername(username);
-                    umControl.removeUserFromStudy(studyAcc, u);
-                }
-            }
-
-            final String message = UIUtils.getPrivacyModificationReport(studyToVisability, addedUsers, removedUsers).toString();
-
-            transaction.commit();
-            umControl.getEntityManager().clear();
-
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    JPanel resultPanel = createResultPanel(Globals.PRIVACY_MOD_SUCCESS, Globals.BACK_MAIN,
-                            Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, message);
-                    appContainer.setGlassPanelContents(resultPanel);
-                    progressIndicator.stop();
-                    appContainer.validate();
-                }
-            });
-
-        }
-        catch (final Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-
-            if (umControl != null) {
-                umControl.getEntityManager().clear();
-            }
-            e.printStackTrace();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    appContainer.setGlassPanelContents(createResultPanel(Globals.PRIVACY_MOD_FAILED, Globals.BACK_MAIN,
-                            Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, e.getMessage()));
-                    progressIndicator.stop();
-                    appContainer.validate();
-                }
-            });
-        }
     }
 
     public Map<String, Set<String>> getAddedItems(Map<String, Set<String>> original, Map<String, Set<String>> modified) {
@@ -694,157 +282,12 @@ public class DataManagerToolUI extends CommonUI {
 
 
     protected void loadToDatabase(BIIObjectStore store, String isatabSubmissionPath, final String report) {
-        try {
-            // will dispatch files to parent file
-            File isatabLoadingDirector = new File(selectISATABUI.getSelectedFile());
-
-            final String dispatchDirectory = isatabLoadingDirector.getPath();
-
-            File dispatchDirCreate = new File(dispatchDirectory);
-            if (!dispatchDirCreate.exists()) {
-                dispatchDirCreate.mkdir();
-            }
-
-            final GUIISATABLoader isatabLoader = new GUIISATABLoader();
-
-            GUIInvokerResult result = isatabLoader.persist(store, isatabSubmissionPath);
-
-            // in the event of loading failing, tell the user why it didn't load.
-            if (result == GUIInvokerResult.ERROR) {
-                List<TabLoggingEventWrapper> logResult = isatabLoader.getLog();
-                ErrorReport er = new ErrorReport(logResult, getAllowedLogLevels());
-                appContainer.setGlassPanelContents(
-                        createResultPanel(Globals.LOAD_FAILED, Globals.LOAD_ANOTHER,
-                                Globals.LOAD_ANOTHER_OVER, Globals.EXIT, Globals.EXIT_OVER, null, er));
-                appContainer.validate();
-            } else {
-
-                // show success screen
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-
-                        progressIndicator.stop();
-                        // should perhaps extract this to the create user management method...
-
-                        final Thread[] threads = new Thread[1];
-                        threads[0] = new Thread(new Runnable() {
-                            public void run() {
-                                appContainer.setGlassPanelContents(createProgressScreen("finding users..."));
-                                appContainer.validate();
-                                progressIndicator.start();
-
-                                createUserManagement(report);
-                            }
-                        });
-                        threads[0].start();
-                    }
-                });
-            }
-        } catch (final Exception e) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    progressIndicator.stop();
-                    appContainer.setGlassPanelContents(
-                            createResultPanel(Globals.LOAD_FAILED, Globals.LOAD_ANOTHER,
-                                    Globals.LOAD_ANOTHER_OVER, Globals.EXIT, Globals.EXIT_OVER, e.getMessage()));
-                    appContainer.validate();
-                }
-            });
-        }
-    }
-
-
-    protected void performUsermanagementAssociations(final String report) {
-        UserManagementControl umControl = new UserManagementControl();
-
-        try {
-            StudyPrivacyUI privacy = studyPermissionManagement.getStudyPrivacy();
-            StudyOwnershipUI ownership = studyPermissionManagement.getStudyOwnership();
-
-            EntityTransaction transaction = umControl.getEntityManager().getTransaction();
-            transaction.begin();
-
-            for (String studyAcc : privacy.getStudyPrivacySelections().keySet()) {
-                umControl.changeStudyVisability(studyAcc, privacy.getStudyPrivacySelections().get(studyAcc));
-            }
-
-            for (String studyAcc : ownership.getStudyToUser().keySet()) {
-                // add curator to allowed study users.
-                ownership.getStudyToUser().get(studyAcc).add(login.getLoggedInUserName());
-                // now iterate through the users assigned to the study and add them to the database
-                for (String user : ownership.getStudyToUser().get(studyAcc)) {
-                    User u = umControl.getUserByUsername(user);
-                    umControl.addUserToStudy(studyAcc, u);
-                }
-            }
-
-            transaction.commit();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    appContainer.setGlassPanelContents(createResultPanel(Globals.LOAD_SUCCESS, Globals.BACK_MAIN, Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, "<p>" + report + "</p>", getValidatorReport()));
-                    progressIndicator.stop();
-                    appContainer.validate();
-                }
-            });
-        } catch (final Exception e) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    e.printStackTrace();
-                    appContainer.setGlassPanelContents(createResultPanel(Globals.LOAD_SUCCESS_UM_FAILED, Globals.BACK_MAIN, Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, "<p>" + report + "</p>"));
-                    progressIndicator.stop();
-                    appContainer.validate();
-                }
-            });
-        }
+        dbLoader.loadToDatabase(store, isatabSubmissionPath, report);
     }
 
     protected void createUserManagement(final String report) {
 
-        try {
-
-            UserManagementControl umControl = new UserManagementControl();
-
-            String[] users = umControl.getUsernames();
-
-            studyPermissionManagement = new StudyAccessibilityModificationUI(appContainer, getLoadedStudies(), users);
-            studyPermissionManagement.createGUI(false);
-
-            progressIndicator.stop();
-            appContainer.setGlassPanelContents(studyPermissionManagement);
-            appContainer.validate();
-
-            studyPermissionManagement.addPropertyChangeListener("doPrivacySettings", new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            final Thread[] threads = new Thread[1];
-                            threads[0] = new Thread(new Runnable() {
-                                public void run() {
-                                    appContainer.setGlassPanelContents(createProgressScreen("setting privacy info..."));
-                                    appContainer.validate();
-                                    progressIndicator.start();
-
-                                    performUsermanagementAssociations(report);
-                                }
-                            });
-                            threads[0].start();
-                        }
-                    });
-
-                }
-            });
-        } catch (final Exception e) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    appContainer.setGlassPanelContents(createResultPanel(Globals.PRIVACY_MOD_FAILED, Globals.BACK_MAIN,
-                            Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, e.getMessage()));
-                    progressIndicator.stop();
-                    appContainer.validate();
-                }
-            });
-        }
-
+        permissionManagement.createUserManagement(report);
     }
 
     protected void showLoaderMenu() {
@@ -852,8 +295,11 @@ public class DataManagerToolUI extends CommonUI {
         appContainer.validate();
     }
 
+    public AppContainer getAppContainer() {
+        return appContainer;
+    }
 
-    private String[] getLoadedStudies() {
+    String[] getLoadedStudies() {
         java.util.List<Study> studies = isatabValidator.getStudiesInSubmission();
         String[] studyAccessions = new String[studies.size()];
         for (int i = 0; i < studies.size(); i++) {
@@ -878,5 +324,30 @@ public class DataManagerToolUI extends CommonUI {
 
     protected void instantiateConversionUtilPanel(String fileLoc) {
         // do nothing here.
+    }
+
+
+    public SmallLoader getProgressIndicator() {
+        return progressIndicator;
+    }
+
+    public Container getLoaderMenu() {
+        return loaderMenu;
+    }
+
+    public SelectISATABUI getSelectISATABUI() {
+        return selectISATABUI;
+    }
+
+    public StudyAccessibilityModificationUI getStudyPermissionManagement() {
+        return studyPermissionManagement;
+    }
+
+    public void setStudyPermissionManagement(StudyAccessibilityModificationUI studyPermissionManagement) {
+        this.studyPermissionManagement = studyPermissionManagement;
+    }
+
+    public LoginUI getLogin() {
+        return login;
     }
 }

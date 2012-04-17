@@ -118,7 +118,7 @@ public class CreateCuratorProfileInterface extends JFrame {
         setUndecorated(true);
         setAlwaysOnTop(true);
 
-        setBackground(new Color(34, 34, 34));
+        setBackground(UIHelper.BG_COLOR);
 
         add(titlePanel, BorderLayout.NORTH);
         titlePanel.installListeners();
@@ -453,7 +453,7 @@ public class CreateCuratorProfileInterface extends JFrame {
         glass = (JPanel) getGlassPane();
         glass.setLayout(new GridBagLayout());
         glass.setOpaque(true);
-        glass.setBackground(new Color(34, 34, 34, 90));
+        glass.setBackground(UIHelper.BG_COLOR);
         glass.addMouseListener(new MouseAdapter() {
 
         });

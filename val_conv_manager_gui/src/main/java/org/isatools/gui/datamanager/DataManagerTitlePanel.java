@@ -56,8 +56,8 @@ import java.awt.*;
 
 public class DataManagerTitlePanel extends TitlePanel {
 
-    private Image grip = new ImageIcon(getClass().getResource("/images/DataManager/loader_grip.png")).getImage();
-    private Image inactiveGrip = new ImageIcon(getClass().getResource("/images/DataManager/loader_grip_inactive.png")).getImage();
+    private Image grip = new ImageIcon(getClass().getResource("/images/titlebar/title-grip.png")).getImage();
+    private Image inactiveGrip = new ImageIcon(getClass().getResource("/images/titlebar/title-grip-inactive.png")).getImage();
     private Image title = new ImageIcon(getClass().getResource("/images/DataManager/loader_title.png")).getImage();
 
     protected void drawGrip(Graphics2D g2d, boolean active) {

@@ -62,7 +62,7 @@ public class GradientPanel extends JPanel {
     protected Color gradientEnd;
 
     public GradientPanel() {
-        this(new BorderLayout(), new Color(51, 51, 51, 100), new Color(51, 51, 51));
+        this(new BorderLayout(), new Color(255, 255, 255, 0), new Color(255, 255, 255));
     }
 
     public GradientPanel(Color gradStart, Color gradEnd) {

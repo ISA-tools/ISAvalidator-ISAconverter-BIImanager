@@ -83,8 +83,6 @@ public class Globals {
     public static final ImageIcon EXPORT_ISA_OVER = new ImageIcon(Globals.class.getResource("/images/DataManager/export_isatab_over.png"));
     public static final ImageIcon REINDEX = new ImageIcon(Globals.class.getResource("/images/DataManager/reindex_menu_item.png"));
     public static final ImageIcon REINDEX_OVER = new ImageIcon(Globals.class.getResource("/images/DataManager/reindex_menu_item_over.png"));
-    public static final ImageIcon MIBBI_CHECKLIST = new ImageIcon(Globals.class.getResource("/images/DataManager/mibbi_checklists.png"));
-    public static final ImageIcon MIBBI_CHECKLIST_OVER = new ImageIcon(Globals.class.getResource("/images/DataManager/mibbi_checklists_over.png"));
 
     public static final ImageIcon INVALID_ISATAB = new ImageIcon(Globals.class.getResource("/images/common/invalid_isatab.png"));
     public static final ImageIcon VALID_ISATAB = new ImageIcon(Globals.class.getResource("/images/validator/valid_isatab.png"));

@@ -98,7 +98,7 @@ public class CheckableTreeRenderer implements TreeCellRenderer {
 
         expansionIndicator = new JLabel();
         checkedIndicator = new JLabel();
-        text = UIHelper.createLabel("", UIHelper.VER_12_PLAIN, UIHelper.LIGHT_GREY_COLOR);
+        text = UIHelper.createLabel("", UIHelper.VER_12_PLAIN, UIHelper.LIGHT_GREEN_COLOR);
 
         iconAndCheckContainer.add(expansionIndicator);
         iconAndCheckContainer.add(checkedIndicator);
@@ -128,12 +128,12 @@ public class CheckableTreeRenderer implements TreeCellRenderer {
 
             CheckableNode checkedNode = (CheckableNode) node.getUserObject();
             checkedIndicator.setIcon(checkedNode.isChecked() ? checked : unchecked);
-            text.setForeground(checkedNode.isChecked() ? UIHelper.LIGHT_GREEN_COLOR : UIHelper.LIGHT_GREY_COLOR);
+            text.setForeground(checkedNode.isChecked() ? UIHelper.LIGHT_GREEN_COLOR : UIHelper.LIGHT_GREEN_COLOR);
         } else {
             checkedIndicator.setIcon(rootNode);
         }
 
-        text.setForeground(selected ? UIHelper.LIGHT_GREEN_COLOR : UIHelper.LIGHT_GREY_COLOR);
+        text.setForeground(selected ? UIHelper.LIGHT_GREEN_COLOR : UIHelper.LIGHT_GREEN_COLOR);
 
         if (leaf) {
             // leaf nodes...

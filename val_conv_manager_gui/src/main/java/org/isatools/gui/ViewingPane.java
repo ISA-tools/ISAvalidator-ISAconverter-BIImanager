@@ -112,7 +112,7 @@ public class ViewingPane extends JPanel {
         JPanel listPanel = new JPanel(new BorderLayout());
         listPanel.setOpaque(false);
         listPanel.setBorder(new TitledBorder(
-                new RoundedBorder(UIHelper.LIGHT_GREY_COLOR, 6),
+                new RoundedBorder(UIHelper.LIGHT_GREEN_COLOR, 4),
                 title, TitledBorder.DEFAULT_JUSTIFICATION,
                 TitledBorder.DEFAULT_POSITION, UIHelper.VER_12_BOLD,
                 UIHelper.LIGHT_GREY_COLOR));

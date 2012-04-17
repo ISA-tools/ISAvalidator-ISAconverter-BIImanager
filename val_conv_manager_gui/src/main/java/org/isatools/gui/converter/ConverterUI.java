@@ -127,6 +127,8 @@ public class ConverterUI extends CommonUI {
                         } else {
                             String topMostError = "";
 
+                            // todo here process the logs and modify the resultPanel output to use the error reporter UI consistent with ISAcreator
+
                             for (TabLoggingEventWrapper tlew : converter.getLog()) {
                                 LoggingEvent le = tlew.getLogEvent();
                                 topMostError = le.getMessage().toString();

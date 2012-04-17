@@ -54,6 +54,8 @@ import org.isatools.gui.AppContainer;
 import org.isatools.gui.Globals;
 import org.isatools.gui.ViewingPane;
 import org.isatools.isatab.manager.UserManagementControl;
+import org.jdesktop.fuse.InjectedResource;
+import org.jdesktop.fuse.ResourceInjector;
 import uk.ac.ebi.bioinvindex.model.security.Person;
 import uk.ac.ebi.bioinvindex.model.security.UserRole;
 import uk.ac.ebi.bioinvindex.utils.StringEncryption;
@@ -77,9 +79,6 @@ import java.util.Date;
 
 public class LoginUI extends ViewingPane {
 
-    // TODO: We cannot reuse this over multiple operations, Hibernate problems
-    // private UserManagementControl umControl;
-
     private JLabel status;
     private JPasswordField password;
     private JTextField username;
@@ -87,15 +86,13 @@ public class LoginUI extends ViewingPane {
 
     private String loggedInUser;
 
-    public static final ImageIcon LOGIN = new ImageIcon(LoginUI.class.getResource("/images/DataManager/login.png"));
-    public static final ImageIcon LOGIN_OVER = new ImageIcon(LoginUI.class.getResource("/images/DataManager/login_over.png"));
-    public static final ImageIcon EXIT = new ImageIcon(LoginUI.class.getResource("/images/common/exit_other.png"));
-    public static final ImageIcon EXIT_OVER = new ImageIcon(LoginUI.class.getResource("/images/common/exit_other_over.png"));
+    @InjectedResource
+    private ImageIcon login, loginOver, exit, exitOver, littlePeople, authenticateYourselfHeader;
 
 
     public LoginUI(AppContainer container) {
         super(container);
-
+        ResourceInjector.get("datamanager-package.style").inject(this);
         setPreferredSize(new Dimension(275, 250));
         setLayout(new BorderLayout());
         setOpaque(false);
@@ -148,19 +145,15 @@ public class LoginUI extends ViewingPane {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
 
-        headerPanel.add(new JLabel(
-                new ImageIcon(getClass()
-                        .getResource("/images/DataManager/little_people_icon.png"))), BorderLayout.WEST);
+        headerPanel.add(new JLabel(littlePeople), BorderLayout.WEST);
 
 
-        headerPanel.add(new JLabel(
-                new ImageIcon(getClass()
-                        .getResource("/images/DataManager/authenticate_yourself.png"))), BorderLayout.EAST);
+        headerPanel.add(new JLabel(authenticateYourselfHeader), BorderLayout.EAST);
 
         JPanel buttonContainer = new JPanel(new BorderLayout());
         buttonContainer.setOpaque(false);
 
-        final JLabel exitButton = new JLabel(EXIT,
+        final JLabel exitButton = new JLabel(exit,
                 JLabel.LEFT);
         exitButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent event) {
@@ -168,11 +161,11 @@ public class LoginUI extends ViewingPane {
             }
 
             public void mouseEntered(MouseEvent event) {
-                exitButton.setIcon(EXIT_OVER);
+                exitButton.setIcon(exitOver);
             }
 
             public void mouseExited(MouseEvent event) {
-                exitButton.setIcon(EXIT);
+                exitButton.setIcon(exit);
             }
         });
 
@@ -211,21 +204,21 @@ public class LoginUI extends ViewingPane {
 
         buttonContainer.add(createCurator, BorderLayout.CENTER);
 
-        final JLabel login = new JLabel(LOGIN,
+        final JLabel loginButton = new JLabel(login,
                 JLabel.RIGHT);
-        login.addMouseListener(new MouseAdapter() {
+        loginButton.addMouseListener(new MouseAdapter() {
 
             public void mousePressed(MouseEvent event) {
-                login.setIcon(LOGIN);
+                loginButton.setIcon(login);
                 login();
             }
 
             public void mouseEntered(MouseEvent event) {
-                login.setIcon(LOGIN_OVER);
+                loginButton.setIcon(loginOver);
             }
 
             public void mouseExited(MouseEvent event) {
-                login.setIcon(LOGIN);
+                loginButton.setIcon(login);
             }
         });
 
@@ -240,7 +233,7 @@ public class LoginUI extends ViewingPane {
         username.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "LOGIN");
         username.getActionMap().put("LOGIN", loginAction);
 
-        buttonContainer.add(login, BorderLayout.EAST);
+        buttonContainer.add(loginButton, BorderLayout.EAST);
 
         JPanel southPanel = new JPanel();
         southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.PAGE_AXIS));
@@ -279,13 +272,6 @@ public class LoginUI extends ViewingPane {
         user.setJoinDate(new Date());
         user.setPassword(StringEncryption.getInstance().encrypt(password));
 
-// TODO: review, we need to re-create the object, so that the entity manager is re-created too and we can
-// avoid Hibernate problems
-
-//		if(umControl == null) {
-//			umControl =  new UserManagementControl();
-//		}
-
         UserManagementControl umControl = new UserManagementControl();
         umControl.createUser(user);
 
@@ -301,13 +287,6 @@ public class LoginUI extends ViewingPane {
                     container.validate();
                     sl.start();
                     try {
-
-                        // TODO: review, we need to re-create the object, so that the entity manager is re-created too and we can
-                        // avoid Hibernate problems
-
-//							if(umControl == null) {
-//								umControl =  new UserManagementControl();
-//							}
 
                         UserManagementControl umControl = new UserManagementControl();
 
@@ -337,13 +316,6 @@ public class LoginUI extends ViewingPane {
                     "<html>Please enter a <b>username</b>...</html>");
         }
     }
-
-    /**
-     * TODO: Doesn't work, we need to recreate it, Hibernate problems.
-     * public UserManagementControl getUmControl() {
-     * return umControl;
-     * }
-     */
 
     public String getLoggedInUserName() {
         return loggedInUser;

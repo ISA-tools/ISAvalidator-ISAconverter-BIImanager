@@ -124,7 +124,7 @@ public class FileSelectionUtil extends JPanel {
         fileToUse = new JTextField(text);
         fileToUse.setEditable(false);
         fileToUse.setBorder(new CustomRoundedBorder(UIHelper.LIGHT_GREY_COLOR, false));
-        UIHelper.renderComponent(fileToUse, textFont, textColor, UIHelper.LIGHT_GREY_COLOR);
+        UIHelper.renderComponent(fileToUse, textFont, textColor, UIHelper.BG_COLOR);
 
         fileSelectionUtil.add(fileToUse);
 

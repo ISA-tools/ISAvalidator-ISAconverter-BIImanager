@@ -56,7 +56,7 @@ import java.awt.*;
 
 public class ConverterBackgroundPanel extends GenericPanel {
     private static Image logo = new ImageIcon(GenericPanel.class.getResource("/images/converter/converter_logo.png")).getImage();
-    private static Image notes = new ImageIcon(GenericPanel.class.getResource("/images/converter/converter_info.png")).getImage();
+    private static Image notes = new ImageIcon(GenericPanel.class.getResource("/images/validator/validator_release_note.png")).getImage();
     private static Image abstract_central_logo = new ImageIcon(GenericPanel.class.getResource("/images/converter/abstract_converter_logo.png")).getImage();
 
     protected void drawHeader(Graphics2D g2, int width, int height) {

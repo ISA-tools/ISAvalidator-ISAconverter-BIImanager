@@ -66,7 +66,7 @@ import java.util.zip.ZipFile;
 public class SelectISATABUI extends JPanel implements MouseListener {
 
     private JTextField fileLocationTxt;
-    private JLabel genericButton;
+    private JLabel genericButton, information;
     private ImageIcon buttonImage;
     private ImageIcon buttonImageOver;
     private JFileChooser fileChooser;
@@ -155,13 +155,15 @@ public class SelectISATABUI extends JPanel implements MouseListener {
                     backToMenu.setIcon(Globals.BACK_MAIN);
                     firePropertyChange("toMenu", "", "tm");
                 }
-
             });
-
             buttonCont.add(backToMenu, BorderLayout.WEST);
         }
 
-        add(Box.createVerticalStrut(30));
+        add(Box.createVerticalStrut(10));
+        information = UIHelper.createLabel("", UIHelper.VER_10_BOLD, UIHelper.RED_COLOR);
+        add(UIHelper.wrapComponentInPanel(information));
+
+        add(Box.createVerticalStrut(10));
         add(buttonCont);
     }
 
@@ -235,14 +237,12 @@ public class SelectISATABUI extends JPanel implements MouseListener {
         genericButton.setIcon(buttonImage);
         if (checkDirectoryForISATAB(fileLocationTxt.getText())) {
             // proceed to validation!
+            information.setText("");
             firePropertyChange("doValidation", "", "new");
 
         } else {
-            // show a message informing the user that the currently selected directory does not contain an
-            // ISATAB!
-            new InformationWindow(getCurrentInstance(), "<strong> | warning</strong>" +
-                    "<p>the selected directory does not contain an investigation following the naming convention: " +
-                    "<strong>i_name-of-investigation.txt</strong></p>");
+            // show a message informing the user that the currently selected directory does not contain an ISATAB!
+            information.setText("No ISA-Tab files located in this directory.");
         }
     }
 

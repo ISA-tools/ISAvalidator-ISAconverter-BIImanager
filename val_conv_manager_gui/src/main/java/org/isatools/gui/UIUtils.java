@@ -73,7 +73,7 @@ public class UIUtils {
                 "   font-family: Verdana; " +
                 "	font-weight: bold;" +
                 "	font-size: 9px;" +
-                "   color: #999999; }" +
+                "   color: #58595B; }" +
                 "-->" +
                 "</style>" + "</head>" +
                 "<body class=\"bodyFont\">";
@@ -97,7 +97,7 @@ public class UIUtils {
                 "   font-family: Verdana; " +
                 "	font-weight: bold;" +
                 "	font-size: 9px;" +
-                "   color: #999999; }" +
+                "   color: #58595B; }" +
                 "-->" +
                 "<!--" +
                 ".highlight-good {" +

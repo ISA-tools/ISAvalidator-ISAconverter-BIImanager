@@ -76,9 +76,9 @@ public class LoadConfigurationPanel extends JPanel {
     private static final String CONFIG_DIR = AbstractImportLayerShellCommand.getConfigPath();
 
     @InjectedResource
-    private ImageIcon searchIcon, searchOverIcon, loadIcon, loadOverIcon;
+    private ImageIcon searchIcon, searchOverIcon, loadIcon, loadOverIcon, loadConfigurationHeader, configListItem;
 
-    private DefaultListModel dlm;
+    private DefaultListModel defaultListModel;
     private String problemLog;
     private JEditorPane problemReporter;
 
@@ -105,17 +105,12 @@ public class LoadConfigurationPanel extends JPanel {
         problemReporter.setEditable(false);
         problemReporter.setPreferredSize(new Dimension(300, 75));
 
-        /*
-                 list should display all previous submission files which are held in a Submissions folder
-                 in the ISAcreator directory. Each folder in this directory is named from a reference supplied by
-                 the user when they first start a submission. Inside each of these directories will be the Investigation
-                 file which is ALWAYS the first point of reference, and should always be called Investigation.
-             */
-        dlm = new DefaultListModel();
+
+        defaultListModel = new DefaultListModel();
 
         configurationFiles = updatePreviousConfigurations();
 
-        configurations = new JList(dlm);
+        configurations = new JList(defaultListModel);
         configurations.setBorder(null);
         configurations.setOpaque(false);
 
@@ -133,7 +128,7 @@ public class LoadConfigurationPanel extends JPanel {
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         listScroller.setBorder(new TitledBorder(
-                new RoundedBorder(UIHelper.LIGHT_GREY_COLOR, 9),
+                new RoundedBorder(UIHelper.LIGHT_GREEN_COLOR, 6),
                 "select configuration...",
                 TitledBorder.DEFAULT_POSITION,
                 TitledBorder.ABOVE_TOP, UIHelper.VER_14_BOLD,
@@ -146,8 +141,7 @@ public class LoadConfigurationPanel extends JPanel {
         JPanel topContainer = new JPanel(new GridLayout(1, 1));
         topContainer.setOpaque(false);
 
-        JLabel loadISAImage = new JLabel(new ImageIcon(
-                getClass().getResource("/images/configuration/load_configuration.png")),
+        JLabel loadISAImage = new JLabel(loadConfigurationHeader,
                 JLabel.RIGHT);
         loadISAImage.setForeground(UIHelper.DARK_GREEN_COLOR);
 
@@ -304,7 +298,7 @@ public class LoadConfigurationPanel extends JPanel {
     }
 
     private File[] updatePreviousConfigurations() {
-        dlm.clear();
+        defaultListModel.clear();
 
         File f = new File(LoadConfigurationPanel.CONFIG_DIR);
 
@@ -317,7 +311,7 @@ public class LoadConfigurationPanel extends JPanel {
         for (File prevSubmission : configurationFiles) {
             if (prevSubmission.isDirectory()) {
                 if (!prevSubmission.getName().startsWith(".")) {
-                    dlm.addElement(prevSubmission.getName());
+                    defaultListModel.addElement(prevSubmission.getName());
                 }
             }
         }
@@ -336,7 +330,7 @@ public class LoadConfigurationPanel extends JPanel {
             setLayout(new BorderLayout());
             listCellRenderer = new DefaultListCellRenderer();
 
-            JLabel image = new JLabel(new ImageIcon(getClass().getResource("/images/configuration/config_list_item.png")));
+            JLabel image = new JLabel(configListItem);
             image.setOpaque(false);
 
             add(image, BorderLayout.WEST);

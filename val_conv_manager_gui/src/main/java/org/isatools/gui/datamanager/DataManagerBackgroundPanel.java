@@ -56,16 +56,13 @@ import java.awt.*;
 public class DataManagerBackgroundPanel extends GenericPanel {
 
     private static Image logo = new ImageIcon(GenericPanel.class.getResource("/images/DataManager/loader_logo.png")).getImage();
-    private static Image notes = new ImageIcon(GenericPanel.class.getResource("/images/DataManager/load_info.png")).getImage();
-    private static Image abstract_central_logo = new ImageIcon(GenericPanel.class.getResource("/images/DataManager/abstract_loader_logo.png")).getImage();
+    private static Image notes = new ImageIcon(GenericPanel.class.getResource("/images/validator/validator_release_note.png")).getImage();
 
     protected void drawHeader(Graphics2D g2, int width, int height) {
         g2.drawImage(logo, 0, 60, null);
     }
 
-    protected void drawCentralPanel(Graphics2D g2, int width, int height) {
-        g2.drawImage(abstract_central_logo, (width / 2) - (abstract_central_logo.getWidth(null) / 2), (height / 2 - abstract_central_logo.getHeight(null) / 2), null);
-    }
+    protected void drawCentralPanel(Graphics2D g2, int width, int height) {}
 
     protected void drawHelpPanel(Graphics2D g2, int width, int height) {
         g2.drawImage(notes, (width - notes.getWidth(null) + 10), (height - notes.getHeight(null) - 40), null);

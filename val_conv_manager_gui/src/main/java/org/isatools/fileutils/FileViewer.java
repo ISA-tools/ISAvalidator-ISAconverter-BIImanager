@@ -48,7 +48,6 @@
 
 package org.isatools.fileutils;
 
-import org.isatools.effects.GradientPanel;
 import org.isatools.effects.UIHelper;
 import org.isatools.gui.TitlePanel;
 
@@ -90,7 +89,6 @@ public class FileViewer extends JFrame {
 
         JPanel southPanel = new JPanel(new GridLayout(1, 1));
         southPanel.setPreferredSize(new Dimension(450, 20));
-        southPanel.add(new GradientPanel(UIHelper.GREY_COLOR, Color.WHITE));
         add(southPanel, BorderLayout.SOUTH);
 
         pack();

@@ -52,6 +52,8 @@ import org.isatools.effects.UIHelper;
 import org.isatools.gui.AppContainer;
 import org.isatools.gui.Globals;
 import org.isatools.gui.ViewingPane;
+import org.jdesktop.fuse.InjectedResource;
+import org.jdesktop.fuse.ResourceInjector;
 
 import javax.swing.*;
 import java.awt.*;
@@ -67,6 +69,10 @@ import java.awt.event.MouseEvent;
 
 
 public class StudyAccessibilityModificationUI extends ViewingPane {
+
+    @InjectedResource
+    private ImageIcon studyManagementHeader, userListIcon, tabStudyPrivacy;
+
 
     private static final int OWNERSHIP = 0;
     private static final int PRIVACY = 1;
@@ -87,6 +93,7 @@ public class StudyAccessibilityModificationUI extends ViewingPane {
 
     public StudyAccessibilityModificationUI(AppContainer container, String[] studies, String[] users) {
         super(container);
+        ResourceInjector.get("datamanager-package.style").inject(this);
         this.studies = studies;
         this.users = users;
         swappableUIContainer = new JPanel();
@@ -102,7 +109,7 @@ public class StudyAccessibilityModificationUI extends ViewingPane {
 
         JPanel northPanel = new JPanel(new BorderLayout());
         northPanel.setOpaque(false);
-        northPanel.add(new JLabel(new ImageIcon(getClass().getResource("/images/DataManager/study_management_header.png")), SwingConstants.RIGHT), BorderLayout.EAST);
+        northPanel.add(new JLabel(studyManagementHeader, SwingConstants.RIGHT), BorderLayout.EAST);
 
         northPanel.add(createMenuPanel(), BorderLayout.SOUTH);
 
@@ -186,7 +193,7 @@ public class StudyAccessibilityModificationUI extends ViewingPane {
         JPanel menuPanel = new JPanel(new FlowLayout());
         menuPanel.setOpaque(false);
 
-        studyUserItem = createMenuLabel("modify ownership", new ImageIcon(getClass().getResource("/images/DataManager/tab_user_study_assoc.png")));
+        studyUserItem = createMenuLabel("modify ownership", userListIcon);
         studyUserItem.addMouseListener(new MouseAdapter() {
 
             public void mouseEntered(MouseEvent mouseEvent) {
@@ -203,7 +210,7 @@ public class StudyAccessibilityModificationUI extends ViewingPane {
 
         });
 
-        studyPrivacyItem = createMenuLabel("modify privacy", new ImageIcon(getClass().getResource("/images/DataManager/tab_study_privacy.png")));
+        studyPrivacyItem = createMenuLabel("modify privacy", tabStudyPrivacy);
         studyPrivacyItem.addMouseListener(new MouseAdapter() {
 
             public void mouseEntered(MouseEvent mouseEvent) {

@@ -138,7 +138,7 @@ public abstract class CommonUI extends JLayeredPane {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 add(generic, JLayeredPane.DEFAULT_LAYER);
-                add(new GradientPanel(), JLayeredPane.DEFAULT_LAYER + 1);
+//                add(new GradientPanel(), JLayeredPane.DEFAULT_LAYER + 1);
 
                 loadConfigurationUI = new LoadConfigurationPanel();
                 loadConfigurationUI.createGUI();
@@ -164,20 +164,8 @@ public abstract class CommonUI extends JLayeredPane {
                     }
                 });
 
-//                if (isAnimated()) {
-//                    startAnimation();
-//                }
             }
         });
-    }
-
-    protected boolean isAnimated() {
-        for (String option : options) {
-            if (Options.NO_ANIMATION.toString().equalsIgnoreCase(option)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     protected abstract void createLoginScreen();
@@ -187,17 +175,6 @@ public abstract class CommonUI extends JLayeredPane {
     protected abstract void loadToDatabase(BIIObjectStore store, String isatabSubmissionPath, final String report);
 
     protected abstract void showLoaderMenu();
-
-//    private void startAnimation() {
-//        Timer timer = new Timer(125, new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                generic.animate();
-//                generic.repaint();
-//            }
-//        });
-//        timer.start();
-//    }
-
 
     protected void validateFile(final String[] fileLoc) {
 
@@ -249,13 +226,13 @@ public abstract class CommonUI extends JLayeredPane {
         appContainer.validate();
     }
 
-    protected ErrorReport getValidatorReport() {
+    public ErrorReport getValidatorReport() {
         List<TabLoggingEventWrapper> logResult = isatabValidator.getLog();
 
         return new ErrorReport(logResult, getAllowedLogLevels());
     }
 
-    protected Set<Level> getAllowedLogLevels() {
+    public Set<Level> getAllowedLogLevels() {
         Set<Level> displayedLogLevels = new HashSet<Level>();
         displayedLogLevels.add(Level.WARN);
         displayedLogLevels.add(Level.ERROR);
@@ -295,7 +272,7 @@ public abstract class CommonUI extends JLayeredPane {
      * @param text -  message to show when validating or loading...
      * @return - JPanel
      */
-    protected JPanel createProgressScreen(String text) {
+    public JPanel createProgressScreen(String text) {
 
         JPanel loadingPanel = new JPanel();
         loadingPanel.setLayout(new BoxLayout(loadingPanel, BoxLayout.PAGE_AXIS));
@@ -310,11 +287,11 @@ public abstract class CommonUI extends JLayeredPane {
 
     }
 
-    protected JPanel createResultPanel(ImageIcon mainImage, final ImageIcon anotherImage, final ImageIcon anotherImageOver, final ImageIcon exitImage, final ImageIcon exitImageOver, final String message) {
+    public JPanel createResultPanel(ImageIcon mainImage, final ImageIcon anotherImage, final ImageIcon anotherImageOver, final ImageIcon exitImage, final ImageIcon exitImageOver, final String message) {
         return createResultPanel(mainImage, anotherImage, anotherImageOver, exitImage, exitImageOver, message, null);
     }
 
-    protected JPanel createResultPanel(ImageIcon mainImage, final ImageIcon anotherImage, final ImageIcon anotherImageOver, final ImageIcon exitImage, final ImageIcon exitImageOver, final String message, ErrorReport report) {
+    public JPanel createResultPanel(ImageIcon mainImage, final ImageIcon anotherImage, final ImageIcon anotherImageOver, final ImageIcon exitImage, final ImageIcon exitImageOver, final String message, ErrorReport report) {
         final TaskResultPanel resultPanel = new TaskResultPanel(mainImage, anotherImage, anotherImageOver, exitImage, exitImageOver, message, report);
 
         resultPanel.addPropertyChangeListener("back", new PropertyChangeListener() {

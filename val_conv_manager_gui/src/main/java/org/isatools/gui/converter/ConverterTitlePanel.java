@@ -55,8 +55,8 @@ import java.awt.*;
 
 public class ConverterTitlePanel extends TitlePanel {
 
-    private Image grip = new ImageIcon(getClass().getResource("/images/converter/converter_grip_active.png")).getImage();
-    private Image inactiveGrip = new ImageIcon(getClass().getResource("/images/converter/converter_grip_inactive.png")).getImage();
+    private Image grip = new ImageIcon(getClass().getResource("/images/titlebar/title-grip.png")).getImage();
+    private Image inactiveGrip = new ImageIcon(getClass().getResource("/images/titlebar/title-grip-inactive.png")).getImage();
     private Image title = new ImageIcon(getClass().getResource("/images/converter/converter_title.png")).getImage();
 
     protected void drawGrip(Graphics2D g2d, boolean active) {

@@ -56,10 +56,10 @@ import java.util.Vector;
 
 public class UIHelper {
 
-    public static final Color BG_COLOR = new Color(20, 20, 20);
+    public static final Color BG_COLOR = Color.WHITE;
     public static final Color DARK_GREEN_COLOR = new Color(0, 104, 56);
     public static final Color GREY_COLOR = new Color(51, 51, 51);
-    public static final Color LIGHT_GREY_COLOR = new Color(153, 153, 153);
+    public static final Color LIGHT_GREY_COLOR = new Color(51, 51, 51);
     public static final Color RED_COLOR = new Color(191, 30, 45);
     public static final Color TRANSPARENT_RED_COLOR = new Color(191, 30, 45, 50);
     public static final Color LIGHT_GREEN_COLOR = new Color(140, 198, 63);
