@@ -48,31 +48,23 @@
 
 package org.isatools.gui.datamanager.studyaccess;
 
-import org.apache.commons.collections15.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.isatools.checkabletree.CheckableNode;
-import org.isatools.checkabletree.CheckableTree;
-import org.isatools.checkabletree.CheckableTreeRenderer;
 import org.isatools.gui.AppContainer;
 import org.isatools.gui.datamanager.StudyOperationCommon;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
-import uk.ac.ebi.bioinvindex.model.Investigation;
 import uk.ac.ebi.bioinvindex.model.Study;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 // Make this abstract for use as an unloading interface or an export interface for ISATab.
 public class StudyAccessionGUI extends StudyOperationCommon {
@@ -80,11 +72,12 @@ public class StudyAccessionGUI extends StudyOperationCommon {
     protected static final Logger log = Logger.getLogger(StudyAccessionGUI.class);
 
     @InjectedResource
-    private ImageIcon unloadButton, unloadButtonOver, unloadStudyHeader, noStudiesPresentInfo, connectionProblemInfo;
+    private ImageIcon unloadButton, unloadButtonOver,
+            unloadStudyHeader, noStudiesPresentInfo,
+            connectionProblemInfo;
 
-    private CheckableTree studyAvailabilityTree;
-
-    private Map<String, List<String>> availableStudies;
+    private StudySelector studySelector;
+    private Set<String> availableStudies;
     private Collection<Study> studies;
 
     // need to look something like the converter gui in terms of providing selection alternatives, only difference being
@@ -185,21 +178,15 @@ public class StudyAccessionGUI extends StudyOperationCommon {
         studyAccessionSelector.setOpaque(false);
 
         JLabel information = new JLabel(unloadStudyHeader);
-        information.setHorizontalAlignment(SwingConstants.RIGHT);
+        information.setHorizontalAlignment(SwingConstants.LEFT);
         information.setVerticalAlignment(SwingConstants.TOP);
 
         studyAccessionSelector.add(information, BorderLayout.NORTH);
 
         retrieveAndProcessStudyInformation();
 
-        JScrollPane treeScroller = new JScrollPane(studyAvailabilityTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        treeScroller.getViewport().setOpaque(false);
-        treeScroller.setOpaque(false);
-        treeScroller.setBorder(new EmptyBorder(1, 1, 1, 1));
-
-        treeScroller.setPreferredSize(new Dimension(380, 210));
-
-        studyAccessionSelector.add(treeScroller);
+        studySelector = new StudySelector(availableStudies);
+        studyAccessionSelector.add(studySelector);
 
         container.add(studyAccessionSelector);
 
@@ -220,7 +207,7 @@ public class StudyAccessionGUI extends StudyOperationCommon {
             }
 
             public void mousePressed(MouseEvent mouseEvent) {
-                Set<String> studiesToUnload = studyAvailabilityTree.getCheckedStudies(studyAvailabilityTree.getRoot());
+                Set<String> studiesToUnload = studySelector.getSelectedStudies();
                 log.info("going to unload: ");
                 for (String acc : studiesToUnload) {
                     log.info("study with acc " + acc);
@@ -230,11 +217,8 @@ public class StudyAccessionGUI extends StudyOperationCommon {
 
         });
         buttonCont.add(unload, BorderLayout.EAST);
-
         buttonCont.add(createBackToMainMenuButton(), BorderLayout.WEST);
-
         container.add(buttonCont);
-
         return container;
     }
 
@@ -275,88 +259,22 @@ public class StudyAccessionGUI extends StudyOperationCommon {
     private void retrieveAndProcessStudyInformation() {
         studies = loadStudiesFromDatabase();
         log.info("got studies, there are  : " + studies.size() + " of them!");
-        if (studies == null) {
-            createDummyTree();
-        } else {
+        if (studies != null) {
+
             processStudies(studies);
             log.info("available studies size is : " + availableStudies.size() + " and content is:");
-            for (String studyAcc : availableStudies.keySet()) {
+            for (String studyAcc : availableStudies) {
                 log.info("\t" + studyAcc);
             }
-            createTree();
         }
 
     }
 
     private void processStudies(Collection<Study> studies) {
-        availableStudies = new ListOrderedMap<String, List<String>>();
+        availableStudies = new HashSet<String>();
         for (Study study : studies) {
-            if (study.getInvestigations().size() > 0) {
-                for (Investigation inv : study.getInvestigations()) {
-                    if (!availableStudies.containsKey(inv.getAcc())) {
-                        availableStudies.put(inv.getAcc(), new ArrayList<String>());
-                    }
-                    availableStudies.get(inv.getAcc()).add(study.getAcc());
-                }
-            } else {
-
-                availableStudies.put(study.getAcc(), null);
-            }
+            availableStudies.add(study.getAcc());
         }
-    }
-
-
-    private void createDummyTree() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("  no studies found");
-
-        DefaultTreeModel model = new DefaultTreeModel(root);
-        studyAvailabilityTree = new CheckableTree(model);
-
-    }
-
-    private void createTree() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("  available studies");
-
-        for (String key : availableStudies.keySet()) {
-            log.info("adding " + key + " to tree");
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new CheckableNode(key));
-
-            if (availableStudies.get(key) != null) {
-                for (String study : availableStudies.get(key)) {
-                    CheckableNode studyNode = new CheckableNode(study);
-                    node.add(new DefaultMutableTreeNode(studyNode));
-                }
-            }
-            root.add(node);
-        }
-
-        DefaultTreeModel model = new DefaultTreeModel(root);
-        studyAvailabilityTree = new CheckableTree(model);
-        configureTreeLook();
-    }
-
-    private void configureTreeLook() {
-        studyAvailabilityTree.setCellRenderer(new CheckableTreeRenderer());
-
-        BasicTreeUI ui = new BasicTreeUI() {
-            @Override
-            public Icon getCollapsedIcon() {
-                return null;
-            }
-
-            @Override
-            public Icon getExpandedIcon() {
-                return null;
-            }
-
-            @Override
-            protected boolean getShowsRootHandles() {
-                return false;
-            }
-        };
-
-        studyAvailabilityTree.setUI(ui);
-        studyAvailabilityTree.setOpaque(false);
     }
 
     private String getReport(Set<String> studiesToBeUnloaded) {

@@ -369,7 +369,8 @@ public abstract class CommonUI extends JLayeredPane {
     }
 
     public JPanel createResultPanel(ImageIcon mainImage, final ImageIcon anotherImage, final ImageIcon anotherImageOver, final ImageIcon exitImage, final ImageIcon exitImageOver, final String message) {
-        final TaskResultPanel resultPanel = new TaskResultPanel(mainImage, anotherImage, anotherImageOver, exitImage, exitImageOver, message, createErrorReport(getErrorMessages(isatabValidator.getLog())));
+        final TaskResultPanel resultPanel = new TaskResultPanel(mainImage, anotherImage, anotherImageOver, exitImage, exitImageOver, message, isatabValidator != null
+                ? createErrorReport(getErrorMessages(isatabValidator.getLog())) : null);
 
         resultPanel.addPropertyChangeListener("back", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent propertyChangeEvent) {

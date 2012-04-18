@@ -260,11 +260,8 @@ public class DataManagerToolUI extends CommonUI {
 
     public Map<String, Set<String>> getRemovedItems(Map<String, Set<String>> original, Map<String, Set<String>> modified) {
         Map<String, Set<String>> difference = new HashMap<String, Set<String>>();
-
         for (String studyAcc : modified.keySet()) {
-
             difference.put(studyAcc, new HashSet<String>());
-
             if (original.containsKey(studyAcc)) {
                 for (String originalContents : original.get(studyAcc)) {
                     if (modified.containsKey(studyAcc)) {
@@ -275,7 +272,6 @@ public class DataManagerToolUI extends CommonUI {
                 }
             }
         }
-
         return difference;
     }
 
@@ -305,7 +301,6 @@ public class DataManagerToolUI extends CommonUI {
             Study study = studies.get(i);
             studyAccessions[i] = study.getAcc();
         }
-
         return studyAccessions;
     }
 

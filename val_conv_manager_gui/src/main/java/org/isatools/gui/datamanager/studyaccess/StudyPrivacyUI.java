@@ -118,7 +118,7 @@ public class StudyPrivacyUI extends ViewingPane {
             studyList.setSelectedIndex(0);
         }
 
-        add(createListContainer(studyList, "studies", new StudyPrivacyCellRenderer()));
+        add(UIHelper.createListContainer(studyList, "studies", new StudyPrivacyCellRenderer()));
 
         if (!studyList.isSelectionEmpty()) {
             setPrivacyChoice(studyList.getSelectedTerm());

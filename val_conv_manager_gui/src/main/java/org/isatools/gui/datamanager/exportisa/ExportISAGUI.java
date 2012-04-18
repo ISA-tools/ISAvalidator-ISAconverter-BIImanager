@@ -48,30 +48,26 @@
 
 package org.isatools.gui.datamanager.exportisa;
 
-import org.apache.commons.collections15.map.ListOrderedMap;
-import org.isatools.checkabletree.CheckableNode;
-import org.isatools.checkabletree.CheckableTree;
 import org.isatools.effects.UIHelper;
 import org.isatools.gui.AppContainer;
 import org.isatools.gui.datamanager.StudyOperationCommon;
+import org.isatools.gui.datamanager.studyaccess.StudySelector;
 import org.isatools.gui.optionselector.OptionGroup;
 import org.jdesktop.fuse.InjectedResource;
 import org.jdesktop.fuse.ResourceInjector;
-import uk.ac.ebi.bioinvindex.model.Investigation;
 import uk.ac.ebi.bioinvindex.model.Study;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * ExportISAGUI
@@ -87,10 +83,11 @@ public class ExportISAGUI extends StudyOperationCommon {
     @InjectedResource
     private ImageIcon panelHeader, exportISAIcon, exportISAIconOver, warningIcon;
     // A Map from either a Study Accession to null or from an investigation accession to a List of study accessions.
-    private Map<String, List<String>> availableStudies;
+    private Set<String> availableStudies;
     private Collection<Study> studies;
 
-    private CheckableTree studyAvailabilityTree;
+    private StudySelector studySelector;
+
     private FileSelectionUtil localDirectoryLocation;
     private OptionGroup<String> fileLocationOptionGroup;
     private OptionGroup<String> dataFileExportOptionGroup;
@@ -185,14 +182,10 @@ public class ExportISAGUI extends StudyOperationCommon {
 
         retrieveAndProcessStudyInformation();
 
-        JScrollPane treeScroller = new JScrollPane(studyAvailabilityTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        treeScroller.getViewport().setOpaque(false);
-        treeScroller.setOpaque(false);
-        treeScroller.setBorder(new EmptyBorder(1, 1, 1, 1));
+        studySelector = new StudySelector(availableStudies, "studies to export");
 
-        treeScroller.setPreferredSize(new Dimension(380, 250));
+        availableSubmissionsContainer.add(studySelector, BorderLayout.CENTER);
 
-        availableSubmissionsContainer.add(treeScroller, BorderLayout.CENTER);
         add(availableSubmissionsContainer, BorderLayout.CENTER);
         add(createSouthPanel(), BorderLayout.SOUTH);
     }
@@ -227,7 +220,7 @@ public class ExportISAGUI extends StudyOperationCommon {
                 if (!selectedOutputFolderExists() && !exportToRepository()) {
                     localDirectoryLocation.setBackgroundToError();
                 } else {
-                    if (studyAvailabilityTree.getCheckedStudies(studyAvailabilityTree.getRoot()).size() == 0) {
+                    if (studySelector.getSelectedStudies().size() == 0) {
                         errorDisplay.setText("<html>please select <i>at least one study</i> to export!</html>");
                         errorDisplay.setVisible(true);
                     } else {
@@ -255,66 +248,22 @@ public class ExportISAGUI extends StudyOperationCommon {
 
     private void retrieveAndProcessStudyInformation() {
         studies = loadStudiesFromDatabase();
-        System.out.println("got studies, there are  : " + studies.size() + " of them!");
-        if (studies == null) {
-            createDummyTree();
-        } else {
+        log.info("got studies, there are  : " + studies.size() + " of them!");
+        if (studies != null) {
+
             processStudies(studies);
-            System.out.println("available studies size is : " + availableStudies.size() + " and content is:");
-            for (String studyAcc : availableStudies.keySet()) {
+            log.info("available studies size is : " + availableStudies.size() + " and content is:");
+            for (String studyAcc : availableStudies) {
                 System.out.println("\t" + studyAcc);
             }
-            createTree();
         }
-
     }
 
     private void processStudies(Collection<Study> studies) {
-        availableStudies = new ListOrderedMap<String, List<String>>();
+        availableStudies = new HashSet<String>();
         for (Study study : studies) {
-//			System.out.println("study investigation is : " + study.getInvestigations().size());
-            if (study.getInvestigations().size() > 0) {
-                for (Investigation inv : study.getInvestigations()) {
-                    if (!availableStudies.containsKey(inv.getAcc())) {
-                        availableStudies.put(inv.getAcc(), new ArrayList<String>());
-                    }
-                    availableStudies.get(inv.getAcc()).add(study.getAcc());
-                }
-            } else {
-
-                availableStudies.put(study.getAcc(), null);
-            }
+            availableStudies.add(study.getAcc());
         }
-    }
-
-    private void createDummyTree() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("  no studies found");
-
-        DefaultTreeModel model = new DefaultTreeModel(root);
-        studyAvailabilityTree = new CheckableTree(model);
-
-    }
-
-    private void createTree() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("  available studies");
-
-        for (String key : availableStudies.keySet()) {
-            System.out.println("adding " + key + " to tree");
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new CheckableNode(key));
-
-            if (availableStudies.get(key) != null) {
-                for (String study : availableStudies.get(key)) {
-                    CheckableNode studyNode = new CheckableNode(study);
-                    node.add(new DefaultMutableTreeNode(studyNode));
-                }
-            }
-
-            root.add(node);
-        }
-
-        DefaultTreeModel model = new DefaultTreeModel(root);
-        studyAvailabilityTree = new CheckableTree(model);
-
     }
 
     /**
@@ -323,7 +272,7 @@ public class ExportISAGUI extends StudyOperationCommon {
      * @return Collection<Study> containing the Studies to be exported
      */
     public Collection<Study> getSelectedStudiesForExport() {
-        Set<String> checkedNodes = studyAvailabilityTree.getCheckedStudies(studyAvailabilityTree.getRoot());
+        Set<String> checkedNodes = studySelector.getSelectedStudies();
 
         Collection<Study> toExport = new ArrayList<Study>();
         for (String checkedNode : checkedNodes) {

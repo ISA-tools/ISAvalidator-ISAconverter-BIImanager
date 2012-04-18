@@ -134,17 +134,17 @@ public class MIChecklistConfiguratorUI extends ViewingPane {
         selectedChecklists = new JList();
         selectedChecklists.setOpaque(false);
 
-        add(createListContainer(studyList, "studies", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
+        add(UIHelper.createListContainer(studyList, "studies", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
                 UIHelper.LIGHT_GREEN_COLOR, UIHelper.VER_11_PLAIN, UIHelper.LIGHT_GREY_COLOR, Globals.LIST_ICON_STUDY)));
         // add available user list to the UI
-        add(createListContainer(availableChecklists, "available MI guidelines", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
+        add(UIHelper.createListContainer(availableChecklists, "available MI guidelines", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
                 UIHelper.LIGHT_GREEN_COLOR, UIHelper.VER_11_PLAIN, UIHelper.LIGHT_GREY_COLOR,
                 Globals.LIST_ICON_USER)));
 
         add(createControlPanel());
 
         // add selected user list to the UI
-        add(createListContainer(selectedChecklists, "selected MI guidelines", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
+        add(UIHelper.createListContainer(selectedChecklists, "selected MI guidelines", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
                 UIHelper.LIGHT_GREEN_COLOR, UIHelper.VER_11_PLAIN, UIHelper.LIGHT_GREY_COLOR,
                 Globals.LIST_ICON_USER)));
 

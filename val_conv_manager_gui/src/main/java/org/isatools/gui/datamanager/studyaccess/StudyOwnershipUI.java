@@ -85,7 +85,6 @@ public class StudyOwnershipUI extends ViewingPane {
 
     private ControlPanel controlPanel;
 
-
     public StudyOwnershipUI(AppContainer container, String[] studies, String[] users) {
         super(container);
         this.studies = studies;
@@ -133,17 +132,17 @@ public class StudyOwnershipUI extends ViewingPane {
         selectedUsers = new JList();
         selectedUsers.setOpaque(false);
 
-        add(createListContainer(studyList, "studies", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
+        add(UIHelper.createListContainer(studyList, "studies", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
                 UIHelper.LIGHT_GREEN_COLOR, UIHelper.VER_11_PLAIN, UIHelper.LIGHT_GREY_COLOR, Globals.LIST_ICON_STUDY)));
         // add available user list to the UI
-        add(createListContainer(availableUsersList, "available users", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
+        add(UIHelper.createListContainer(availableUsersList, "available users", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
                 UIHelper.LIGHT_GREEN_COLOR, UIHelper.VER_11_PLAIN, UIHelper.LIGHT_GREY_COLOR,
                 Globals.LIST_ICON_USER)));
 
         add(createControlPanel());
 
         // add selected user list to the UI
-        add(createListContainer(selectedUsers, "selected users", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
+        add(UIHelper.createListContainer(selectedUsers, "selected users", new ColumnFilterRenderer(UIHelper.VER_11_BOLD,
                 UIHelper.LIGHT_GREEN_COLOR, UIHelper.VER_11_PLAIN, UIHelper.LIGHT_GREY_COLOR,
                 Globals.LIST_ICON_USER)));
 

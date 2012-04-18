@@ -48,6 +48,7 @@
 
 package org.isatools.gui.datamanager;
 
+import org.apache.log4j.Logger;
 import org.isatools.gui.AppContainer;
 import org.isatools.gui.Globals;
 import org.isatools.gui.ViewingPane;
@@ -70,6 +71,7 @@ import java.util.Collection;
 
 public class StudyOperationCommon extends ViewingPane {
 
+    public static final Logger log = Logger.getLogger(StudyOperationCommon.class.getName());
 
     protected GUIISATABUnloader unloaderUtil;
 
