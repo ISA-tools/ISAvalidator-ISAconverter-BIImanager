@@ -50,9 +50,10 @@ package org.isatools.gui;
 
 import org.apache.log4j.Level;
 import org.isatools.effects.GenericPanel;
-import org.isatools.effects.GradientPanel;
 import org.isatools.effects.SmallLoader;
 import org.isatools.effects.UIHelper;
+import org.isatools.errorreporter.model.*;
+import org.isatools.errorreporter.ui.ErrorReporterView;
 import org.isatools.fileutils.ArchiveOrDirectoryFileFilter;
 import org.isatools.fileutils.FileUnzipper;
 import org.isatools.gui.converter.ConverterBackgroundPanel;
@@ -68,14 +69,13 @@ import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Single entry point for displaying the different stages of the validation from selecting the ISATAB file, status screen
@@ -203,7 +203,6 @@ public abstract class CommonUI extends JLayeredPane {
                     }
                 });
             } else if (useAs == ApplicationType.CONVERTER) {
-
                 instantiateConversionUtilPanel(fileLoc[0]);
                 progressIndicator.stop();
             } else {
@@ -219,11 +218,93 @@ public abstract class CommonUI extends JLayeredPane {
                 threads[0].start();
             }
         } else {
-            appContainer.setGlassPanelContents(createResultPanel(Globals.INVALID_ISATAB, Globals.VALIDATE_ANOTHER,
-                    Globals.VALIDATE_ANOTHER_OVER, Globals.EXIT, Globals.EXIT_OVER, null, getValidatorReport()));
+
+            Map<String, List<ErrorMessage>> errorMessages = getErrorMessages(
+                    isatabValidator.getLog());
+            displayValidationErrorsAndWarnings(errorMessages);
+
             progressIndicator.stop();
         }
         appContainer.validate();
+    }
+
+    private void displayValidationErrorsAndWarnings(Map<String, List<ErrorMessage>> fileToErrors) {
+        List<ISAFileErrorReport> errors = new ArrayList<ISAFileErrorReport>();
+        for (String fileName : fileToErrors.keySet()) {
+            errors.add(new ISAFileErrorReport(fileName,
+                    FileType.INVESTIGATION, fileToErrors.get(fileName)));
+        }
+
+        if (fileToErrors.size() > 0) {
+            ErrorReporterView view = new ErrorReporterView(errors);
+            view.setPreferredSize(new Dimension(400, 450));
+            view.createGUI();
+            view.add(createReturnToMenuOrExitPanel(), BorderLayout.SOUTH);
+            appContainer.setGlassPanelContents(view);
+            appContainer.validate();
+        }
+    }
+
+    private JPanel createReturnToMenuOrExitPanel() {
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.setOpaque(false);
+
+        final JLabel backButton = new JLabel(useAs == ApplicationType.VALIDATOR
+                ? Globals.VALIDATE_ANOTHER : useAs == ApplicationType.CONVERTER
+                ? Globals.CONVERT_ANOTHER : Globals.LOAD_ANOTHER, JLabel.LEFT);
+
+        backButton.addMouseListener(new MouseAdapter() {
+
+            public void mousePressed(MouseEvent event) {
+                backButton.setIcon(useAs == ApplicationType.VALIDATOR
+                        ? Globals.VALIDATE_ANOTHER : useAs == ApplicationType.CONVERTER
+                        ? Globals.CONVERT_ANOTHER : Globals.LOAD_ANOTHER);
+                if (backButton.getIcon() == Globals.BACK_MAIN) {
+                    showLoaderMenu();
+                } else {
+                    appContainer.setGlassPanelContents(selectISATABUI);
+                }
+
+                appContainer.validate();
+            }
+
+            public void mouseEntered(MouseEvent event) {
+                backButton.setIcon(useAs == ApplicationType.VALIDATOR
+                        ? Globals.VALIDATE_ANOTHER_OVER : useAs == ApplicationType.CONVERTER
+                        ? Globals.CONVERT_ANOTHER_OVER : Globals.LOAD_ANOTHER_OVER);
+            }
+
+            public void mouseExited(MouseEvent event) {
+                backButton.setIcon(useAs == ApplicationType.VALIDATOR
+                        ? Globals.VALIDATE_ANOTHER : useAs == ApplicationType.CONVERTER
+                        ? Globals.CONVERT_ANOTHER : Globals.LOAD_ANOTHER);
+            }
+        });
+
+        buttonPanel.add(backButton, BorderLayout.WEST);
+
+        final JLabel exitButton = new JLabel(Globals.EXIT, JLabel.RIGHT);
+
+        exitButton.addMouseListener(new MouseAdapter() {
+
+            public void mousePressed(MouseEvent event) {
+                appContainer.setVisible(false);
+                appContainer.dispose();
+                System.exit(0);
+            }
+
+            public void mouseEntered(MouseEvent event) {
+                exitButton.setIcon(Globals.EXIT_OVER);
+            }
+
+            public void mouseExited(MouseEvent event) {
+                exitButton.setIcon(Globals.EXIT);
+            }
+        });
+
+        buttonPanel.add(exitButton, BorderLayout.EAST);
+
+        return buttonPanel;
     }
 
     public ErrorReport getValidatorReport() {
@@ -316,6 +397,24 @@ public abstract class CommonUI extends JLayeredPane {
 
         resultPanel.createGUI();
         return resultPanel;
+    }
+
+    protected Map<String, List<ErrorMessage>> getErrorMessages(List<TabLoggingEventWrapper> logEvents) {
+        Map<String, List<ErrorMessage>> fileToErrors = new HashMap<String, List<ErrorMessage>>();
+
+        for (TabLoggingEventWrapper event : logEvents) {
+            String fileName = ErrorUtils.extractFileInformation(event.getLogEvent());
+
+            if (fileName != null) {
+                if (event.getLogEvent().getLevel().toInt() >= Level.WARN_INT) {
+                    if (!fileToErrors.containsKey(fileName)) {
+                        fileToErrors.put(fileName, new ArrayList<ErrorMessage>());
+                    }
+                    fileToErrors.get(fileName).add(new ErrorMessage(event.getLogEvent().getLevel() == Level.WARN ? ErrorLevel.WARNING : ErrorLevel.ERROR, event.getLogEvent().getMessage().toString()));
+                }
+            }
+        }
+        return fileToErrors;
     }
 
 }
