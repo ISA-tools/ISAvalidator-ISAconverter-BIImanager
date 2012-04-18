@@ -64,25 +64,36 @@ public class SimpleManager {
 
     private static Logger log = Logger.getLogger(SimpleManager.class.getName());
 
+    private VisibilityStatus status = VisibilityStatus.PUBLIC;
     private EntityManager sharedEntityManager;
 
     public SimpleManager() {
     }
 
-    public void loadISAtab(String isatabFile, String configurationDirectory, String userName) {
+    public VisibilityStatus getStatus() {
+        return status;
+    }
 
+    public void setStatus(VisibilityStatus status) {
+        this.status = status;
+    }
+
+    public void loadISATab(String isatabFile, String userName, VisibilityStatus status) {
+        this.status = status;
+        loadISAtab(isatabFile, userName);
+    }
+
+    public void loadISAtab(String isatabFile, String configurationDirectory, String userName) {
         if (loadConfiguration(configurationDirectory)) {
             loadISAtab(isatabFile, userName);
         } else {
             log.info("No configuration directory found...");
         }
-
     }
 
     public void validateISAtab(String isatabFile, String configurationDirectory) {
         if (loadConfiguration(configurationDirectory)) {
             GUIISATABValidator isatabValidator = new GUIISATABValidator();
-
             GUIInvokerResult validationResult = isatabValidator.validate(isatabFile);
             if (validationResult == GUIInvokerResult.SUCCESS) {
                 System.out.println("Validation successful!");
@@ -99,8 +110,8 @@ public class SimpleManager {
     public void loadISAtab(String isatabFile, String userName) {
 
         GUIISATABValidator isatabValidator = new GUIISATABValidator();
-
         GUIInvokerResult validationResult = isatabValidator.validate(isatabFile);
+
         if (validationResult == GUIInvokerResult.SUCCESS) {
             GUIISATABLoader loader = new GUIISATABLoader();
             log.info("Validation successful, now proceeding to load ISAtab into the BII...");
@@ -112,16 +123,13 @@ public class SimpleManager {
 
                 // using this call, we can get all objects of type Study from the BIIObjectStore.
                 Collection<Study> studies = isatabValidator.getStore().valuesOfType(Study.class);
-
                 Set<String> accessions = new HashSet<String>();
 
                 for (Study study : studies) {
                     accessions.add(study.getAcc());
                 }
 
-                changeStudyPermissions(VisibilityStatus.PUBLIC, userName,
-                        accessions.toArray(new String[accessions.size()]));
-
+                changeStudyPermissions(status, userName, accessions.toArray(new String[accessions.size()]));
                 log.info("Loading completed and reindexing performed");
             }
         } else {
@@ -135,14 +143,12 @@ public class SimpleManager {
      *
      * @param studyId    - ID of study to unload
      * @param isatabFile - directory for ISAtab to be reloaded
+     * @param configurationDirectory - where the configuration files are
      * @param userName   - username of submitter to be assigned as the owner of the submission
      */
     public void reloadISAtab(String studyId, String isatabFile, String configurationDirectory, String userName) {
-
         loadConfiguration(configurationDirectory);
-
         reloadISAtab(studyId, isatabFile, userName);
-
     }
 
     /**
