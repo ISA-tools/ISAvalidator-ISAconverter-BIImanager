@@ -142,7 +142,7 @@ public class ExportISATab implements Serializable {
 
             if (result == GUIInvokerResult.ERROR) {
                 dataManagerToolUI.createResultPanel(exportFailureImage, Globals.BACK_MAIN, Globals.BACK_MAIN_OVER, Globals.EXIT,
-                        Globals.EXIT_OVER, null, new ErrorReport(exporter.getLog(), dataManagerToolUI.getAllowedLogLevels()));
+                        Globals.EXIT_OVER, null);
             } else {
                 SuccessOrFailureGUI successGUI = new SuccessOrFailureGUI(dataManagerToolUI.getAppContainer(), SuccessOrFailureGUI.EXPORT_SUCCESS,
                         exportISAGUI.generateExportSuccessMessage());

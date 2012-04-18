@@ -37,11 +37,9 @@ public class DBLoader implements Serializable {
 
             // in the event of loading failing, tell the user why it didn't load.
             if (result == GUIInvokerResult.ERROR) {
-                List<TabLoggingEventWrapper> logResult = isatabLoader.getLog();
-                ErrorReport er = new ErrorReport(logResult, dataManagerToolUI.getAllowedLogLevels());
                 dataManagerToolUI.getAppContainer().setGlassPanelContents(
                         dataManagerToolUI.createResultPanel(Globals.LOAD_FAILED, Globals.LOAD_ANOTHER,
-                                Globals.LOAD_ANOTHER_OVER, Globals.EXIT, Globals.EXIT_OVER, null, er));
+                                Globals.LOAD_ANOTHER_OVER, Globals.EXIT, Globals.EXIT_OVER, null));
                 dataManagerToolUI.getAppContainer().validate();
             } else {
 

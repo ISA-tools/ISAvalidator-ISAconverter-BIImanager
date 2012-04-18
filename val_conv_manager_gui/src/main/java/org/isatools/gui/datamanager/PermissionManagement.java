@@ -232,7 +232,7 @@ public class PermissionManagement implements Serializable {
             transaction.commit();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    dataManagerToolUI.getAppContainer().setGlassPanelContents(dataManagerToolUI.createResultPanel(Globals.LOAD_SUCCESS, Globals.BACK_MAIN, Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, "<p>" + report + "</p>", dataManagerToolUI.getValidatorReport()));
+                    dataManagerToolUI.getAppContainer().setGlassPanelContents(dataManagerToolUI.createResultPanel(Globals.LOAD_SUCCESS, Globals.BACK_MAIN, Globals.BACK_MAIN_OVER, Globals.EXIT, Globals.EXIT_OVER, "<p>" + report + "</p>"));
                     dataManagerToolUI.getProgressIndicator().stop();
                     dataManagerToolUI.getAppContainer().validate();
                 }

@@ -49,6 +49,7 @@
 package org.isatools.gui;
 
 import org.apache.log4j.Level;
+import org.apache.log4j.pattern.LogEvent;
 import org.isatools.effects.GenericPanel;
 import org.isatools.effects.SmallLoader;
 import org.isatools.effects.UIHelper;
@@ -86,6 +87,7 @@ import java.util.List;
  */
 
 public abstract class CommonUI extends JLayeredPane {
+    public static final String DATABASE_ERROR = "database error";
     private GenericPanel generic;
 
     protected AppContainer appContainer;
@@ -104,7 +106,7 @@ public abstract class CommonUI extends JLayeredPane {
     private File configDir;
 
     // Loads and validate a submission, the first step for almost all the operations.
-    protected GUIISATABValidator isatabValidator;
+    public GUIISATABValidator isatabValidator;
 
     public CommonUI(final AppContainer appContainer, ApplicationType useAs, String[] options) {
         this.appContainer = appContainer;
@@ -198,7 +200,7 @@ public abstract class CommonUI extends JLayeredPane {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         appContainer.setGlassPanelContents(createResultPanel(Globals.VALID_ISATAB, Globals.VALIDATE_ANOTHER,
-                                Globals.VALIDATE_ANOTHER_OVER, Globals.EXIT, Globals.EXIT_OVER, isatabValidator.report(true), getValidatorReport().getReport().isEmpty() ? null : getValidatorReport()));
+                                Globals.VALIDATE_ANOTHER_OVER, Globals.EXIT, Globals.EXIT_OVER, isatabValidator.report(true)));
                         progressIndicator.stop();
                     }
                 });
@@ -229,20 +231,25 @@ public abstract class CommonUI extends JLayeredPane {
     }
 
     private void displayValidationErrorsAndWarnings(Map<String, List<ErrorMessage>> fileToErrors) {
-        List<ISAFileErrorReport> errors = new ArrayList<ISAFileErrorReport>();
-        for (String fileName : fileToErrors.keySet()) {
-            errors.add(new ISAFileErrorReport(fileName,
-                    FileType.INVESTIGATION, fileToErrors.get(fileName)));
-        }
+        List<ISAFileErrorReport> errors = createErrorReport(fileToErrors);
 
         if (fileToErrors.size() > 0) {
             ErrorReporterView view = new ErrorReporterView(errors);
-            view.setPreferredSize(new Dimension(400, 450));
+            view.setPreferredSize(new Dimension(400, 420));
             view.createGUI();
             view.add(createReturnToMenuOrExitPanel(), BorderLayout.SOUTH);
             appContainer.setGlassPanelContents(view);
             appContainer.validate();
         }
+    }
+
+    private List<ISAFileErrorReport> createErrorReport(Map<String, List<ErrorMessage>> fileToErrors) {
+        List<ISAFileErrorReport> errors = new ArrayList<ISAFileErrorReport>();
+        for (String fileName : fileToErrors.keySet()) {
+            errors.add(new ISAFileErrorReport(fileName,
+                    FileType.INVESTIGATION, fileToErrors.get(fileName)));
+        }
+        return errors;
     }
 
     private JPanel createReturnToMenuOrExitPanel() {
@@ -369,11 +376,7 @@ public abstract class CommonUI extends JLayeredPane {
     }
 
     public JPanel createResultPanel(ImageIcon mainImage, final ImageIcon anotherImage, final ImageIcon anotherImageOver, final ImageIcon exitImage, final ImageIcon exitImageOver, final String message) {
-        return createResultPanel(mainImage, anotherImage, anotherImageOver, exitImage, exitImageOver, message, null);
-    }
-
-    public JPanel createResultPanel(ImageIcon mainImage, final ImageIcon anotherImage, final ImageIcon anotherImageOver, final ImageIcon exitImage, final ImageIcon exitImageOver, final String message, ErrorReport report) {
-        final TaskResultPanel resultPanel = new TaskResultPanel(mainImage, anotherImage, anotherImageOver, exitImage, exitImageOver, message, report);
+        final TaskResultPanel resultPanel = new TaskResultPanel(mainImage, anotherImage, anotherImageOver, exitImage, exitImageOver, message, createErrorReport(getErrorMessages(isatabValidator.getLog())));
 
         resultPanel.addPropertyChangeListener("back", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
@@ -382,7 +385,6 @@ public abstract class CommonUI extends JLayeredPane {
                 } else {
                     appContainer.setGlassPanelContents(selectISATABUI);
                 }
-
                 appContainer.validate();
             }
         });
@@ -399,7 +401,7 @@ public abstract class CommonUI extends JLayeredPane {
         return resultPanel;
     }
 
-    protected Map<String, List<ErrorMessage>> getErrorMessages(List<TabLoggingEventWrapper> logEvents) {
+    public Map<String, List<ErrorMessage>> getErrorMessages(List<TabLoggingEventWrapper> logEvents) {
         Map<String, List<ErrorMessage>> fileToErrors = new HashMap<String, List<ErrorMessage>>();
 
         for (TabLoggingEventWrapper event : logEvents) {
@@ -410,11 +412,20 @@ public abstract class CommonUI extends JLayeredPane {
                     if (!fileToErrors.containsKey(fileName)) {
                         fileToErrors.put(fileName, new ArrayList<ErrorMessage>());
                     }
-                    fileToErrors.get(fileName).add(new ErrorMessage(event.getLogEvent().getLevel() == Level.WARN ? ErrorLevel.WARNING : ErrorLevel.ERROR, event.getLogEvent().getMessage().toString()));
+                    fileToErrors.get(fileName).add(createErrorMessage(event));
                 }
+            } else if(event.getFormattedMessage().contains("The accession")) {
+                // we have a different type of error
+                if (!fileToErrors.containsKey(DATABASE_ERROR))
+                    fileToErrors.put(DATABASE_ERROR, new ArrayList<ErrorMessage>());
+                fileToErrors.get(DATABASE_ERROR).add(new ErrorMessage(ErrorLevel.ERROR, event.getLogEvent().getMessage().toString()));
             }
         }
         return fileToErrors;
+    }
+
+    private ErrorMessage createErrorMessage(TabLoggingEventWrapper event) {
+       return new ErrorMessage(event.getLogEvent().getLevel() == Level.WARN ? ErrorLevel.WARNING : ErrorLevel.ERROR, event.getLogEvent().getMessage().toString());
     }
 
 }

@@ -50,7 +50,6 @@ package org.isatools.gui.datamanager;
 
 import org.isatools.effects.SmallLoader;
 import org.isatools.gui.*;
-import org.isatools.gui.datamanager.exportisa.ExportISAGUI;
 import org.isatools.gui.datamanager.studyaccess.*;
 import org.isatools.tablib.exceptions.TabException;
 import org.isatools.tablib.utils.BIIObjectStore;
@@ -350,4 +349,6 @@ public class DataManagerToolUI extends CommonUI {
     public LoginUI getLogin() {
         return login;
     }
+
+
 }

@@ -122,7 +122,7 @@ public class ConverterUI extends CommonUI {
                             appContainer.setGlassPanelContents(createResultPanel(
                                     new ImageIcon(getClass().getResource("/images/converter/conversion_success.png")),
                                     Globals.CONVERT_ANOTHER, Globals.CONVERT_ANOTHER_OVER, Globals.EXIT, Globals.EXIT_OVER,
-                                    "<p>conversion success. files sent to " + outputDir.getAbsolutePath() + "</p><p>" + isatabValidator.report(true) + "</p>", getValidatorReport()));
+                                    "<p>conversion success. files sent to " + outputDir.getAbsolutePath() + "</p><p>" + isatabValidator.report(true) + "</p>"));
                             appContainer.validate();
                         } else {
                             String topMostError = "";

@@ -49,8 +49,8 @@
 package org.isatools.gui;
 
 import org.isatools.effects.UIHelper;
-import org.isatools.gui.errorprocessing.ErrorReport;
-import org.isatools.gui.errorprocessing.ErrorReportUI;
+import org.isatools.errorreporter.model.ISAFileErrorReport;
+import org.isatools.errorreporter.ui.ErrorReporterView;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -58,6 +58,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,7 +79,7 @@ public class TaskResultPanel extends JPanel {
     private ImageIcon exitImage;
     private ImageIcon exitImageOver;
     private String message;
-    private ErrorReport report;
+    private List<ISAFileErrorReport> report;
 
     private JLabel showSummary;
     private JLabel showWarnings;
@@ -89,12 +90,7 @@ public class TaskResultPanel extends JPanel {
     private int currentlySelectedPane;
 
     public TaskResultPanel(ImageIcon mainImage, ImageIcon anotherImage, ImageIcon anotherImageOver,
-                           ImageIcon exitImage, ImageIcon exitImageOver, String message) {
-        this(mainImage, anotherImage, anotherImageOver, exitImage, exitImageOver, message, null);
-    }
-
-    public TaskResultPanel(ImageIcon mainImage, ImageIcon anotherImage, ImageIcon anotherImageOver,
-                           ImageIcon exitImage, ImageIcon exitImageOver, String message, ErrorReport report) {
+                           ImageIcon exitImage, ImageIcon exitImageOver, String message, List<ISAFileErrorReport> report) {
         this.mainImage = mainImage;
         this.anotherImage = anotherImage;
         this.anotherImageOver = anotherImageOver;
@@ -113,13 +109,12 @@ public class TaskResultPanel extends JPanel {
         centralPanel.setLayout(new BoxLayout(centralPanel, BoxLayout.PAGE_AXIS));
         centralPanel.setOpaque(false);
 
-
         centralPanel.add(UIHelper.wrapComponentInPanel(new JLabel(mainImage, SwingUtilities.CENTER)));
         centralPanel.add(Box.createVerticalStrut(10));
 
 
         // add buttons here to switch between summary and error report if error report isn't null
-        if (report != null && report.getReport().size() > 0) {
+        if (report != null && report.size() > 0) {
             swappableUIContainer = new JPanel();
             swappableUIContainer.setOpaque(false);
             // create a tabbed form of view between summary and warnings log.
@@ -186,21 +181,16 @@ public class TaskResultPanel extends JPanel {
         });
 
         buttonPanel.add(exitButton, BorderLayout.EAST);
-
         add(buttonPanel, BorderLayout.SOUTH);
-
     }
 
     private JPanel createErrorPanel() {
-        final ErrorReportUI errorReportTable = new ErrorReportUI(report);
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                errorReportTable.createGUI();
-            }
-        });
+        final ErrorReporterView view = new ErrorReporterView(report);
+        view.setPreferredSize(new Dimension(400, 450));
+        view.createGUI();
 
-        return errorReportTable;
+        return view;
     }
 
     private JComponent createEditorPane(String content) {
