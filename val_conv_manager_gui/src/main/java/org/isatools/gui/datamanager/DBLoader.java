@@ -1,16 +1,13 @@
 package org.isatools.gui.datamanager;
 
 import org.isatools.gui.Globals;
-import org.isatools.gui.errorprocessing.ErrorReport;
 import org.isatools.isatab.gui_invokers.GUIISATABLoader;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.tablib.utils.BIIObjectStore;
-import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.Serializable;
-import java.util.List;
 
 public class DBLoader implements Serializable {
     private final DataManagerToolUI dataManagerToolUI;

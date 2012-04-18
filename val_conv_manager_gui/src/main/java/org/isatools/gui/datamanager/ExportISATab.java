@@ -3,7 +3,6 @@ package org.isatools.gui.datamanager;
 import org.isatools.gui.Globals;
 import org.isatools.gui.datamanager.exportisa.ExportISAGUI;
 import org.isatools.gui.datamanager.exportisa.SuccessOrFailureGUI;
-import org.isatools.gui.errorprocessing.ErrorReport;
 import org.isatools.isatab.gui_invokers.GUIISATABExporter;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.jdesktop.fuse.InjectedResource;

@@ -49,7 +49,6 @@
 package org.isatools.gui;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.pattern.LogEvent;
 import org.isatools.effects.GenericPanel;
 import org.isatools.effects.SmallLoader;
 import org.isatools.effects.UIHelper;
@@ -60,7 +59,6 @@ import org.isatools.fileutils.FileUnzipper;
 import org.isatools.gui.converter.ConverterBackgroundPanel;
 import org.isatools.gui.datamanager.DataManagerBackgroundPanel;
 import org.isatools.gui.datamanager.studyaccess.LoginUI;
-import org.isatools.gui.errorprocessing.ErrorReport;
 import org.isatools.gui.validator.ValidatorBackgroundPanel;
 import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
@@ -314,11 +312,6 @@ public abstract class CommonUI extends JLayeredPane {
         return buttonPanel;
     }
 
-    public ErrorReport getValidatorReport() {
-        List<TabLoggingEventWrapper> logResult = isatabValidator.getLog();
-
-        return new ErrorReport(logResult, getAllowedLogLevels());
-    }
 
     public Set<Level> getAllowedLogLevels() {
         Set<Level> displayedLogLevels = new HashSet<Level>();

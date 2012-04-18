@@ -71,7 +71,7 @@ public class AppContainer extends JFrame {
 
     static {
         UIManager.put("ToolTip.foreground", UIHelper.LIGHT_GREEN_COLOR);
-        UIManager.put("ToolTip.background", UIHelper.GREY_COLOR);
+        UIManager.put("ToolTip.background", UIHelper.BG_COLOR);
 
         ResourceInjector.addModule("org.jdesktop.fuse.swing.SwingModule");
 
