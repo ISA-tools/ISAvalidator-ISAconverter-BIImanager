@@ -68,8 +68,6 @@ public class FieldCardinalityConstraint extends FieldConstraint {
         MIN, MAX, EXACT
     }
 
-    ;
-
     private final CardinalityType cardinalityType;
     private final int cardinality;
 

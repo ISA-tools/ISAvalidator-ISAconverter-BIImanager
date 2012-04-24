@@ -50,8 +50,7 @@ package org.isatools.isatab.export.magetab;
 
 import org.isatools.tablib.export.FormatComponentExporter;
 import org.isatools.tablib.export.FormatExporter;
-import org.isatools.tablib.schema.Format;
-import org.isatools.tablib.schema.FormatInstance;
+import org.isatools.tablib.schema.*;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Study;
 
@@ -60,7 +59,7 @@ import java.util.ArrayList;
 /**
  * The MAGE/IDF format exporter
  * <p/>
- * date: Apr 7, 2008
+ * <dl><dt>date:</dt><dd>Apr 7, 2008</dd></dl>
  *
  * @author brandizi
  */
@@ -73,10 +72,27 @@ public class IDFExporter extends FormatExporter {
         super(store);
         exporters = new ArrayList<FormatComponentExporter<?>>();
         exporters.add(new StudyTabExporter(store, study));
+        exporters.add(new DesignTabExporter(store, study));
         exporters.add(new FactorTypeTabExporter(store, study));
+        exporters.add(new ContactTabExporter(store, study));
         exporters.add(new PublicationTabExporter(store, study));
         exporters.add(new ProtocolTabExporter(store, study));
         exporters.add(new OntologySourceTabExporter(store));
+    }
+
+    @Override
+    public FormatInstance export() {
+        // Do the job and then add the SDRF File Name
+        FormatInstance sdrfI = super.export();
+        Format sdrf = sdrfI.getFormat();
+        Section sdrfFile = sdrf.getSection("sdrfFile");
+        SectionInstance sdrfFileI = new SectionInstance(sdrfFile);
+        sdrfFileI.addField(sdrfFile.getFields().get(0).clone());
+        Record rec = new Record(sdrfFileI);
+        rec.set(0, "sdrf.txt");
+        sdrfFileI.addRecord(rec);
+        sdrfI.addSectionInstance(sdrfFileI);
+        return sdrfI;
     }
 
 

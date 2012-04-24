@@ -48,13 +48,12 @@
 
 package org.isatools.isatab.export.magetab;
 
-import org.isatools.isatab.export.properties.FreeTextTermExportingHelper;
+import org.isatools.tablib.export.properties.DateExportingHelper;
 import org.isatools.tablib.export.properties.PropertyExportingHelper;
 import org.isatools.tablib.export.properties.StringExportingHelper;
 import org.isatools.tablib.schema.Section;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Study;
-import uk.ac.ebi.bioinvindex.model.term.Design;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,11 +69,9 @@ public class StudyTabExporter extends StudyComponentTabExporter<Study> {
 
         propertyExportingHelpers = new ArrayList<PropertyExportingHelper<Study>>();
         propertyExportingHelpers.add(new StringExportingHelper<Study>(store, "title", "Investigation Title"));
-        propertyExportingHelpers.add(new FreeTextTermExportingHelper<Study, Design>(
-                store, "design",
-                "Experimental Design", "Experimental Design Type", "Experimental Design Type Accession Number",
-                "Experimental Design Type Term Source REF")
-        );
+        propertyExportingHelpers.add(new ExperimentDescriptionExportingHelper(store));
+        propertyExportingHelpers.add(new DateExportingHelper<Study>(store, "submissionDate", "Date of Experiment"));
+        propertyExportingHelpers.add(new DateExportingHelper<Study>(store, "releaseDate", "Public Release Date"));
     }
 
     /**

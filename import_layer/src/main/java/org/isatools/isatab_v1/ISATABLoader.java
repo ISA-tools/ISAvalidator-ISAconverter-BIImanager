@@ -66,12 +66,10 @@ import java.util.List;
 
 /**
  * The specific loader to be used with the ISATAB format.
- * <p/>
+ *
  * PLEASE NOTE: This is *not* the GUI Loader, mentioned in the end-user documentation. That loader is actually
  * a wrapper of {@link ISATABPersister}. This loader refers to the first in-memory loading of the ISATAB structure,
  * which produces an object model that reflects the strucure in the spreadsheet files (named the Tabular View).
- * <p/>
- * <p/>
  * date: Mar 12, 2008
  *
  * @author brandizi
@@ -134,10 +132,8 @@ public class ISATABLoader extends org.isatools.isatab.ISATABLoader {
                                 + "' (column #" + (assayFileNameIdx + 1) + "), measurement type is a mandatory attribute for the assay file");
                     }
 
-
                     // We can only deal with one of the formats defined in the ISATAB specification, and defined
                     // in the ISATAB schema file (in /main/resources/).
-                    //
                     String assayFormatId = AssayTypeEntries.getAssayFormatIdFromLabels(endPoint, technology);
 
                     if (assayFormatId == null) {

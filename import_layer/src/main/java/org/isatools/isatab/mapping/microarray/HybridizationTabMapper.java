@@ -67,23 +67,17 @@ public class HybridizationTabMapper extends MaterialNodeTabMapper<Material> {
 
     public HybridizationTabMapper(BIIObjectStore store, SectionInstance sectionInstance, int fieldIndex, int endField) {
         super(store, sectionInstance, fieldIndex, endField);
-
-        // Mapped by "Hybridization Assay Name"
-        //TODO: Do we need a specific property for this?
         this.mappingHelpersConfig.put("Array Design REF", new MappingHelperConfig<AnnotationMappingHelper>(
                 AnnotationMappingHelper.class, new String[][]{{"propertyName", "arrayDesignREF"}}
         ));
-
     }
 
 
     public Material map(int recordIndex) {
         // Instantiate a new material and provides mapping via helpers
         Material hybridization = super.map(recordIndex);
-
         // Create the corresponding assay
         createAssay(hybridization);
-
         return hybridization;
     }
 
@@ -92,9 +86,6 @@ public class HybridizationTabMapper extends MaterialNodeTabMapper<Material> {
      * Provides a new sample
      */
     public Material newMappedObject() throws InstantiationException, IllegalAccessException {
-        // TODO: we need proper constants for the roles
-        // TODO: fix to use real ReferenceSource
-        //
         return new Material(
                 "", new MaterialRole("bii:hybridization", "Hybridization",
                         new ReferenceSource("bii:roles", "BII Roles"))

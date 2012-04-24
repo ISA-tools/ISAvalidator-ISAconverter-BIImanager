@@ -243,13 +243,10 @@ public class ISATABMapper extends FormatSetTabMapper {
         }
 
         // OK, they're physically different but equivalent, let's merge them
-        //
-
         log.trace("Merging equivalent materials: [ " + material1.getName() + " ]");
 
         Collection<CharacteristicValue> cvals1 = material1.getCharacteristicValues();
         for (CharacteristicValue characteristicValue : material2.getCharacteristicValues()) {
-            // TODO: do we allow multiple characteristics of the same type?
             if (!Utils.contains(cvals1, characteristicValue)) {
                 material1.addCharacteristicValue(characteristicValue);
             }
@@ -263,27 +260,9 @@ public class ISATABMapper extends FormatSetTabMapper {
             }
         }
 
-//		Set<String> doneAnns = new HashSet<String> ();
-//		for ( Annotation annotation: material1.getAnnotations () ) 
-//		{
-//			String sann = StringUtils.trimToEmpty ( annotation.getType ().getValue () ) 
-//			+ StringUtils.trimToEmpty ( annotation.getText () );
-//			// Same type/value comes from merging and doesn't make sense
-//			if ( sann.length () == 0 || doneAnns.contains ( sann ) ) continue;
-//			doneAnns.add ( sann );
-//		}
         for (Annotation annotation : material2.getAnnotations()) {
-            // TODO: do we allow multiple annotations of the same type?
-            String sann = StringUtils.trimToEmpty(annotation.getType().getValue())
-                    + StringUtils.trimToEmpty(annotation.getText());
-            // Same type/value comes from merging and doesn't make sense
-//			if ( sann.length () == 0 || doneAnns.contains ( sann ) ) continue;
-//			doneAnns.add ( sann );
             material1.addAnnotation(annotation);
         }
-
-        // TODO: remove, both node2 and material2 will be eliminated
-        // node2.setMaterial ( material1 );
 
         // Deletes the material, the associated assay, and all the nodes referring to it
         removeAssay(node2, material2);
@@ -335,22 +314,7 @@ public class ISATABMapper extends FormatSetTabMapper {
             throw new TabInconsistentValuesException(i18n.msg("same_file_name_2_DM_urls", data1.getName()));
         }
 
-//		Set<String> doneAnns = new HashSet<String> ();
-//		for ( Annotation annotation: data1.getAnnotations () ) 
-//		{
-//			String sann = StringUtils.trimToEmpty ( annotation.getType ().getValue () ) 
-//			+ StringUtils.trimToEmpty ( annotation.getText () );
-//			// Same type/value comes from merging and doesn't make sense
-//			if ( sann.length () == 0 || doneAnns.contains ( sann ) ) continue;
-//			doneAnns.add ( sann );
-//		}
         for (Annotation annotation : data2.getAnnotations()) {
-            // TODO: do we allow multiple annotations of the same type?
-            String sann = StringUtils.trimToEmpty(annotation.getType().getValue())
-                    + StringUtils.trimToEmpty(annotation.getText());
-//			// Same type/value comes from merging and doesn't make sense
-//			if ( sann.length () == 0 || doneAnns.contains ( sann ) ) continue;
-//			doneAnns.add ( sann );
             data1.addAnnotation(annotation);
         }
 
@@ -482,7 +446,7 @@ public class ISATABMapper extends FormatSetTabMapper {
                                     return true;
                                 }
 
-                                fvs.addAll(((Material) material).getFactorValues());
+                                fvs.addAll((material).getFactorValues());
                                 return true;
                             }
                         }
@@ -657,8 +621,6 @@ public class ISATABMapper extends FormatSetTabMapper {
                         + ", technology: " + ag.getTechnologyName()
                         + ", platform: " + ag.getPlatform());
 
-                //out.println ( "  This assay file uses " + visitor.getSourceCt () + " source material(s) and" );
-                //out.println ( "  " + visitor.getSampleCt () + " sample material(s)." );
                 out.println("  " + assays.size() + " assay(s) found in the assay file, which has/have produced");
                 out.println("  " + visitor.getRawDataCt() + " raw data items (s) and");
                 out.println("  " + visitor.getDerivedDataCt() + " derived data item(s)");
@@ -1421,8 +1383,6 @@ public class ISATABMapper extends FormatSetTabMapper {
             }
             return true;
         }
-        // if ( data )
-
     }
 
 }

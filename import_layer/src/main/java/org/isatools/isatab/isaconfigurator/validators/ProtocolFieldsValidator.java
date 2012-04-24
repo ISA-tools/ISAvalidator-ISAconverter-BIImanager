@@ -142,8 +142,11 @@ public class ProtocolFieldsValidator extends AbstractValidatorComponent {
                 continue;
             }
 
+            // gets all protocols in the configuration defined between field x and y within the configuration.
             List<ProtocolFieldType> cprotos = isaConfigSet.getProtocolsBetween(cleftField, crightField);
 
+            // if there are no protocols defined between these fields, then just skip the remaining parts
+            // of this logic and go to check the next field.
             if (cprotos == null || cprotos.size() == 0) {
                 continue;
             }

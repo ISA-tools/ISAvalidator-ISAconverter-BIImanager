@@ -46,9 +46,8 @@
 
  */
 
-package org.isatools.isatab_v1.export.magetab;
+package org.isatools.isatab.export.magetab;
 
-import org.isatools.isatab.export.magetab.StudyComponentTabExporter;
 import org.isatools.isatab.export.properties.FreeTextSimpleExportingUtility;
 import org.isatools.tablib.export.StringPropertyComparator;
 import org.isatools.tablib.schema.Record;

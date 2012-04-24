@@ -49,9 +49,9 @@
 package org.isatools.isatab.gui_invokers;
 
 import org.isatools.isatab.commandline.AbstractImportLayerShellCommand;
+import org.isatools.isatab.export.magetab.MAGETABExporter;
 import org.isatools.isatab.export.pride.DraftPrideExporter;
 import org.isatools.isatab.export.sra.SraExporter;
-import org.isatools.isatab_v1.export.magetab.MAGETABExporter;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 

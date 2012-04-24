@@ -52,9 +52,9 @@
 
 package org.isatools.isatab_v1.export;
 
+import org.isatools.isatab.export.magetab.MAGETABExporter;
 import org.isatools.isatab.mapping.AssayGroup;
 import org.isatools.isatab_v1.ISATABLoader;
-import org.isatools.isatab_v1.export.magetab.MAGETABExporter;
 import org.isatools.isatab_v1.mapping.ISATABMapper;
 import org.isatools.tablib.export.FormatSetExporter;
 import org.isatools.tablib.schema.FormatInstance;

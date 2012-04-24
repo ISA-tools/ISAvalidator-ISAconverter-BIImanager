@@ -58,6 +58,9 @@ import org.isatools.tablib.schema.FormatSet;
 import org.isatools.tablib.schema.FormatSetInstance;
 import org.isatools.tablib.schema.SchemaBuilder;
 import org.isatools.tablib.utils.BIIObjectStore;
+import org.isatools.tablib.utils.logging.TabNDC;
+import uk.ac.ebi.bioinvindex.model.Investigation;
+import uk.ac.ebi.bioinvindex.model.Study;
 import uk.ac.ebi.bioinvindex.utils.datasourceload.DataLocationManager;
 
 import java.io.BufferedInputStream;
@@ -65,7 +68,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Set;
 
 /**
  * The MAGE-TAB exporter, creates a single instance of the format.
@@ -112,9 +114,10 @@ public class MAGETABExporter extends FormatSetExporter {
         return magetabSchema = SchemaBuilder.loadFormatSetFromXML(input);
     }
 
+
     /**
-     * Does the exporting job, taking all the assays in store of type microarray and creating a MAGE-TAB submission for
-     * each of them.
+     * Does the exporting job from the ISATAB submission, taking all the assays in store of type microarray and creating
+     * a MAGE-TAB submission for each of them.
      */
     public static void dispatch(BIIObjectStore store, String sourcePath, String outPath) throws IOException {
         if (outPath == null) {
@@ -125,10 +128,22 @@ public class MAGETABExporter extends FormatSetExporter {
         }
         outPath += "magetab";
 
+        int count = 0;
         for (AssayGroup assayGroup : store.valuesOfType(AssayGroup.class)) {
             if (!"magetab".equalsIgnoreCase(AssayTypeEntries.getDispatchTargetIdFromLabels(assayGroup))) {
                 continue;
             }
+
+            TabNDC ndc = TabNDC.getInstance();
+
+            Study study = assayGroup.getStudy();
+            Investigation investigation = study.getUniqueInvestigation();
+            if (investigation != null) {
+                ndc.pushObject(investigation);
+            }
+            ndc.pushObject(study);
+
+            ndc.pushObject(assayGroup);
 
             String assayPath = outPath + "/" + DataLocationManager.filePath2Id(assayGroup.getFilePath());
             File assayPathDir = new File(assayPath);
@@ -140,25 +155,23 @@ public class MAGETABExporter extends FormatSetExporter {
             MAGETABExporter exporter = new MAGETABExporter(store, assayGroup);
 
             FormatSetInstance mageInstance = exporter.export();
-
             mageInstance.dump(assayPath);
 
             // All the external files
             exporter.dispatchFiles(sourcePath, assayPath);
+
+            count++;
+
+            ndc.popObject(); // assayGroup
+            ndc.popObject(); // study
+            if (investigation != null) {
+                ndc.popObject();
+            }
         }
     }
 
 
-    /**
-     * Those files which refer to external files, needed to build a correct MAGETAB submission file set. It is initialized
-     * upon class loading. CAN ONLY BE CALLED AFTER {@link #export()}.
-     */
-    public Set<String> getExternalFileFieldNames() {
-        return sdrfExporter.getExternalFileFieldHeaders();
-    }
-
     public void dispatchFiles(String sourcePath, String outPath) throws IOException {
         sdrfExporter.dispatchFiles(sourcePath, outPath);
     }
-
 }

@@ -515,14 +515,9 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
                 //
                 ProcessingEntityTabMapper<?> nodeMapper;
                 try {
-                    nodeMapper =
-                            (ProcessingEntityTabMapper<?>) ConstructorUtils.invokeConstructor(
-                                    previousNodeMapperClass,
-                                    new Object[]{
-                                            getStore(), sectionInstance, previousFieldIndex, fieldIndex
-                                    },
-                                    new Class<?>[]{BIIObjectStore.class, SectionInstance.class, Integer.class, Integer.class}
-                            );
+                    nodeMapper = (ProcessingEntityTabMapper<?>) ConstructorUtils.invokeConstructor(previousNodeMapperClass,
+                                    new Object[]{getStore(), sectionInstance, previousFieldIndex, fieldIndex},
+                                    new Class<?>[]{BIIObjectStore.class, SectionInstance.class, Integer.class, Integer.class});
                 }
                 catch (Exception ex) {
                     throw new TabInternalErrorException(

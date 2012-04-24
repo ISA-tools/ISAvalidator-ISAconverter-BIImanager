@@ -88,9 +88,6 @@ public class MaDataTransformationTabMapper extends DataNodeTabMapper {
      */
     @Override
     public Data newMappedObject() throws InstantiationException, IllegalAccessException {
-        // TODO: we need proper constants for the roles
-        // TODO: fix to use real ReferenceSource
-        //
         return new Data(
                 "", new DataType("bii:microarray_derived_data", "Microarray Derived Data", new ReferenceSource("bii:data_types", "bii:data_types"))
         );

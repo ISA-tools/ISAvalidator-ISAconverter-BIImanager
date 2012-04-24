@@ -7,9 +7,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.isatools.isatab.export.magetab.MAGETABExporter;
 import org.isatools.isatab.export.pride.DraftPrideExporter;
 import org.isatools.isatab.export.sra.SraExporter;
-import org.isatools.isatab_v1.export.magetab.MAGETABExporter;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 

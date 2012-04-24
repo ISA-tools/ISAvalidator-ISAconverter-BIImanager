@@ -71,14 +71,32 @@ public class MaProcessingTabMapper extends ProcessingsTabMapper {
 
     public MaProcessingTabMapper(BIIObjectStore store, SectionInstance sectionInstance) {
         super(store, sectionInstance);
+
+        log.info("In MaProcessingTabMapper...");
+        boolean scanNameExists = checkSectionInstanceForFieldPresence(sectionInstance, "Scan Name");
+        boolean dataTransformationName = checkSectionInstanceForFieldPresence(sectionInstance, "Data Transformation Name");
+
         nodeMappersConfig.put("Sample Name", SampleTabMapper.class);
         nodeMappersConfig.put("Protocol REF", GenericProtocolApplicationTabMapper.class);
         nodeMappersConfig.put("Extract Name", ExtractTabMapper.class);
         nodeMappersConfig.put("Labeled Extract Name", LabeledExtractTabMapper.class);
         nodeMappersConfig.put("Hybridization Assay Name", HybridizationTabMapper.class);
-        nodeMappersConfig.put("Scan Name", MaRawDataTabMapper.class);
+
+        // there are a number of cases where scan name isn't really required. Having an image file is enough SlimMaRawDataTabMapper
+        nodeMappersConfig.put(scanNameExists ? "Scan Name" : "Array Data File",
+                scanNameExists ? MaRawDataTabMapper.class : SlimMaRawDataTabMapper.class);
         nodeMappersConfig.put("Normalization Name", MaNormalizationTabMapper.class);
-        nodeMappersConfig.put("Data Transformation Name", MaDataTransformationTabMapper.class);
+
+        // there are a number of cases where the data transformation name isn't really required. Having the
+        // derived data file should be enough. So we need to have slimmed down mappings. SlimMaDataTransformationTabMapper
+        nodeMappersConfig.put(dataTransformationName ? "Data Transformation Name" : "Derived Array Data File",
+                dataTransformationName ? MaDataTransformationTabMapper.class : SlimMaProcessedDataTabMapper.class);
+    }
+
+    private boolean checkSectionInstanceForFieldPresence(SectionInstance sectionInstance, String fieldName) {
+        boolean fieldExists = sectionInstance.getFieldByHeader(fieldName) != null;
+        log.info("Do we have a " + fieldName + "? " + fieldExists);
+        return fieldExists;
     }
 
 
