@@ -50,6 +50,7 @@ package org.isatools.isatab_v1.mapping;
 
 import org.isatools.isatab.mapping.FactorTypeHelper;
 import org.isatools.isatab.mapping.StudyComponentTabMapper;
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.mapping.ClassTabMapper;
 import org.isatools.tablib.mapping.MappingUtils;
@@ -80,6 +81,8 @@ public class FactorTabMapper extends ClassTabMapper<FactorTypeHelper> implements
         mappingHelpersConfig.put("Study Factor Name", new MappingHelperConfig<StringPropertyMappingHelper>(
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "value"}}
         ));
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(CommentMappingHelper.class));
 
         mappingUtils = new MappingUtils(store);
     }

@@ -81,7 +81,6 @@ import java.util.*;
 /**
  * The processings mapper. Analyzes all the experimental pipeline's nodes and protocol applications
  * and build a graph of {@link Processing} with them.
- * <p/>
  * You may configure a sequence of {@link ProcessingNodeTabMapper}(s) and {@link AbstractProtocolApplicationTabMapper}(s)
  * this mapper has to expect from the pipeline, via the {@link #nodeMappersConfig} variable.
  * <p/>
@@ -91,7 +90,6 @@ import java.util.*;
  */
 public abstract class ProcessingsTabMapper extends SectionTabMapper {
     private List<? extends ProcessingEntityTabMapper<?>> nodeMappers;
-    private List<Integer> fieldsSplitting;
     protected final MappingUtils mappingUtils;
 
     /**
@@ -109,8 +107,8 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
     /**
      * The node mapper's configuration. For each node mapper, this processing mapper expect to find information
      * to feed the node mapper with, starting from the field named by the key in this Java map.
-     * <p/>
-     * TODO: we do not do checkings on the order of node types (e.g.: a source precedes a sample), this is left
+
+     * we do not do checkings on the order of node types (e.g.: a source precedes a sample), this is left
      * to the validator.
      */
     protected Map<String, Class<? extends ProcessingEntityTabMapper<?>>> nodeMappersConfig =
@@ -142,7 +140,6 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
 
         try {
             // Assign this assay section to the assay group
-            // TODO: Create a specific ISATAB mapper
             AssayGroup assayGroup = mappingUtils.getAssayGroupFromSection(sectionInstance);
             if (assayGroup != null) {
                 assayGroup.setAssaySectionInstance(sectionInstance);
@@ -176,7 +173,6 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         return store;
     }
 
-
     /**
      * Produces a list of indexes which represent the splitting of headers into node headers and protocol reference
      * headers.
@@ -187,9 +183,7 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
      */
     @SuppressWarnings("unchecked")
     protected List<Integer> getFieldSplitting() {
-        if (fieldsSplitting != null) {
-            return fieldsSplitting;
-        }
+
 
         // Goes through the nodeMappers
         List<?> nodeMappers = getNodeMappers();
@@ -298,10 +292,8 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
             }
 
             processing.addAnnotation(new Annotation(procColIdAnnType, fileId + ":" + i));
-
             log.trace("Returning new processing: " + processing.getAcc() + " (" + this.getClass().getSimpleName() + ")");
         }
-
         return store;
     }
 
@@ -327,7 +319,7 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         Class<?> inputType = inputMapper.getMappedClass();
         Class<?> outputType = outputMapper.getMappedClass();
 
-        Processing<?, ?> processing = null;
+        Processing<?, ?> processing;
 
         String fileId = StringUtils.trimToNull(sectionInstance.getFileId());
         Study study = mappingUtils.getStudyFromSection(sectionInstance);
@@ -430,15 +422,11 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         }
 
         // OK, now let's go for the protocols between in/out
-        //
-        // TODO: remove int pappIdx = 0;
         for (int i = inputIndexField + 1; i < outputIndexField; i++) {
             GenericProtocolApplicationTabMapper protoAppMapper = (GenericProtocolApplicationTabMapper) nodeMappers.get(i);
             ProtocolApplication protoApp = protoAppMapper.map(recordIndex);
             // Protocol Applications should not have an accession in this stage, cause this prevents us from
             // detecting that two processings sharing the same inputs and outputs are actually the same.
-            //
-            // TODO: remove protoApp.setAcc ( processingKey + ":papp:" + pappIdx++ );
             if (protoApp != null) {
                 processing.addProtocolApplication(protoApp);
             }
@@ -562,7 +550,6 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         Section section = sectionInstance.getSection();
 
         // Cardinality
-        //
         for (String nodeFieldName : nodeMappersConfig.keySet()) {
             Field nodeField = section.getField(nodeFieldName);
             if (nodeField == null) {
@@ -586,13 +573,13 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         }
 
         // Order
-        //
         int nmappers = nodeMappers.size();
         for (int i = 0; i < nmappers; i++) {
             ProcessingEntityTabMapper<?> mapper = nodeMappers.get(i);
             int fieldIndex = mapper.getFieldIndex();
             Field field = sectionInstance.getField(fieldIndex);
             for (FieldConstraint constraint : field.getConstraints()) {
+
                 if (constraint instanceof FollowsConstraint) {
                     FollowsConstraint pcons = (FollowsConstraint) constraint;
                     String consField = pcons.getFieldName();
@@ -633,7 +620,6 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
                         }
                     }
                 } // precedes
-
 
                 else if (constraint instanceof PrecedesConstraint) {
                     PrecedesConstraint pcons = (PrecedesConstraint) constraint;

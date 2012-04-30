@@ -48,6 +48,7 @@
 
 package org.isatools.isatab_v1.mapping;
 
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.mapping.ClassTabMapper;
 import org.isatools.tablib.mapping.MappingUtils;
@@ -90,6 +91,8 @@ public class InvestigationPublicationTabMapper extends ClassTabMapper<Publicatio
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "title"}}
         ));
 
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(CommentMappingHelper.class));
+
         mappingUtils = new MappingUtils(store);
     }
 
@@ -103,8 +106,6 @@ public class InvestigationPublicationTabMapper extends ClassTabMapper<Publicatio
         // The status, retrieved from the corresponding fields
         //
         // Use the default ontology for status
-        // TODO: now we have the term source/accession etc.
-        //
         ReferenceSource source = new ReferenceSource("bii:publication-states");
         source.setAcc("bii:publication-states");
         source.setUrl("bii:publication:states");
@@ -115,7 +116,6 @@ public class InvestigationPublicationTabMapper extends ClassTabMapper<Publicatio
                 PublicationStatus.class
         );
 
-        // TODO: check specification about status
         if (status.getAcc() == null) {
             status.setAcc(status.getName());
         }

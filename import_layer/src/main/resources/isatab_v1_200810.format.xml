@@ -173,7 +173,7 @@
                            follows: allows to specify which headers should/must follow this one. Can be prefixed by "supposed ".
                            Can be [nothing], meaning it should/must be the first node
 
-                           precedes: similar to follows. The code supports simmetry/transitivity of "follows" and
+                           precedes: similar to follows. The code supports symmetry/transitivity of "follows" and
                            "precedes", so that order rules can be specified only once.
 
                            TODO: these restrictions are checked in node fields (e.g.: Source Name or Sample Name) and certain attributes

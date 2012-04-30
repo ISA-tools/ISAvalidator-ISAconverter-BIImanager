@@ -51,8 +51,10 @@ package org.isatools.isatab_v1.mapping.properties;
 import org.isatools.isatab.mapping.attributes.MultiValueOEMappingHelper;
 import org.isatools.tablib.schema.SectionInstance;
 import org.isatools.tablib.utils.BIIObjectStore;
+import uk.ac.ebi.bioinvindex.model.Annotation;
 import uk.ac.ebi.bioinvindex.model.Contact;
 import uk.ac.ebi.bioinvindex.model.term.ContactRole;
+import uk.ac.ebi.bioinvindex.model.term.OntologyEntry;
 
 import java.util.Collection;
 import java.util.Map;

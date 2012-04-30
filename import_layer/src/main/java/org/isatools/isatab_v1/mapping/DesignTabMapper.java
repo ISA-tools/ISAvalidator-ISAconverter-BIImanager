@@ -49,6 +49,7 @@
 package org.isatools.isatab_v1.mapping;
 
 import org.isatools.isatab.mapping.StudyComponentTabMapper;
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.mapping.ClassTabMapper;
 import org.isatools.tablib.mapping.MappingUtils;
@@ -75,6 +76,8 @@ public class DesignTabMapper extends ClassTabMapper<Design> implements StudyComp
     public DesignTabMapper(BIIObjectStore store, SectionInstance sectionInstance) {
         super(store, sectionInstance);
         mappingUtils = new MappingUtils(store);
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(CommentMappingHelper.class));
     }
 
 

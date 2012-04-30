@@ -100,10 +100,10 @@ public class StudyTabMapper extends ClassTabMapper<Study> {
         mappingHelpersConfig.put("Study Public Release Date", new MappingHelperConfig<DatePropertyMappingHelper>(
                 DatePropertyMappingHelper.class, new String[][]{{"propertyName", "releaseDate"}}
         ));
-        this.mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(
                 CommentMappingHelper.class
         ));
-        this.mappingHelpersConfig.put("Study File Name", new MappingHelperConfig<AnnotationMappingHelper>(
+        mappingHelpersConfig.put("Study File Name", new MappingHelperConfig<AnnotationMappingHelper>(
                 AnnotationMappingHelper.class,
                 new String[][]{{"propertyName", ProcessingEntityTabMapper.SAMPLE_FILE_ANNOTATION_TAG}}
         ));

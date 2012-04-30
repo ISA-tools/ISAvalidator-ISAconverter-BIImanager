@@ -49,6 +49,7 @@
 package org.isatools.isatab_v1.mapping;
 
 import org.isatools.isatab.mapping.StudyComponentTabMapper;
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.tablib.mapping.ClassTabMapper;
 import org.isatools.tablib.mapping.MappingUtils;
 import org.isatools.tablib.mapping.properties.StringPropertyMappingHelper;
@@ -89,6 +90,8 @@ public class StudyPublicationTabMapper extends ClassTabMapper<Publication> imple
         mappingHelpersConfig.put("Study Publication Title", new MappingHelperConfig<StringPropertyMappingHelper>(
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "title"}}
         ));
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(CommentMappingHelper.class));
 
         mappingUtils = new MappingUtils(store);
     }

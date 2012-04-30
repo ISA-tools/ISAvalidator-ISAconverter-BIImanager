@@ -50,6 +50,7 @@ package org.isatools.isatab_v1.mapping;
 
 
 import org.isatools.isatab.mapping.StudyComponentTabMapper;
+import org.isatools.isatab.mapping.attributes.CommentMappingHelper;
 import org.isatools.isatab_v1.mapping.properties.StudyContactRoleMappingHelper;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.mapping.ClassTabMapper;
@@ -118,6 +119,8 @@ public class StudyContactTabMapper extends ClassTabMapper<Contact> implements St
         mappingHelpersConfig.put("Study Person Roles", new MappingHelperConfig<StudyContactRoleMappingHelper>(
                 StudyContactRoleMappingHelper.class, (String[][]) null
         ));
+
+        mappingHelpersConfig.put("Comment", new MappingHelperConfig<CommentMappingHelper>(CommentMappingHelper.class));
 
         mappingUtils = new MappingUtils(store);
     }

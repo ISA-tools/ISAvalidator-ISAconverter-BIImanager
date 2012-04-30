@@ -85,6 +85,7 @@ public class MaProcessingTabMapper extends ProcessingsTabMapper {
         // there are a number of cases where scan name isn't really required. Having an image file is enough SlimMaRawDataTabMapper
         nodeMappersConfig.put(scanNameExists ? "Scan Name" : "Array Data File",
                 scanNameExists ? MaRawDataTabMapper.class : SlimMaRawDataTabMapper.class);
+
         nodeMappersConfig.put("Normalization Name", MaNormalizationTabMapper.class);
 
         // there are a number of cases where the data transformation name isn't really required. Having the
