@@ -251,7 +251,7 @@ public class SchemaNode {
     }
 
     public String getAttr(String name) {
-        return (String) attrs.get(name);
+        return attrs.get(name);
     }
 
     public Map<String, String> getAttrs() {

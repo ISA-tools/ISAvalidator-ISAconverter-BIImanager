@@ -431,8 +431,46 @@ public class ISATABMappingIntegrationTest {
 
         }
         assertEquals("Not as many comments in study protocols for BII-S-1 as I was expecting", 3, commentCount);
+    }
 
+    @Test
+    /**
+     * Tests how the code performs when receiving 'ontologised' characteristics, factor values, etc.
+     */
+    public void testOntologisedExtendedFields() throws Exception {
+        out.println("\n\n__________ testOntologisedPropertyExtension __________\n\n");
 
+        String baseDir = System.getProperty("basedir");
+        String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/JCastrillo-BII-I-1-with-ontology-extensions";
+        ISATABLoader loader = new ISATABLoader(filesPath);
+        FormatSetInstance isatabInstance = loader.load();
+
+        BIIObjectStore store = new BIIObjectStore();
+        ISATABMapper isatabMapper = new ISATABMapper(store, isatabInstance);
+
+        isatabMapper.map();
+        assertTrue("Oh no! No mapped object! ", store.size() > 0);
+
+        Study study = store.getType(Study.class, "BII-S-1");
+        assertNotNull("Oh no! Study bii:study:1 not found in the results!", study);
+
+        out.println(store.toStringVerbose());
+
+//        System.out.println("There are " + study.getAssays().size() + " assays in BII-S-1.");
+//        for (Assay assay : study.getAssays()) {
+//            System.out.println("Analyzing assay");
+//            for (FactorValue value : assay.) {
+//                System.out.println("FOUND Factor: " + value.getType());
+//
+//                if (value.getType().getOntologyTerms().size() > 0) {
+//                    System.out.println("Type has " + value.getType().getOntologyTerms().size() + " ontology terms attached");
+//
+//                    for (OntologyTerm term : value.getType().getOntologyTerms()) {
+//                        System.out.println("\t" + term);
+//                    }
+//                }
+//            }
+//        }
     }
 
 }

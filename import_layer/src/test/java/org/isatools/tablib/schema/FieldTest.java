@@ -59,6 +59,7 @@ import org.junit.Test;
 
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -80,29 +81,44 @@ public class FieldTest {
 	public void testBasicHeader() {
 		f = new Field("FactorValue");
 		f = f.parseHeader("FactorValue", 0);
-		out.println(f.getAttr("type") + ", " + f.getAttr("type1"));
+		out.println(f.getAttr("type") + ", " + f.getAttr("accession"));
 		assertEquals("Test 1, Type wrongly recognized", f.getAttr("type"), null);
-		assertEquals("Test 1, Type 1 wrongly recognized", f.getAttr("type1"), null);
+		assertEquals("Test 1, Accession wrongly recognized", f.getAttr("accession"), null);
 	}
 
 	@Test
 	public void testComplexHeader() {
 		f = new Field("FactorValue");
 		f = f.parseHeader("FactorValue [Grow Condition]", 1);
-		out.println(String.format("Type: '%s', Type 1: '%s'", f.getAttr("type"), f.getAttr("type1")));
+		out.println(String.format("Type: '%s', Accession: '%s'", f.getAttr("type"), f.getAttr("accession")));
 		assertEquals("Test 2, Type wrongly recognized", f.getAttr("type"), "Grow Condition");
-		assertEquals("Test 2, Type 1 wrongly recognized", f.getAttr("type1"), null);
+		assertEquals("Test 2, Accession  wrongly recognized", f.getAttr("accession"), null);
 	}
 
 	@Test
 	public void testVeryComplexHeader() {
-
+        // testing ontology handling capability within field to support URIs for ontology terms
 		f = new Field("FactorValue");
-		f = f.parseHeader("FactorValue [Grow Condition] (media)", 0);
-		out.println(String.format("Type: '%s', Type 1: '%s'", f.getAttr("type"), f.getAttr("type1")));
+		f = f.parseHeader("FactorValue [Grow Condition (obi:24432)]", 0);
+		out.println(String.format("Type: '%s', Accession : '%s'", f.getAttr("type"), f.getAttr("accession")));
 		assertEquals("Test 1, Type wrongly recognized", f.getAttr("type"), "Grow Condition");
-		assertEquals("Test 1, Type 1 wrongly recognized", f.getAttr("type1"), "media");
+		assertEquals("Test 1, Accession wrongly recognized", f.getAttr("accession"), "obi:24432");
+        assertFalse("Test 1, Accession wrongly identified as URL", f.isAccessionURL());
 	}
+
+
+    @Test
+    public void testAnotherVeryComplexHeader() {
+        // testing url within field to support URIs for ontology terms
+        f = new Field("FactorValue");
+        f = f.parseHeader("FactorValue [Grow Condition(http://purl.obi.org/122312)]", 0);
+        out.println(String.format("Type: '%s', Accession 1: '%s'", f.getAttr("type"), f.getAttr("accession")));
+        assertEquals("Test 1, Type wrongly recognized", f.getAttr("type"), "Grow Condition");
+        assertEquals("Test 1, Accession wrongly recognized", f.getAttr("accession"), "http://purl.obi.org/122312");
+        assertTrue("Test 1, Accession wrongly identified as non URL", f.isAccessionURL());
+    }
+
+
 
 
 	@Test
@@ -112,7 +128,7 @@ public class FieldTest {
 
 			f = new Field("FactorValue");
 			f = f.parseHeader("FactorValue1 [Grow Condition] (media)", 0);
-			out.println(String.format("Type: '%s', Type 1: '%s'", f.getAttr("type"), f.getAttr("type1")));
+			out.println(String.format("Type: '%s', Accession: '%s'", f.getAttr("type"), f.getAttr("accession")));
 
 		}
 		catch (TabInvalidValueException ex) {

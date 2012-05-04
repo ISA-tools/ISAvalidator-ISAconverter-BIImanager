@@ -57,6 +57,7 @@ import org.isatools.tablib.schema.constraints.FollowsConstraint;
 import org.isatools.tablib.schema.constraints.PrecedesConstraint;
 import uk.ac.ebi.utils.regex.RegEx;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -80,6 +81,7 @@ public class Field extends SchemaNode implements Cloneable {
      * How we match an header, either in X or in X[Y](Z), X,Y,Z must match this pattern
      */
     public static final String ID_PATTERN = "[\\w_]+(?: *[\\w/_\\-\\: ]+)? *";
+    public static final String URL_PATTERN = "\\b(((\\S+)?)(@|mailto\\:|(news|(ht|f)tp(s?))\\://)\\S+)\\b";
 
     public Field() {
     }
@@ -106,7 +108,8 @@ public class Field extends SchemaNode implements Cloneable {
 
     /**
      * Parses a possibly complex header and sets up corresponding bits in the field, for instance
-     * "Factor[Grow Condition](media)" is splitted into Factor, GC, media
+     * "Factor Value[Grow Condition(obi:media)" is splitted into Factor, GC, obi:media or Factor Value[Grow Condition(http://purl.org/obi/12133) is split
+     * into Factor Value, GC, http://purl.org/obi/12133
      * <p/>
      * Returns the array returned by the RE matcher, with the values:
      * <pre>
@@ -126,7 +129,9 @@ public class Field extends SchemaNode implements Cloneable {
         //
         String
                 // Used to match the whole header
-                pattern = "^ *(" + ID_PATTERN + ") *(?:\\[ *(" + ID_PATTERN + ") *\\] *(?:\\( *(" + ID_PATTERN + ") *\\))?)? *$";
+                pattern = "^ *(" + ID_PATTERN + ") *(?:\\[ *(" + ID_PATTERN + ")* *(?:\\( *(" + ID_PATTERN + "|" + URL_PATTERN  + ") *\\))?\\])? *$";
+
+        System.out.println("Pattern is " + pattern);
 
         log.trace("Field.parseHeader( '" + header + "' ), using the pattern: '" + pattern + "'");
         String bits[] = new RegEx(pattern, isCaseSensitive ? 0 : Pattern.CASE_INSENSITIVE).groups(header);
@@ -144,7 +149,6 @@ public class Field extends SchemaNode implements Cloneable {
     public static String[] parseHeaderRawResult(String header) {
         return parseHeaderRawResult(header, true);
     }
-
 
     /**
      * Parses a possibly complex header and sets up corresponding bits in the field, for instance
@@ -192,9 +196,9 @@ public class Field extends SchemaNode implements Cloneable {
 
         // Setup the sub-type
         if (bits.length > 3 && bits[3] != null) {
-            String type1 = bits[3].trim();
-            clone.setAttr("type1", type1);
-            builtHeader += " (" + type1 + ")";
+            String supposedAccession = bits[3].trim();
+            clone.setAttr("accession", supposedAccession);
+            builtHeader += " (" + supposedAccession + ")";
         }
 
         clone.setAttr("header", builtHeader);
@@ -284,9 +288,7 @@ public class Field extends SchemaNode implements Cloneable {
 
         if (this.constraints != null) {
             clone.constraints = new FieldConstraint[this.constraints.length];
-            for (int i = 0; i < this.constraints.length; i++) {
-                clone.constraints[i] = this.constraints[i];
-            }
+            System.arraycopy(this.constraints, 0, clone.constraints, 0, this.constraints.length);
         }
         return clone;
     }
@@ -318,7 +320,7 @@ public class Field extends SchemaNode implements Cloneable {
 
     public StringBuilder dump() {
         String type = getAttr("type");
-        String type1 = getAttr("type1");
+        String type1 = getAttr("accession");
         StringBuilder result = new StringBuilder(getId());
         if (type != null && type.length() != 0) {
             result.append("[" + type + "]");
@@ -327,6 +329,11 @@ public class Field extends SchemaNode implements Cloneable {
             result.append("(" + type1 + ")");
         }
         return result;
+    }
+
+    public boolean isAccessionURL() {
+        return getAttr("accession") != null
+                && getAttr("accession").matches("(" + URL_PATTERN + ")?");
     }
 
 

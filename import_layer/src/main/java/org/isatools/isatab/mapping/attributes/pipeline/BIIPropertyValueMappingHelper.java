@@ -55,8 +55,10 @@ import org.isatools.tablib.schema.Field;
 import org.isatools.tablib.schema.SectionInstance;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Identifiable;
+import uk.ac.ebi.bioinvindex.model.term.OntologyTerm;
 import uk.ac.ebi.bioinvindex.model.term.Property;
 import uk.ac.ebi.bioinvindex.model.term.PropertyValue;
+import uk.ac.ebi.bioinvindex.model.xref.ReferenceSource;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.utils.reflection.ReflectionUtils;
 
@@ -71,10 +73,10 @@ import java.util.Map;
  * </ul>
  * Jan 24, 2008
  *
- * @author brandizi
- * @param <PT> The property type the value is about (an instance
- * of this is created and attached to the value).
+ * @param <PT>  The property type the value is about (an instance
+ *              of this is created and attached to the value).
  * @param <PVT> The propertyValue mapped by this mapper.
+ * @author brandizi
  */
 public abstract class BIIPropertyValueMappingHelper
         <T extends Identifiable, PT extends Property<PVT>, PVT extends PropertyValue<PT>>
@@ -174,6 +176,17 @@ public abstract class BIIPropertyValueMappingHelper
             throw new TabInternalErrorException(i18n.msg("pb_mapping_attribute", typeStr, ex.getMessage()), ex);
         }
         type.setValue(typeStr);
+
+        // we may have an accession in the header, which defines the type as an ontology term. It can have accessions as
+        // URLs or as the standard OBI:23122 type. Here we get those and attach the ontology to the term so that we can 
+        // use it later. 
+        String accessionStr = attributeField.getAttr("accession");
+        if (accessionStr != null && accessionStr.length() > 0) {
+            boolean accessionIsUrl = attributeField.isAccessionURL();
+            String source = accessionIsUrl ? "" : accessionStr.contains(":") ? accessionStr.substring(0, accessionStr.indexOf(":")) : "";
+            System.out.println("Adding ontology term to " + typeStr + ", it is " + accessionStr + " whose source is " + source);
+            type.addOntologyTerm(new OntologyTerm(accessionStr, typeStr, new ReferenceSource(source)));
+        }
         return type;
     }
 
