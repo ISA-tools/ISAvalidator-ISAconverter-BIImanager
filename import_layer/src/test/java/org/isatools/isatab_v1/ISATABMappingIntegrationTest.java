@@ -408,7 +408,7 @@ public class ISATABMappingIntegrationTest {
                     commentCount++;
                 }
             }
-            assertEquals("Not as many comments in study contactss for BII-S-1 as I was expecting", 1, commentCount);
+            assertEquals("Not as many comments in study contacts for BII-S-1 as I was expecting", 1, commentCount);
         }
 
         for (Publication publication : study.getPublications()) {
@@ -454,23 +454,7 @@ public class ISATABMappingIntegrationTest {
         Study study = store.getType(Study.class, "BII-S-1");
         assertNotNull("Oh no! Study bii:study:1 not found in the results!", study);
 
-        out.println(store.toStringVerbose());
-
-//        System.out.println("There are " + study.getAssays().size() + " assays in BII-S-1.");
-//        for (Assay assay : study.getAssays()) {
-//            System.out.println("Analyzing assay");
-//            for (FactorValue value : assay.) {
-//                System.out.println("FOUND Factor: " + value.getType());
-//
-//                if (value.getType().getOntologyTerms().size() > 0) {
-//                    System.out.println("Type has " + value.getType().getOntologyTerms().size() + " ontology terms attached");
-//
-//                    for (OntologyTerm term : value.getType().getOntologyTerms()) {
-//                        System.out.println("\t" + term);
-//                    }
-//                }
-//            }
-//        }
+        // todo add tests to ensure that we have the expected values in place.
     }
 
 }
