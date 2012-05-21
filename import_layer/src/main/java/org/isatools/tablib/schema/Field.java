@@ -131,8 +131,6 @@ public class Field extends SchemaNode implements Cloneable {
                 // Used to match the whole header
                 pattern = "^ *(" + ID_PATTERN + ") *(?:\\[ *(" + ID_PATTERN + ")* *(?:\\( *(" + ID_PATTERN + "|" + URL_PATTERN  + ") *\\))?\\])? *$";
 
-        System.out.println("Pattern is " + pattern);
-
         log.trace("Field.parseHeader( '" + header + "' ), using the pattern: '" + pattern + "'");
         String bits[] = new RegEx(pattern, isCaseSensitive ? 0 : Pattern.CASE_INSENSITIVE).groups(header);
         log.trace(String.format("Field.parseHeaderRawResult('%s'), bits are: %s", header, Arrays.toString(bits)));
