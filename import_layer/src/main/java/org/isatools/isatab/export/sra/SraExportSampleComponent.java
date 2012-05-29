@@ -240,9 +240,15 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
     private void populateSampleAttributes(Material material, SAMPLEATTRIBUTES sampleAttrs, SAMPLENAME xsampleName) {
         for (CharacteristicValue cvalue : material.getCharacteristicValues()) {
-            AttributeType xattr = characteristicValue2SampleAttr(cvalue);
 
+
+            AttributeType xattr = characteristicValue2SampleAttr(cvalue);
+            System.out.println("cvalue = " + cvalue.getType().getValue());
             boolean isOrganismTag = checkCharacteristicValue(cvalue, "(?i)tax|(?i)organism");
+
+            System.out.println("Is an organism tag? " + isOrganismTag);
+
+//            System.out.println(xattr);
 
             if (xattr != null) {
                 if (!isOrganismTag) {
@@ -251,33 +257,42 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 }
             }
 
-            for (OntologyTerm oe : cvalue.getOntologyTerms()) {
-                ReferenceSource src = oe.getSource();
-                if (src == null) {
-                    break;
-                }
-                if ((!StringUtils.containsIgnoreCase(src.getDescription(), "NCBI")) || (!StringUtils.containsIgnoreCase(src.getDescription(), "Taxonomy"))) {
-                    break;
-                }
-                String taxon = oe.getAcc();
-                if (taxon == null) {
-                    break;
-                }
-                try {
+            if (isOrganismTag) {
+                for (OntologyTerm oe : cvalue.getOntologyTerms()) {
 
-                    log.info("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+                    ReferenceSource src = oe.getSource();
 
-                    if (isOrganismTag) {
-                        xsampleName.setTAXONID(Integer.parseInt(taxon));
-                        xsampleName.setSCIENTIFICNAME(oe.getName());
+                    if (src == null) {
+                        break;
                     }
 
-                } catch (NumberFormatException ex) {
-                    nonRepeatedMessages.add("Invalid NCBI ID '" + taxon + "', ignoring it");
-                }
-                break; // Only the first one
-            }
+                   // wrong logic here. Was OR, should have been AND. In the case where both statements are true,
+                   // the overriding conclusion is false due to the negation operation.
+                    if ((!StringUtils.containsIgnoreCase(src.getDescription(), "ncbi")) && (!StringUtils.containsIgnoreCase(src.getDescription(), "taxonomy"))) {
+                        break;
+                    }
 
+                    String taxon = oe.getAcc();
+                    System.out.println("taxon = " + taxon);
+                    if (taxon == null) {
+                        break;
+                    }
+                    try {
+
+                        log.info("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+                        System.out.println("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+
+                        xsampleName.setTAXONID(Integer.parseInt(taxon));
+                        xsampleName.setSCIENTIFICNAME(oe.getName());
+                        System.out.println(xattr + oe.getName());
+
+
+                    } catch (NumberFormatException ex) {
+                        nonRepeatedMessages.add("Invalid NCBI ID '" + taxon + "', ignoring it");
+                    }
+                    break; // Only the first one
+                }
+            }
         } // for ( cvalue )
     }
 

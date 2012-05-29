@@ -51,11 +51,11 @@ package org.isatools.isatab.export.sra;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.xmlbeans.XmlOptions;
 import org.isatools.isatab.export.sra.templateutil.SRAUtils;
 import org.isatools.isatab.mapping.AssayTypeEntries;
 import org.isatools.tablib.exceptions.TabIOException;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
-import org.isatools.tablib.exceptions.TabInvalidValueException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Contact;
@@ -76,7 +76,7 @@ import uk.ac.ebi.embl.era.sra.xml.StudyType.STUDYATTRIBUTES;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.STUDYLINKS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.*;
+import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.ADD;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS.CONTACT;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES;
@@ -157,35 +157,32 @@ public class SraExporter extends SraExportPipelineComponent {
             }
             xsubmission.setCenterName(centerName);
 
-            String submissionId = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Submission ID"));
-            if (submissionId == null) {
-                log.warn(MessageFormat.format(
-                        "The study ''{0}'' has no 'SRA Submission ID'",
-                        study.getAcc()
-                ));
-            } else {
-                xsubmission.setAccession(submissionId);
-                xsubmission.setAlias(studyAcc);
-            }
+            String submissionId = "";
+            xsubmission.setAccession(submissionId);
+            xsubmission.setAlias(studyAcc);
 
-            brokerName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Broker Name"));
+
+            //brokerName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Broker Name"));
             if (brokerName == null) {
-                log.warn(MessageFormat.format(
-                        "The study ''{0}'' has no 'SRA Broker Name'",
-                        study.getAcc()
-                ));
+                    brokerName="ISAcreator";
+//                log.warn(MessageFormat.format(
+//                        "The study ''{0}'' has no 'SRA Broker Name'",
+//                        study.getAcc()
+//                ));
             } else {
                 xsubmission.setBrokerName(brokerName);
             }
 
-            String labName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Lab Name"));
+            String labName = null; //StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Lab Name"));
             if (labName == null) {
-                log.warn(MessageFormat.format(
-                        "The study ''{0}'' has no 'SRA Lab Name'",
-                        study.getAcc()
-                ));
-            } else {
+                labName=centerName;
                 xsubmission.setLabName(labName);
+//                log.warn(MessageFormat.format(
+//                        "The study ''{0}'' has no 'SRA Lab Name'",
+//                        study.getAcc()
+//                ));
+            } else {
+                xsubmission.setLabName(centerName);
             }
 
 
@@ -248,8 +245,8 @@ public class SraExporter extends SraExportPipelineComponent {
                             study.getAcc()
                     ));
                 } else {
+                    String xSubmissionPath = exportPath + "/" + DataLocationManager.accession2FileName(studyAcc);
                     try {
-                        String xSubmissionPath = exportPath + "/" + DataLocationManager.accession2FileName(studyAcc);
 
 
                         log.debug("SRA exporter: copying SRA data files for study " + studyAcc);
@@ -281,9 +278,7 @@ public class SraExporter extends SraExportPipelineComponent {
                                     );
 
                                 }
-                            }
-
-                            else {
+                            } else {
 
                                 String checksum = fileToMD5.get(fileName);
                                 xfile.setChecksum(checksum);
@@ -294,7 +289,6 @@ public class SraExporter extends SraExportPipelineComponent {
 
 
                             xsubmission.setFILES(xsubFiles);
-
 
 
                             String filePath = sourcePath + "/" + fileName;
@@ -315,7 +309,6 @@ public class SraExporter extends SraExportPipelineComponent {
                         xsubmission.setFILES(xsubFiles);
 
 
-
                         File xsubmissionDir = new File(xSubmissionPath);
 
                         if (!xsubmissionDir.exists()) {
@@ -330,6 +323,9 @@ public class SraExporter extends SraExportPipelineComponent {
                         FileUtils.writeStringToFile(new File(xSubmissionPath + "/study.xml"), xstudyDoc.toString());
 
                         EXPERIMENTSETDocument expSetDoc = EXPERIMENTSETDocument.Factory.newInstance();
+
+
+                        EXPERIMENTSETDocument.Factory.newInstance();
                         expSetDoc.setEXPERIMENTSET(expSet);
 
                         // A modification is made on the XML to be output to remove any tags required for injection of elements into
@@ -341,6 +337,7 @@ public class SraExporter extends SraExportPipelineComponent {
                         runSetDoc.setRUNSET(runSet);
                         FileUtils.writeStringToFile(new File(xSubmissionPath + "/run_set.xml"), runSetDoc.toString());
 
+
                         SAMPLESETDocument sampleSetDoc = SAMPLESETDocument.Factory.newInstance();
                         sampleSetDoc.setSAMPLESET(sampleSet);
                         FileUtils.writeStringToFile(new File(xSubmissionPath + "/sample_set.xml"), sampleSetDoc.toString());
@@ -348,6 +345,14 @@ public class SraExporter extends SraExportPipelineComponent {
 
                     } catch (IOException ex) {
                         throw new TabIOException(MessageFormat.format("Error during SRA export of study {0}: {1}", studyAcc, ex.getMessage()), ex);
+                    } finally {
+
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/submission.xml"), "SRA.submission.xsd", "<SUBMISSION\\\\s");
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/study.xml"), "SRA.study.xsd", "<STUDY\\\\s");
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/sample_set.xml"), "SRA.sample_set.xsd", "<SAMPLE_SET>");
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/experiment_set.xml"), "SRA.experiment_set.xsd", "<EXPERIMENT_SET>");
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/run_set.xml"), "SRA.run.xsd", "<RUN_SET>");
+
                     }
                 }
             } // is assay OK
@@ -373,10 +378,14 @@ public class SraExporter extends SraExportPipelineComponent {
      * @return the SRA STUDY element that is to be used to build the corresponding XML study file.
      */
     private STUDYDocument buildExportedStudy(Study study) {
+
         final String studyAcc = study.getAcc();
         final Investigation investigation = study.getUniqueInvestigation();
 
-        STUDYDocument xstudyDoc = STUDYDocument.Factory.newInstance();
+        XmlOptions xmlOptions = new XmlOptions();
+        xmlOptions.setSaveNamespacesFirst();
+
+        STUDYDocument xstudyDoc = STUDYDocument.Factory.newInstance(xmlOptions);
         StudyType xstudy = StudyType.Factory.newInstance();
         xstudy.setAlias(studyAcc);
 
@@ -390,10 +399,12 @@ public class SraExporter extends SraExportPipelineComponent {
 
         String centerPrjName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Center Project Name"));
         if (centerPrjName == null) {
-            throw new TabMissingValueException(MessageFormat.format(
-                    "The study ''{0}'' has no 'SRA Center Project Name', cannot export to SRA format",
-                    study.getAcc()
-            ));
+               centerPrjName = centerName;
+
+//            throw new TabMissingValueException(MessageFormat.format(
+//                    "The study ''{0}'' has no 'SRA Center Project Name', cannot export to SRA format",
+//                    study.getAcc()
+//            ));
         }
         xdescriptor.setCENTERPROJECTNAME(centerPrjName);
 
@@ -427,10 +438,14 @@ public class SraExporter extends SraExportPipelineComponent {
         }
 
         if (investigation != null) {
+            //if (!investigation.getAcc().isEmpty()) {
+            System.out.println("Processing investigation...probably shouldn't be.");
             String invAcc = investigation.getAcc();
-            AttributeType xacc = buildStudyAttribute("BII Investigation Accession", invAcc, null);
+            if (investigation.getAcc() != null)  {
+                AttributeType xacc = buildStudyAttribute("BII Investigation Accession", invAcc, null);
             xattrs.addNewSTUDYATTRIBUTE();
             xattrs.setSTUDYATTRIBUTEArray(xattrs.sizeOfSTUDYATTRIBUTEArray() - 1, xacc);
+            }
         }
 
 
@@ -465,7 +480,9 @@ public class SraExporter extends SraExportPipelineComponent {
         xstudy.setDESCRIPTOR(xdescriptor);
 
         for (Contact contact : study.getContacts()) {
-            buildExportedContact(contact, xattrs, false);
+            if (!contact.getFullName().isEmpty()) {
+                buildExportedContact(contact, xattrs, false);
+            }
         }
         if (investigation != null) {
             for (Contact contact : investigation.getContacts()) {
@@ -473,12 +490,12 @@ public class SraExporter extends SraExportPipelineComponent {
             }
         }
 
-        for (Publication contact : study.getPublications()) {
-            buildExportedPublication(contact, xattrs, xlinks, false);
+        for (Publication publication : study.getPublications()) {
+            buildExportedPublication(publication, xattrs, xlinks, false);
         }
         if (investigation != null) {
-            for (Publication contact : investigation.getPublications()) {
-                buildExportedPublication(contact, xattrs, xlinks, true);
+            for (Publication publication : investigation.getPublications()) {
+                buildExportedPublication(publication, xattrs, xlinks, true);
             }
         }
 
@@ -692,67 +709,90 @@ public class SraExporter extends SraExportPipelineComponent {
      * @param study the input study where to take the contacts from.
      */
     private void buildStudyActions(final SubmissionType xsub, final Study study) {
+
         ACTIONS xactions = ACTIONS.Factory.newInstance();
 
-        for (String action : study.getAnnotationValues("comment:SRA Submission Action")) {
-            action = StringUtils.trimToEmpty(action);
-            if ("VALIDATE".equalsIgnoreCase(action)) {
-                // If it is validate, let's validate all.
-                //
-                final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};    //, "analysis" could be added when needed
-                final VALIDATE.Schema.Enum[] schemas = new VALIDATE.Schema.Enum[]{
-                        VALIDATE.Schema.STUDY, VALIDATE.Schema.SAMPLE, VALIDATE.Schema.EXPERIMENT, VALIDATE.Schema.RUN
-                        //,VALIDATE.Schema.ANALYSIS
-                };
+        String action="ADD";
 
-                for (int i = 0; i < schemas.length; i++) {
-                    VALIDATE xvalidateAction = VALIDATE.Factory.newInstance();
-                    xvalidateAction.setSchema(schemas[i]);
-                    xvalidateAction.setSource(sources[i] + ".xml");
-                    ACTION xaction = xactions.addNewACTION();
-                    xaction.setVALIDATE(xvalidateAction);
-                }
+        if ("ADD".equalsIgnoreCase(action)) {
+            // TODO: What the hell is analysis?
+            final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};//, "analysis" could be added when needed
+            final ADD.Schema.Enum[] schemas = new ADD.Schema.Enum[]{
+                    ADD.Schema.STUDY, ADD.Schema.SAMPLE, ADD.Schema.EXPERIMENT, ADD.Schema.RUN
+                    //,ADD.Schema.ANALYSIS
+            };
 
-            } else if ("ADD".equalsIgnoreCase(action)) {
-                // TODO: What the hell is analysis?
-                final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};//, "analysis" could be added when needed
-                final ADD.Schema.Enum[] schemas = new ADD.Schema.Enum[]{
-                        ADD.Schema.STUDY, ADD.Schema.SAMPLE, ADD.Schema.EXPERIMENT, ADD.Schema.RUN
-                        //,ADD.Schema.ANALYSIS
-                };
-
-                for (int i = 0; i < schemas.length; i++) {
-                    ADD xaddAction = ADD.Factory.newInstance();
-                    xaddAction.setSchema(schemas[i]);
-                    xaddAction.setSource(sources[i] + ".xml");
-                    ACTION xaction = xactions.addNewACTION();
-                    xaction.setADD(xaddAction);
-                }
-            } else if ("SUPPRESS".equalsIgnoreCase(action)) {
-                SUPPRESS xwithdrawAction = SUPPRESS.Factory.newInstance();
-                xwithdrawAction.setTarget(study.getAcc());
+            for (int i = 0; i < schemas.length; i++) {
+                ADD xaddAction = ADD.Factory.newInstance();
+                xaddAction.setSchema(schemas[i]);
+                xaddAction.setSource(sources[i] + ".xml");
                 ACTION xaction = xactions.addNewACTION();
-                xaction.setSUPPRESS(xwithdrawAction);
-            } else if ("RELEASE".equalsIgnoreCase(action)) {
-                RELEASE xrelease = RELEASE.Factory.newInstance();
-                ACTION xaction = xactions.addNewACTION();
-                xaction.setRELEASE(xrelease);
-            } else if ("HOLD".equalsIgnoreCase(action)) {
-                HOLD xhold = HOLD.Factory.newInstance();
-                ACTION xaction = xactions.addNewACTION();
-                xaction.setHOLD(xhold);
-            } else {
-                throw new TabInvalidValueException(MessageFormat.format(
-                        "SRA Action ''{1}'' for the study ''{0}'' is invadlid or not supported",
-                        study.getAcc(), action
-                ));
+                xaction.setADD(xaddAction);
             }
-        } // for actions
+
+//        for (String action : study.getAnnotationValues("comment:SRA Submission Action")) {
+//            action = StringUtils.trimToEmpty(action);
+//            if ("VALIDATE".equalsIgnoreCase(action)) {
+//                // If it is validate, let's validate all.
+//                //
+//                final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};    //, "analysis" could be added when needed
+//                final VALIDATE.Schema.Enum[] schemas = new VALIDATE.Schema.Enum[]{
+//                        VALIDATE.Schema.STUDY, VALIDATE.Schema.SAMPLE, VALIDATE.Schema.EXPERIMENT, VALIDATE.Schema.RUN
+//                        //,VALIDATE.Schema.ANALYSIS
+//                };
+//
+//                for (int i = 0; i < schemas.length; i++) {
+//                    VALIDATE xvalidateAction = VALIDATE.Factory.newInstance();
+//                    xvalidateAction.setSchema(schemas[i]);
+//                    xvalidateAction.setSource(sources[i] + ".xml");
+//                    ACTION xaction = xactions.addNewACTION();
+//                    xaction.setVALIDATE(xvalidateAction);
+//                }
+//
+//            }
+//
+//            else if ("ADD".equalsIgnoreCase(action)) {
+//                // TODO: What the hell is analysis?
+//                final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};//, "analysis" could be added when needed
+//                final ADD.Schema.Enum[] schemas = new ADD.Schema.Enum[]{
+//                        ADD.Schema.STUDY, ADD.Schema.SAMPLE, ADD.Schema.EXPERIMENT, ADD.Schema.RUN
+//                        //,ADD.Schema.ANALYSIS
+//                };
+//
+//                for (int i = 0; i < schemas.length; i++) {
+//                    ADD xaddAction = ADD.Factory.newInstance();
+//                    xaddAction.setSchema(schemas[i]);
+//                    xaddAction.setSource(sources[i] + ".xml");
+//                    ACTION xaction = xactions.addNewACTION();
+//                    xaction.setADD(xaddAction);
+//                }
+//            } else if ("SUPPRESS".equalsIgnoreCase(action)) {
+//                SUPPRESS xwithdrawAction = SUPPRESS.Factory.newInstance();
+//                xwithdrawAction.setTarget(study.getAcc());
+//                ACTION xaction = xactions.addNewACTION();
+//                xaction.setSUPPRESS(xwithdrawAction);
+//            } else if ("RELEASE".equalsIgnoreCase(action)) {
+//                RELEASE xrelease = RELEASE.Factory.newInstance();
+//                ACTION xaction = xactions.addNewACTION();
+//                xaction.setRELEASE(xrelease);
+//            } else if ("HOLD".equalsIgnoreCase(action)) {
+//                HOLD xhold = HOLD.Factory.newInstance();
+//                ACTION xaction = xactions.addNewACTION();
+//                xaction.setHOLD(xhold);
+//            } else {
+//                throw new TabInvalidValueException(MessageFormat.format(
+//                        "SRA Action ''{1}'' for the study ''{0}'' is invadlid or not supported",
+//                        study.getAcc(), action
+//                ));
+//            }
+//        } // for actions
 
         if (xactions.sizeOfACTIONArray() == 0) {
             throw new TabMissingValueException(MessageFormat.format(
                     "The study ''{0}'' has no SRA Submission Action, cannot export to SRA", study.getAcc()));
         }
+
         xsub.setACTIONS(xactions);
+        }
     }
 }

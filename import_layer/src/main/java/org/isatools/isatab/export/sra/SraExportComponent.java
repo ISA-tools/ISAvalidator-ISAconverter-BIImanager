@@ -79,7 +79,7 @@ abstract class SraExportComponent {
     /**
      * All the SRA documents are headed with these
      */
-    protected String centerName = null, brokerName = null;
+    protected String centerName = "", brokerName = "ISAcreator";
 
     protected static final Logger log = Logger.getLogger(SraExporter.class);
     protected static final TabNDC ndc = TabNDC.getInstance();
