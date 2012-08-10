@@ -213,8 +213,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 Data data = ar.getData();
                 String url = StringUtils.trimToNull(data.getUrl());
 
-                Study study = ar.getStudy();
-
                 if (url == null) {
                     String msg = MessageFormat.format(
                             "The assay file of type {0} / {1} for study {2} has a data file node without file name, ignoring",
@@ -227,36 +225,26 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                     return false;
                 }
 
+
                 FILE.Filetype.Enum xfileType = null;
-                String fileType = StringUtils.trimToNull(data.getSingleAnnotationValue("comment:SRA File Type"));
-                if (fileType == null) {
-                    // Let's try to get it from the file extension
-                    //
-                    fileType = StringUtils.trimToNull(FilenameUtils.getExtension(url));
-                    if (fileType != null) {
-                        xfileType = FILE.Filetype.Enum.forString(fileType.toLowerCase());
-                    }
+                //we remove the compression extension so that getExtension methods returns the true extension
+                System.out.println("Data is: " + data.getUrl());
 
-                    if (xfileType == null) {
-                        String msg = MessageFormat.format(
-                                "The assay file of type {0} / {1} for study {2} has a data file node without the annotation " +
-                                        "'SRA file type' and I cannot compute the file type from the file name, ignoring the assay",
-                                assay.getMeasurement().getName(),
-                                assay.getTechnologyName(),
-                                assay.getStudy().getAcc()
-                        );
-                        nonRepeatedMessages.add(msg);
-                        log.trace(msg + ". Data node is " + data.getName());
-                        return false;
-                    }
-                }
+                String fileType = data.getSingleAnnotationValue("comment:SRA File Type") == null
+                        ? data.getUrl()
+                        : data.getSingleAnnotationValue("comment:SRA File Type");
 
-                if (xfileType == null) {
-                    // fileType is certainly non null at this point, cause it was explicitly provided and so we
-                    // have to process it
-                    //
+                fileType = fileType.replace(".gz", "");
+
+                System.out.println("Data after replacement is: " + fileType);
+
+
+                // Let's try to get it from the file extension
+                fileType = StringUtils.trimToNull(FilenameUtils.getExtension(fileType));
+                System.out.println("File type is : " + fileType);
+
+                if (fileType != null) {
                     xfileType = FILE.Filetype.Enum.forString(fileType.toLowerCase());
-
                     if (xfileType == null) {
                         String msg = MessageFormat.format(
                                 "The assay file of type {0} / {1} for study {2} has a bad 'SRA File Type' annotation: '" + fileType + "'" +
@@ -270,7 +258,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                         return false;
                     }
                 }
-
 
                 RunType xrun = RunType.Factory.newInstance();
                 xrun.setAlias(assayAcc);
@@ -305,7 +292,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                     }
                 }
 
-               xfile.setChecksum(fileToMD5.get(url));
+                xfile.setChecksum(fileToMD5.get(url));
 
                 System.out.println("MD5checksum: " + fileToMD5.get(url));
 
@@ -318,7 +305,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 addExportedSubmissionFile(xsubFiles, url);
                 // TODO: remove, it's deprecated now xrun.setTotalDataBlocks ( BigInteger.ONE );
                 xrun.setEXPERIMENTREF(xexpRef);
-
                 xrunSet.addNewRUN();
                 xrunSet.setRUNArray(xrunSet.sizeOfRUNArray() - 1, xrun);
             }
@@ -351,47 +337,39 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         System.out.println("Measurement:" + measurement);
         System.out.println("Technology:" + technology);
 
-
         LibraryDescriptorType xlib = LibraryDescriptorType.Factory.newInstance();
 
         //NOTE: from Schema1.3, setting the library Name is required!
         //Here library name is available only if protocol parameter 'library name' is supplied
 
-        String  targetTaxon="";
-
-                targetTaxon = getParameterValue(assay, papp, "target_taxon", false);
-            if (targetTaxon != null) {
-                xlib.setLIBRARYNAME(assay.getAcc()+"_"+targetTaxon) ;
-               // protocol.append("\n target_taxon: ").append(targetTaxon);
-            }
-
-       //if (null!=(getParameterValue(assay, papp, "library name", true))) { xlib.setLIBRARYNAME(getParameterValue(assay, papp, "library name", true)); }
-        else   {
-
-        //IF not 'library parameter is found', then set the library name to be that on the assay.
-        //TODO TEST TEST TEST
-        xlib.setLIBRARYNAME(assay.getAcc()+"");
-      }
-        // TODO check it is one of the Enum types
+//        if (targetTaxon != null) { xlib.setLIBRARYNAME(assay.getAcc() + "_" + targetTaxon);      }
+//        else {
+//            //IF no 'parameter [library name] is found', then set the library name to be that on the assay
+            xlib.setLIBRARYNAME(assay.getAcc() + "");
+       // }
 
         StringBuffer protocol = new StringBuffer();
-
-
         String pDescription = StringUtils.trimToNull(papp.getProtocol().getDescription());
         if (pDescription != null) {
             protocol.append("\n protocol_description: " + pDescription);
         }
 
 
-
-
         //HERE we handle SRA way of coding transcription profiling using sequencing. We can automatically set LIBRARY SOURCE to TRANSCRIPTOMIC
         //same for Strategy and selection however we check against the user input via the ISA file
         if (measurement.equalsIgnoreCase("transcription profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
 
+
+
             xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.TRANSCRIPTOMIC);
             xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.RNA_SEQ);
             xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.RT_PCR);
+
+            ProtocolApplication pappIp = getProtocol(assay, "library construction");
+            if (pappIp == null) {
+                return null;
+            }
+
 
         }
 
@@ -446,37 +424,45 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.CH_IP_SEQ);
             xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.CH_IP);
 
-              ProtocolApplication pappIp = getProtocol(assay, "library construction");
-                if (pappIp == null) {
-                    return null;
+            ProtocolApplication pappIp = getProtocol(assay, "library construction");
+            if (pappIp == null) {
+                return null;
+            }
+
+            //dealing with Chromatin immunoprecipitation requirements in ISA_TAB and dumping those in SRA Library Construction Protocol section
+            String crosslink = getParameterValue(assay, pappIp, "cross linking", true);
+            if (crosslink != null) {
+                protocol.append("\n cross-linking: ").append(crosslink);
+            }
+
+            String fragmentation = getParameterValue(assay, pappIp, "DNA fragmentation", true);
+            if (fragmentation != null) {
+                protocol.append("\n DNA fragmentation: ").append(fragmentation);
+            }
+
+            String fragsize = getParameterValue(assay, pappIp, "DNA fragment size", true);
+            if (fragsize != null) {
+                protocol.append("\n DNA fragment size: ").append(fragsize);
+            }
+
+            String ipAntibody = getParameterValue(assay, pappIp, "immunoprecipitation antibody", true);
+            if (ipAntibody != null) {
+
+                String[] interestingbits = ipAntibody.split(";");
+                if (interestingbits[0] != null) {
+                    protocol.append("\n antibody name: ").append(interestingbits[0]);
+                }
+                if (interestingbits[1] != null) {
+                    protocol.append("\n antibody manufacturer: ").append(interestingbits[1]);
+                }
+                if (interestingbits[2] != null) {
+                    protocol.append("\n antibody reference number: ").append(interestingbits[2]);
+                }
+                if (interestingbits[3] != null) {
+                    protocol.append("\n immunoprecipitation antibody: ").append(interestingbits[3]);
                 }
 
-              //dealing with Chromatin immunoprecipitation requirements in ISA_TAB and dumping those in SRA Library Construction Protocol section
-                String crosslink = getParameterValue(assay, pappIp, "cross linking", true);
-                if (crosslink != null) {
-                    protocol.append("\n cross-linking: ").append(crosslink);
-                }
-
-                String fragmentation = getParameterValue(assay, pappIp, "DNA fragmentation", true);
-                if (fragmentation != null) {
-                    protocol.append("\n DNA fragmentation: ").append(fragmentation);
-                }
-
-                String fragsize = getParameterValue(assay, pappIp, "DNA fragment size", true);
-                if (fragsize != null) {
-                    protocol.append("\n DNA fragment size: ").append(fragsize);
-                }
-
-                String ipAntibody = getParameterValue(assay, pappIp, "immunoprecipitation antibody", true);
-                if (ipAntibody != null) {
-
-                    String[] interestingbits=ipAntibody.split(";");
-                    if (interestingbits[0] != null) { protocol.append("\n antibody name: ").append(interestingbits[0]); }
-                    if (interestingbits[1] != null) { protocol.append("\n antibody manufacturer: ").append(interestingbits[1]); }
-                    if (interestingbits[2] != null) { protocol.append("\n antibody reference number: ").append(interestingbits[2]); }
-                    if (interestingbits[3] != null) { protocol.append("\n immunoprecipitation antibody: ").append(interestingbits[3]); }
-
-                }
+            }
         }
 
 
@@ -500,11 +486,14 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             String pUrl = getParameterValue(assay, papp, "url", false);
             if (pUrl != null) {
                 protocol.append("\n url: ").append(pUrl);
+
             }
 
-            //String targetTaxon = getParameterValue(assay, papp, "target taxon", false);
+            String targetTaxon = "";
+            targetTaxon = getParameterValue(assay, papp, "target_taxon", false);
             if (targetTaxon != null) {
                 protocol.append("\n target_taxon: ").append(targetTaxon);
+                xlib.setLIBRARYNAME(assay.getAcc() + "_" + targetTaxon);
             }
 
             String targetGene = getParameterValue(assay, papp, "target_gene", true);
@@ -522,6 +511,9 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 protocol.append("\n pcr_primers: ").append(pcrPrimers.replaceAll("=", ":"));
             }
 
+
+
+
             String pcrConditions = getParameterValue(assay, papp, "pcr_cond", true);
             if (pcrConditions != null) {
                 protocol.append("\n pcr_cond: ").append(pcrConditions.replaceAll("=", ":"));
@@ -537,9 +529,21 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
             String locus = getParameterValue(assay, papp, "target_gene", true);
 
+            //This is a new requirement starting from SRA.1.3 schema that a database Xref be provided, we are now checking this in.
+            String pcrPrimersXref = getParameterValue(assay, papp, "pcr_primers_identifier", true);
+
+            XRefType locusXref = XRefType.Factory.newInstance();
+
+            if (pcrPrimersXref != null) {
+
+                locusXref.setID("pcrPrimersXref");
+                locusXref.setDB("PubMed");
+            }
+            
             if (locus != null) {
                 if (locus.toLowerCase().contains("16s")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.X_16_S_R_RNA);
+                    xlocus.setPROBESET(locusXref);
                 } else {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.OTHER);
                 }
@@ -553,8 +557,18 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         }
 
 
-        xlib.setLIBRARYCONSTRUCTIONPROTOCOL(protocol.toString());
 
+        //here we support reporting of multiplex identifiers (mid aka barcodes)
+        String[] barcodes = getBarcodesForAssays(assay);
+
+        if (barcodes.length > 0 && !StringUtils.isEmpty(barcodes[0])) {
+            for (int barcodeIndex = 0; barcodeIndex < barcodes.length; barcodeIndex++) {
+                System.out.println("barcode found:"+ barcodes[barcodeIndex]);
+                protocol.append("\n mid: ").append(barcodes[barcodeIndex]);
+            }
+        }
+
+        xlib.setLIBRARYCONSTRUCTIONPROTOCOL(protocol.toString());
 
 
         // Library Layout: This is a core requirements to ensure that ISA provides enough information to support SRA export
@@ -582,15 +596,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         xlib.setLIBRARYLAYOUT(xlibLayout);
 
 
-        //here we support reporting of multiplex identifiers (mid aka barcodes)
-        String[] barcodes = getBarcodesForAssays(assay);
-
-        if (barcodes.length > 0 && !StringUtils.isEmpty(barcodes[0])) {
-            for (int barcodeIndex = 0; barcodeIndex < barcodes.length; barcodeIndex++) {
-
-                protocol.append("\n mid: ").append(barcodes[barcodeIndex]);
-            }
-        }
 
         String pooling = getParameterValue(assay, papp, "mid", false);
         if (pooling != null) {
@@ -598,9 +603,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             xlib.setPOOLINGSTRATEGY(LibraryDescriptorType.POOLINGSTRATEGY.MULTIPLEXED_LIBRARIES);
 
         }
-
-
-        return xlib;
+              return xlib;
     }
 
 
@@ -669,6 +672,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         }
 
         if (barcodes.length > 0 && !StringUtils.isEmpty(barcodes[0])) {
+            System.out.println("BARCODE IN SPOT: " + barcodes[0] );
             userDefinedAttributes.put(SRAAttributes.READ_GROUP_TAG, barcodes[0]);
         }
 
@@ -760,23 +764,23 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
         SRATemplate sraTemplateToInject = getSRATemplateToInject(SRASection.PROCESSING, sequencingProperties);
 
-        String seqSpaceStr="";
+        String seqSpaceStr = "";
 
         seqSpaceStr = getParameterValue(assay, pApp, "Sequence space", false);
 
 
-        String baseCaller="";
-         baseCaller = getParameterValue(assay, pApp, "Base caller", false);
+        String baseCaller = "";
+        baseCaller = getParameterValue(assay, pApp, "Base caller", false);
 
-         String qualityScorer="";
+        String qualityScorer = "";
 
-         qualityScorer = getParameterValue(assay, pApp, "Quality scorer", false);
+        qualityScorer = getParameterValue(assay, pApp, "Quality scorer", false);
 
-        String numberOfLevels="";
-         numberOfLevels = getParameterValue(assay, pApp, "Number of levels", false);
+        String numberOfLevels = "";
+        numberOfLevels = getParameterValue(assay, pApp, "Number of levels", false);
 
-         String multiplier ="";
-         multiplier = getParameterValue(assay, pApp, "Multiplier", false);
+        String multiplier = "";
+        multiplier = getParameterValue(assay, pApp, "Multiplier", false);
 
         Map<SRAAttributes, String> userDefinedAttributes = new HashMap<SRAAttributes, String>();
 
@@ -862,53 +866,56 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             PlatformType.LS454 ls454 = PlatformType.LS454.Factory.newInstance();
 
             //if we can detect which instrument it was that is consistent with SRA schema
-            if ( sequencinginst.equalsIgnoreCase("454 GS") ||
-                 sequencinginst.equalsIgnoreCase("454 GS FLX") ||
-                 sequencinginst.equalsIgnoreCase("454 GS 20") ||
-                 sequencinginst.equalsIgnoreCase("454 GS FLX Titanium") ||
-                 sequencinginst.equalsIgnoreCase("454 GS Junior"))   {
+            if (sequencinginst.equalsIgnoreCase("454 GS") ||
+                    sequencinginst.equalsIgnoreCase("454 GS FLX") ||
+                    sequencinginst.equalsIgnoreCase("454 GS 20") ||
+                    sequencinginst.equalsIgnoreCase("454 GS FLX Titanium") ||
+                    sequencinginst.equalsIgnoreCase("454 GS Junior")) {
 
-                 ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+                ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString(sequencinginst));
             }
             //otherwise, we fall back on the 'unspecified' value to avoid falling over
-            else { ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString("unspecified")); }
+            else {
+                ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString("unspecified"));
+            }
 
             ls454.setFLOWSEQUENCE("TACG");
             ls454.setFLOWCOUNT(BigInteger.valueOf(800));
             xplatform.setLS454(ls454);
-        }
-
-        else if (sequencinginst.toLowerCase().contains("illumina")) {
+        } else if (sequencinginst.toLowerCase().contains("illumina")) {
 
             PlatformType.ILLUMINA illumina = PlatformType.ILLUMINA.Factory.newInstance();
 
-             //if we can detect which instrument it was that is consistent with SRA schema
-             if ( sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer") ||
-                 sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer II") ||
-                 sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer IIx") ||
-                 sequencinginst.equalsIgnoreCase("Illumina HiSeq 2000") ||
-                 sequencinginst.equalsIgnoreCase("Illumina HiSeq 1000") ||
-                 sequencinginst.equalsIgnoreCase("Illumina MiSeq"))  {
+            //if we can detect which instrument it was that is consistent with SRA schema
+            if (sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer") ||
+                    sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer II") ||
+                    sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer IIx") ||
+                    sequencinginst.equalsIgnoreCase("Illumina HiSeq 2000") ||
+                    sequencinginst.equalsIgnoreCase("Illumina HiSeq 1000") ||
+                    sequencinginst.equalsIgnoreCase("Illumina MiSeq")) {
 
-                 illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+                illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.INSTRUMENTMODEL.Enum.forString(sequencinginst));
 
-             }
-             //otherwise, we fall back on the 'unspecified' value to avoid falling over
-             else {illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.INSTRUMENTMODEL.Enum.forString("unspecified"));}
+            }
+            //otherwise, we fall back on the 'unspecified' value to avoid falling over
+            else {
+                illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.INSTRUMENTMODEL.Enum.forString("unspecified"));
+            }
 
-            illumina.setCYCLESEQUENCE(getParameterValue(assay, pApp, "Cycle Sequence", true));
-            illumina.setCYCLECOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Cycle Count", true))));
+            // illumina.setCYCLESEQUENCE(getParameterValue(assay, pApp, "Cycle Sequence", true));
+            // illumina.setCYCLECOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Cycle Count", true))));
             xplatform.setILLUMINA(illumina);
 
         } else if (sequencinginst.toLowerCase().contains("helicos")) {
 
             PlatformType.HELICOS helicos = PlatformType.HELICOS.Factory.newInstance();
 
-            if (sequencinginst.equalsIgnoreCase("Helicos HeliScope"))  {
+            if (sequencinginst.equalsIgnoreCase("Helicos HeliScope")) {
 
-             helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString(sequencinginst));  }
-
-             else { helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString("unspecified")); }
+                helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+            } else {
+                helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString("unspecified"));
+            }
 
             helicos.setFLOWSEQUENCE(getParameterValue(assay, pApp, "Flow Sequence", true));
             helicos.setFLOWCOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Flow Count", true))));
@@ -919,32 +926,27 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             PlatformType.ABISOLID abisolid = PlatformType.ABISOLID.Factory.newInstance();
 
             if (sequencinginst.equalsIgnoreCase("AB SOLiD System") ||
-                sequencinginst.equalsIgnoreCase("AB SOLiD System 2.0") ||
-                sequencinginst.equalsIgnoreCase("AB SOLiD System 3.0") ||
-                sequencinginst.equalsIgnoreCase("AB SOLiD System 3 Plus") ||
-                sequencinginst.equalsIgnoreCase("AB SOLiD 4 System") ||
-                sequencinginst.equalsIgnoreCase("AB SOLiD 4hq System") ||
-                sequencinginst.equalsIgnoreCase("AB SOLiD PI System") ||
-                sequencinginst.equalsIgnoreCase("AB SOLiD 5500") ||
-                sequencinginst.equalsIgnoreCase("AB SOLiD 5500xl"))
-            {
-            abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString(sequencinginst));}
+                    sequencinginst.equalsIgnoreCase("AB SOLiD System 2.0") ||
+                    sequencinginst.equalsIgnoreCase("AB SOLiD System 3.0") ||
+                    sequencinginst.equalsIgnoreCase("AB SOLiD System 3 Plus") ||
+                    sequencinginst.equalsIgnoreCase("AB SOLiD 4 System") ||
+                    sequencinginst.equalsIgnoreCase("AB SOLiD 4hq System") ||
+                    sequencinginst.equalsIgnoreCase("AB SOLiD PI System") ||
+                    sequencinginst.equalsIgnoreCase("AB SOLiD 5500") ||
+                    sequencinginst.equalsIgnoreCase("AB SOLiD 5500xl")) {
 
-            else { abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString("unspecified"));}
-
-
-
+                abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+            } else {
+                abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString("unspecified"));
+            }
 
             {
                 String colorMatrix = getParameterValue(assay, pApp, "Color Matrix", false);
                 // single dibase colours are semicolon-separated
                 if (colorMatrix != null) {
-
                     PlatformType.ABISOLID.COLORMATRIX xcolorMatrix = PlatformType.ABISOLID.COLORMATRIX.Factory.newInstance();
-
                     String dibases[] = colorMatrix.split("\\;");
                     if (dibases != null && dibases.length > 0) {
-
                         PlatformType.ABISOLID.COLORMATRIX.COLOR xcolors[] = new PlatformType.ABISOLID.COLORMATRIX.COLOR[dibases.length];
                         int i = 0;
                         for (String dibase : dibases) {
@@ -1008,8 +1010,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 //            );
 //            throw new TabMissingValueException(msg);
 //        }
-
-
 
 
         //if (platform!=null) {
@@ -1089,7 +1089,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 //            abisolid.setSEQUENCELENGTH(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Cycle Count", false))));
 //
 //            xplatform.setABISOLID(abisolid);
-         else {
+        else {
             throw new TabInvalidValueException(MessageFormat.format(
                     "The SRA platform ''{0}'' for the assay ''{1}''/''{2}'' in the study ''{3}'' is invalid. Please supply the Platform information for the Assay in the Investigation file",
                     sequencinginst, assay.getMeasurement().getName(), assay.getTechnologyName(), assay.getStudy().getAcc()

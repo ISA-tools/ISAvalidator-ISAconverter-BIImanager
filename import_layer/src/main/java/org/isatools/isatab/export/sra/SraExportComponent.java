@@ -98,6 +98,7 @@ abstract class SraExportComponent {
      *                   In each of these directories you'll have a set of SRA files corresponding to one submission and to the BII study.
      */
     protected SraExportComponent(final BIIObjectStore store, final String sourcePath, final String exportPath) {
+
         this.store = store;
         this.sourcePath = sourcePath;
         this.exportPath = exportPath + "/sra";

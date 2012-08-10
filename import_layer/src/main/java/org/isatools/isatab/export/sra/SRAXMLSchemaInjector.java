@@ -46,14 +46,19 @@ public class SRAXMLSchemaInjector {
                         if (line.contains(openingXMLTag) && openingXMLTag.contains(">")) {
                             line = openingXMLTag.substring(0, openingXMLTag.indexOf(">")) + (line.contains("xmlns:xsi") ? " " : " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ") + STD_SRA_NAMESPACE + namespace + "\">";
                         }
-                        else  if ( line.contains(openingXMLTag) && openingXMLTag.contains(" ")) {
+                        else  if ( line.contains(openingXMLTag) && openingXMLTag.contains("alias")) {
                             
-                            String insertnamespace = openingXMLTag+ " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""  + STD_SRA_NAMESPACE + namespace;
-                            //line = openingXMLTag.substring(0, openingXMLTag.indexOf("\\s")) + (line.contains("xmlns:xsi") ? " " :  + "\">";
-                         line.replaceFirst(openingXMLTag, insertnamespace)  ;
-                            System.out.println("THIS IS NEW !!!!: "+line);
+                            String insertnamespace = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "  + STD_SRA_NAMESPACE + namespace + "\"" + " alias";
+                        line= line.replaceFirst("alias", insertnamespace)  ;
 
-                        } 
+                        }
+                        else  if ( line.contains(openingXMLTag) && openingXMLTag.contains("center_name")) {
+
+                            String insertnamespace = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "  + STD_SRA_NAMESPACE + namespace + "\""+ " center_name";
+                            line= line.replaceFirst("center_name", insertnamespace)  ;
+
+                        }
+
                         outputStream.println(line);
                     }
 
@@ -73,12 +78,32 @@ public class SRAXMLSchemaInjector {
     }
 
     private static File getNewFileName(File originalFile) {
-        String filePath = originalFile.getAbsolutePath();
 
-        filePath = filePath.substring(0, filePath.lastIndexOf(File.separator));
+            String filePath = originalFile.getAbsolutePath();
 
-        return new File(filePath + File.separator + originalFile.getName().replaceFirst(".xml", "-final.xml") );
+            filePath = filePath.substring(0, filePath.lastIndexOf(File.separator));
+             return new File(filePath + File.separator + originalFile.getName().replaceFirst("_initial.xml", ".xml") );
     }
+
+ public static void delete(File fileName) {
+     try {
+         String filePath = fileName.getAbsolutePath();
+
+         File target = fileName;
+         if (!target.exists()) {
+             System.err.println("File " + fileName
+                     + " not present to begin with!");
+             return;
+         }
+         if (target.delete())
+             System.err.println("** Deleted " + fileName + " **");
+         else
+             System.err.println("Failed to delete " + fileName);
+     } catch (SecurityException e) {
+         System.err.println("Unable to delete " + fileName + "("
+                 + e.getMessage() + ")");
+     }
+ }
 
     public static void main(String[] args) {
         addNameSpaceToFile(new File("/Users/prs/git/ValidatorConverterManager/ISAvalidator-ISAconverter-BIImanager/import_layer/target/export/sra/VS-454-MBL/run_set.xml"),

@@ -319,41 +319,47 @@ public class SraExporter extends SraExportPipelineComponent {
                         SUBMISSIONDocument xsubmissionDoc = SUBMISSIONDocument.Factory.newInstance();
                         xsubmissionDoc.setSUBMISSION(xsubmission);
 
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/submission.xml"), xsubmissionDoc.toString());
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/study.xml"), xstudyDoc.toString());
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/submission_initial.xml"), xsubmissionDoc.toString());
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/study_initial.xml"), xstudyDoc.toString());
+
+                        SAMPLESETDocument sampleSetDoc = SAMPLESETDocument.Factory.newInstance();
+                        sampleSetDoc.setSAMPLESET(sampleSet);
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/sample_set_initial.xml"), sampleSetDoc.toString());
+
 
                         EXPERIMENTSETDocument expSetDoc = EXPERIMENTSETDocument.Factory.newInstance();
-
-
                         EXPERIMENTSETDocument.Factory.newInstance();
                         expSetDoc.setEXPERIMENTSET(expSet);
 
                         // A modification is made on the XML to be output to remove any tags required for injection of elements into
                         // the DOM during conversion. These tags are usually found as <INJECTED_TAG>. The SRAUtils.removeInjectedTags method
                         // finds and replaces these tags with empty spaces.
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/experiment_set.xml"), SRAUtils.removeInjectedTags(expSetDoc.toString()));
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/experiment_set_initial.xml"), SRAUtils.removeInjectedTags(expSetDoc.toString()));
 
                         RUNSETDocument runSetDoc = RUNSETDocument.Factory.newInstance();
                         runSetDoc.setRUNSET(runSet);
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/run_set.xml"), runSetDoc.toString());
-
-
-                        SAMPLESETDocument sampleSetDoc = SAMPLESETDocument.Factory.newInstance();
-                        sampleSetDoc.setSAMPLESET(sampleSet);
-                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/sample_set.xml"), sampleSetDoc.toString());
+                        FileUtils.writeStringToFile(new File(xSubmissionPath + "/run_set_initial.xml"), runSetDoc.toString());
 
 
                     } catch (IOException ex) {
                         throw new TabIOException(MessageFormat.format("Error during SRA export of study {0}: {1}", studyAcc, ex.getMessage()), ex);
                     } finally {
 
-                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/submission.xml"), "SRA.submission.xsd", "<SUBMISSION\\\\s");
-                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/study.xml"), "SRA.study.xsd", "<STUDY\\\\s");
-                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/sample_set.xml"), "SRA.sample_set.xsd", "<SAMPLE_SET>");
-                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/experiment_set.xml"), "SRA.experiment_set.xsd", "<EXPERIMENT_SET>");
-                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/run_set.xml"), "SRA.run.xsd", "<RUN_SET>");
+                        //we need to add the schema namespace to the output files in order to allow validation
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/submission_initial.xml"), "SRA.submission.xsd", "<SUBMISSION center_name");
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/study_initial.xml"), "SRA.study.xsd", "<STUDY alias");
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/sample_set_initial.xml"), "SRA.sample.xsd", "<SAMPLE_SET>");
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/experiment_set_initial.xml"), "SRA.experiment.xsd", "<EXPERIMENT_SET>");
+                        SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/run_set_initial.xml"), "SRA.run.xsd", "<RUN_SET>");
+
 
                     }
+                    SRAXMLSchemaInjector.delete(new File(xSubmissionPath + "/submission_initial.xml"));
+                    SRAXMLSchemaInjector.delete(new File(xSubmissionPath + "/study_initial.xml"));
+                    SRAXMLSchemaInjector.delete(new File(xSubmissionPath + "/sample_set_initial.xml"));
+                    SRAXMLSchemaInjector.delete(new File(xSubmissionPath + "/experiment_set_initial.xml"));
+                    SRAXMLSchemaInjector.delete(new File(xSubmissionPath + "/run_set_initial.xml"));
+
                 }
             } // is assay OK
 
@@ -419,7 +425,7 @@ public class SraExporter extends SraExportPipelineComponent {
 
         Date subDate = study.getSubmissionDate();
         if (subDate != null) {
-            AttributeType xdate = buildStudyAttribute("Submission Date", DateFormatUtils.format(subDate, "dd/MM/yyyy"), null);
+            AttributeType xdate = buildStudyAttribute("Submission Date",DateFormatUtils.format(subDate, "dd/MM/yyyy"), null);
             xattrs.addNewSTUDYATTRIBUTE();
             xattrs.setSTUDYATTRIBUTEArray(xattrs.sizeOfSTUDYATTRIBUTEArray() - 1, xdate);
         }
@@ -438,8 +444,6 @@ public class SraExporter extends SraExportPipelineComponent {
         }
 
         if (investigation != null) {
-            //if (!investigation.getAcc().isEmpty()) {
-            System.out.println("Processing investigation...probably shouldn't be.");
             String invAcc = investigation.getAcc();
             if (investigation.getAcc() != null)  {
                 AttributeType xacc = buildStudyAttribute("BII Investigation Accession", invAcc, null);
@@ -463,19 +467,48 @@ public class SraExporter extends SraExportPipelineComponent {
         Design design = designs.iterator().next();
 
         // Try to see if the ISATAB study type is listed in the SRA schema, use 'other' otherwise.
-        // TODO: ontology term
-        // TODO: check on the assay type to determine nature of the study design. for example,
-        // TODO: if measurement type = environmental gene survey, study design = METAGENOMICS
 
+         Collection<Assay> assays = study.getAssays();
+             if (assays == null || assays.isEmpty()) {
+                 throw new TabMissingValueException(
+                         MessageFormat.format("Study ''{0}'' has no study design, cannot be exported to SRA format", studyAcc)
+                 );
+             }
+        String measurement = assays.iterator().next().getMeasurement().getName();
         STUDYTYPE xstudyType = STUDYTYPE.Factory.newInstance();
-        String designStr = design.getValue();
-        ExistingStudyType.Enum xdesign = ExistingStudyType.Enum.forString(designStr);
-        if (designStr == null) {
+
+        if (measurement.equalsIgnoreCase("transcription profiling")) {
+            ExistingStudyType.Enum xdesign = ExistingStudyType.TRANSCRIPTOME_ANALYSIS;
             xstudyType.setExistingStudyType(xdesign);
-        } else {
-            xstudyType.setExistingStudyType(ExistingStudyType.OTHER);
-            xstudyType.setNewStudyType(designStr);
         }
+        else if  (measurement.equalsIgnoreCase("environmental gene survey")) {
+            ExistingStudyType.Enum xdesign = ExistingStudyType.METAGENOMICS;
+            xstudyType.setExistingStudyType(xdesign);
+        }
+        else if  (measurement.equalsIgnoreCase("DNA-protein binding site identification")) {
+            ExistingStudyType.Enum xdesign = ExistingStudyType.GENE_REGULATION_STUDY;
+            xstudyType.setExistingStudyType(xdesign);
+        }
+        else if  (measurement.equalsIgnoreCase("transcription factor binding site identification")) {
+            ExistingStudyType.Enum xdesign = ExistingStudyType.GENE_REGULATION_STUDY;
+            xstudyType.setExistingStudyType(xdesign);
+        }
+        else if  (measurement.equalsIgnoreCase("DNA methylation profiling")) {
+            ExistingStudyType.Enum xdesign = ExistingStudyType.EPIGENETICS;
+            xstudyType.setExistingStudyType(xdesign);
+        }
+        else if  (measurement.equalsIgnoreCase("genome sequencing")) {
+            ExistingStudyType.Enum xdesign = ExistingStudyType.WHOLE_GENOME_SEQUENCING;
+            xstudyType.setExistingStudyType(xdesign);
+        }
+        else if  (measurement.equalsIgnoreCase("chromosome rearrangement")) {
+            ExistingStudyType.Enum xdesign = ExistingStudyType.POPULATION_GENOMICS;
+            xstudyType.setExistingStudyType(xdesign);
+        }
+        else {
+            xstudyType.setExistingStudyType(ExistingStudyType.OTHER);
+        }
+
         xdescriptor.setSTUDYTYPE(xstudyType);
         xstudy.setDESCRIPTOR(xdescriptor);
 

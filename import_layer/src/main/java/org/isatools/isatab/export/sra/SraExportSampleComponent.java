@@ -248,8 +248,6 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
             System.out.println("Is an organism tag? " + isOrganismTag);
 
-//            System.out.println(xattr);
-
             if (xattr != null) {
                 if (!isOrganismTag) {
                     sampleAttrs.addNewSAMPLEATTRIBUTE();
@@ -279,12 +277,12 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                     }
                     try {
 
-                        log.info("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
-                        System.out.println("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+                       // log.info("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+                       // System.out.println("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
 
                         xsampleName.setTAXONID(Integer.parseInt(taxon));
                         xsampleName.setSCIENTIFICNAME(oe.getName());
-                        System.out.println(xattr + oe.getName());
+                       // System.out.println("xattr: " + xattr + oe.getName());
 
 
                     } catch (NumberFormatException ex) {
@@ -370,6 +368,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 MaterialNode leftLeftNode = leftLeftNodes.iterator().next();
                 Material leftLeftMaterial = leftLeftNode.getMaterial();
                 MaterialRole leftLeftRole = leftLeftMaterial.getType();
+
                 if (!StringUtils.containsIgnoreCase(leftLeftRole.getAcc(), "source")) {
                     String msg = MessageFormat.format(
                             "The assay file of type {0} / {1} for study {2} has nested pooled samples, this is not supported by "
