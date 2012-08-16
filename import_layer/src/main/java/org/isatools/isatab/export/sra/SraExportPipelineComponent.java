@@ -58,14 +58,17 @@ import org.isatools.tablib.exceptions.TabIOException;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.exceptions.TabInvalidValueException;
 import org.isatools.tablib.utils.BIIObjectStore;
-import uk.ac.ebi.bioinvindex.model.*;
+import uk.ac.ebi.bioinvindex.model.AssayResult;
+import uk.ac.ebi.bioinvindex.model.Data;
+import uk.ac.ebi.bioinvindex.model.Material;
+import uk.ac.ebi.bioinvindex.model.Protocol;
 import uk.ac.ebi.bioinvindex.model.processing.Assay;
 import uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication;
 import uk.ac.ebi.bioinvindex.model.xref.Xref;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
 import uk.ac.ebi.embl.era.sra.xml.*;
-import uk.ac.ebi.embl.era.sra.xml.ExperimentType.DESIGN;
+import uk.ac.ebi.embl.era.sra.xml.LibraryType;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.PROCESSING;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.STUDYREF;
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK;
@@ -176,7 +179,13 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             EXPERIMENTREF xexpRef = EXPERIMENTREF.Factory.newInstance();
             xexpRef.setRefname(materialAcc);
 
-            DESIGN xdesign = DESIGN.Factory.newInstance();
+              STUDYREF.Factory.newInstance();
+
+
+
+
+           // DESIGN xdesign = DESIGN.Factory.newInstance();
+            LibraryType xdesign =  LibraryType.Factory.newInstance();
             xdesign.setDESIGNDESCRIPTION("See study and sample descriptions for details");
 
 
@@ -543,8 +552,31 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 if (locus.toLowerCase().contains("16s")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.X_16_S_R_RNA);
                     xlocus.setPROBESET(locusXref);
-                } else {
+                }
+                else if (locus.toLowerCase().contains("18s")) {
+                    xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.X_18_S_R_RNA);
+                    xlocus.setPROBESET(locusXref);
+                }
+
+                else if (locus.toLowerCase().contains("cox")) {
+                    xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.COX_1);
+                    xlocus.setPROBESET(locusXref);
+                }
+                else if (locus.toLowerCase().contains("its")) {
+                    xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.ITS_1_5_8_S_ITS_2);
+                    xlocus.setPROBESET(locusXref);
+                }
+                else if (locus.toLowerCase().contains("matk")) {
+                    xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.MAT_K);
+                    xlocus.setPROBESET(locusXref);
+                }
+                else if (locus.toLowerCase().contains("rbcl")) {
+                    xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.RBCL);
+                    xlocus.setPROBESET(locusXref);
+                }
+                else {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.OTHER);
+                    xlocus.setDescription(locus);
                 }
             }
 
@@ -889,6 +921,8 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             if (sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer") ||
                     sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer II") ||
                     sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer IIx") ||
+                    sequencinginst.equalsIgnoreCase("Illumina HiScanSQ") ||
+                    sequencinginst.equalsIgnoreCase("Illumina HiSeq 2500") ||
                     sequencinginst.equalsIgnoreCase("Illumina HiSeq 2000") ||
                     sequencinginst.equalsIgnoreCase("Illumina HiSeq 1000") ||
                     sequencinginst.equalsIgnoreCase("Illumina MiSeq")) {
@@ -920,19 +954,38 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             helicos.setFLOWCOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Flow Count", true))));
             xplatform.setHELICOS(helicos);
 
-        } else if (sequencinginst.toLowerCase().contains("solid")) {
+
+        } else if (sequencinginst.toLowerCase().contains("ion torrent")) {
+
+            PlatformType.IONTORRENT iontorrent = PlatformType.IONTORRENT.Factory.newInstance();
+
+            if (sequencinginst.equalsIgnoreCase("Ion Torrent PGM") || sequencinginst.equalsIgnoreCase("Ion Torrent Proton") ) {
+
+                iontorrent.setINSTRUMENTMODEL(PlatformType.IONTORRENT.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+            } else {
+                iontorrent.setINSTRUMENTMODEL(PlatformType.IONTORRENT.INSTRUMENTMODEL.Enum.forString("unspecified"));
+            }
+
+            xplatform.setIONTORRENT(iontorrent);
+
+        }
+
+        else if (sequencinginst.toLowerCase().contains("solid")) {
 
             PlatformType.ABISOLID abisolid = PlatformType.ABISOLID.Factory.newInstance();
 
-            if (sequencinginst.equalsIgnoreCase("AB SOLiD System") ||
+            if (    sequencinginst.equalsIgnoreCase("AB SOLiD System") ||
                     sequencinginst.equalsIgnoreCase("AB SOLiD System 2.0") ||
                     sequencinginst.equalsIgnoreCase("AB SOLiD System 3.0") ||
-                    sequencinginst.equalsIgnoreCase("AB SOLiD System 3 Plus") ||
+                    sequencinginst.equalsIgnoreCase("AB SOLiD 3 System Plus") ||
                     sequencinginst.equalsIgnoreCase("AB SOLiD 4 System") ||
                     sequencinginst.equalsIgnoreCase("AB SOLiD 4hq System") ||
                     sequencinginst.equalsIgnoreCase("AB SOLiD PI System") ||
                     sequencinginst.equalsIgnoreCase("AB SOLiD 5500") ||
-                    sequencinginst.equalsIgnoreCase("AB SOLiD 5500xl")) {
+                    sequencinginst.equalsIgnoreCase("AB SOLiD 5500xl") ||
+                    sequencinginst.equalsIgnoreCase("AB 5500 Genetic Analyzer") ||
+                    sequencinginst.equalsIgnoreCase("AB 5500xl Genetic Analyzer")
+                    ) {
 
                 abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString(sequencinginst));
             } else {

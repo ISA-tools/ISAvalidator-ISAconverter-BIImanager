@@ -23,7 +23,7 @@ import java.util.Scanner;
 
 public class SRAXMLSchemaInjector {
     
-    private static final String STD_SRA_NAMESPACE = "xsi:noNamespaceSchemaLocation=\"ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_3/";
+    private static final String STD_SRA_NAMESPACE = "xsi:noNamespaceSchemaLocation=\"ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_4/";
     
     public static File addNameSpaceToFile(File originalFile, String namespace, String openingXMLTag) {
 

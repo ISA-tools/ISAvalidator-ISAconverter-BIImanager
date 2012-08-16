@@ -287,16 +287,18 @@
             <field id="Hybridization Assay Name" follows="supposed Labeled Extract Name"/>
             <field id="Array Design REF"/>
 
-            <field id="Scan Name" follows="supposed Hybridization Assay Name"/>
-            <field id="Array Data File" ref-file-type="raw"/>
+            <field id="Scan Name"/>
+            <field id="Array Data File" ref-file-type="raw"  follows="supposed Array Design REF"/>
             <field id="Array Data Matrix File" ref-file-type="raw"/>
             <field id="Image File" ref-file-type="generic"/>
 
-            <field id="Normalization Name" follows="supposed Scan Name"/>
+            <field id="Normalization Name" />          <!--follows="supposed Scan Name" -->
             <field id="Derived Array Data File" ref-file-type="processed"/>
+
+
             <field id="Derived Array Data Matrix File" ref-file-type="processed"/>
 
-            <field id="Data Transformation Name" follows="supposed Normalization Name"/>
+            <field id="Data Transformation Name" follows="supposed Normalization Name"/>             <!---->
 
             <field id="Comment" type="typed(string)"/>
 

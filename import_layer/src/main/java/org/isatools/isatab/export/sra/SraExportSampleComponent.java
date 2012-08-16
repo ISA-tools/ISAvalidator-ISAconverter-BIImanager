@@ -58,12 +58,8 @@ import uk.ac.ebi.bioinvindex.model.term.MaterialRole;
 import uk.ac.ebi.bioinvindex.model.term.OntologyTerm;
 import uk.ac.ebi.bioinvindex.model.xref.ReferenceSource;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
-import uk.ac.ebi.embl.era.sra.xml.AttributeType;
-import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType;
+import uk.ac.ebi.embl.era.sra.xml.*;
 import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType.POOL;
-import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType.POOL.MEMBER;
-import uk.ac.ebi.embl.era.sra.xml.SampleSetType;
-import uk.ac.ebi.embl.era.sra.xml.SampleType;
 import uk.ac.ebi.embl.era.sra.xml.SampleType.SAMPLEATTRIBUTES;
 import uk.ac.ebi.embl.era.sra.xml.SampleType.SAMPLENAME;
 
@@ -165,7 +161,8 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 if (xpoolMembers.size() > 0) {
                     POOL xpool = xSampledescriptor.addNewPOOL();
                     for (SampleType xpoolMember : xpoolMembers) {
-                        MEMBER xmember = xpool.addNewMEMBER();
+
+                        PoolMemberType xmember = xpool.addNewMEMBER();
                         xmember.setRefname(xpoolMember.getAlias());
                     }
                 }
