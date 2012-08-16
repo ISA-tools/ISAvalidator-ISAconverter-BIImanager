@@ -112,7 +112,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 return true;
             }
         }
-
         return false;
     }
 
