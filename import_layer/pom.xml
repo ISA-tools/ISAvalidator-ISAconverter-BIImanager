@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.isatools</groupId>
             <artifactId>graph2tab</artifactId>
-            <version>4.0</version>
+            <version>4.1</version>
         </dependency>
 
         <dependency>
@@ -584,7 +584,7 @@
         <repository>
             <id>oerc-repo</id>
             <name>OeRC Maven repository</name>
-            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/releases</url>
+            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/releases/</url>
         </repository>
     </distributionManagement>
 
