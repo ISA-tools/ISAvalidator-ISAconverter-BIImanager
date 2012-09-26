@@ -72,9 +72,6 @@ public class MaNormalizationTabMapper extends DataNodeTabMapper {
 
         // "Normalization Name" is the first column.
 
-        this.mappingHelpersConfig.put("Derived Array Data File", new MappingHelperConfig<StringPropertyMappingHelper>(
-                StringPropertyMappingHelper.class, new String[][]{{"propertyName", "url"}}
-        ));
         this.mappingHelpersConfig.put("Derived Array Data Matrix File", new MappingHelperConfig<StringPropertyMappingHelper>(
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "dataMatrixUrl"}}
         ));

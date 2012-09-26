@@ -74,7 +74,9 @@ public class MaProcessingTabMapper extends ProcessingsTabMapper {
 
         log.info("In MaProcessingTabMapper...");
         boolean scanNameExists = checkSectionInstanceForFieldPresence(sectionInstance, "Scan Name");
-        boolean dataTransformationName = checkSectionInstanceForFieldPresence(sectionInstance, "Data Transformation Name");
+        boolean dataTransformationNameExists = checkSectionInstanceForFieldPresence(sectionInstance, "Data Transformation Name");
+        boolean normalizationNameExists = checkSectionInstanceForFieldPresence(sectionInstance, "Normalization Name");
+
 
         nodeMappersConfig.put("Sample Name", SampleTabMapper.class);
         nodeMappersConfig.put("Protocol REF", GenericProtocolApplicationTabMapper.class);
@@ -86,12 +88,13 @@ public class MaProcessingTabMapper extends ProcessingsTabMapper {
         nodeMappersConfig.put(scanNameExists ? "Scan Name" : "Array Data File",
                 scanNameExists ? MaRawDataTabMapper.class : SlimMaRawDataTabMapper.class);
 
-        nodeMappersConfig.put("Normalization Name", MaNormalizationTabMapper.class);
+        nodeMappersConfig.put(normalizationNameExists ? "Normalization Name" : "Derived Array Data File",
+                normalizationNameExists ? MaNormalizationTabMapper.class : SlimMaNormalizationNameTabMapper.class);
 
         // there are a number of cases where the data transformation name isn't really required. Having the
         // derived data file should be enough. So we need to have slimmed down mappings. SlimMaDataTransformationTabMapper
-        nodeMappersConfig.put(dataTransformationName ? "Data Transformation Name" : "Derived Array Data File",
-                dataTransformationName ? MaDataTransformationTabMapper.class : SlimMaProcessedDataTabMapper.class);
+        nodeMappersConfig.put(dataTransformationNameExists ? "Data Transformation Name" : "Derived Array Data Matrix File",
+                dataTransformationNameExists ? MaDataTransformationTabMapper.class : SlimMaProcessedDataTabMapper.class);
     }
 
     private boolean checkSectionInstanceForFieldPresence(SectionInstance sectionInstance, String fieldName) {

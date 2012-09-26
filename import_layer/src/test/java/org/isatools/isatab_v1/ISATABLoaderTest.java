@@ -60,9 +60,16 @@ import org.isatools.tablib.schema.Record;
 import org.isatools.tablib.schema.SectionInstance;
 import org.junit.Ignore;
 import org.junit.Test;
+import uk.ac.ebi.bioinvindex.model.AssayResult;
+import uk.ac.ebi.bioinvindex.model.BioEntity;
+import uk.ac.ebi.bioinvindex.model.Investigation;
+import uk.ac.ebi.bioinvindex.model.Study;
+import uk.ac.ebi.bioinvindex.model.processing.Assay;
 
+import java.io.File;
 import java.util.List;
 
+import static java.lang.System.load;
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -79,6 +86,8 @@ public class ISATABLoaderTest {
 		String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_v1rc1/griffin_gauguier";
 		ISATABLoader loader = new ISATABLoader(filesPath);
 		FormatSetInstance isatabInstance = loader.load();
+        
+        
 
 		assertNotNull("Oh no! No loaded format instance", isatabInstance);
 
@@ -148,6 +157,7 @@ public class ISATABLoaderTest {
         String baseDir = System.getProperty("basedir");
         String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/JCastrillo-BII-I-1";
         ISATABLoader loader = new ISATABLoader(filesPath);
+
         FormatSetInstance isatabInstance = loader.load();
 
         assertNotNull("Oh no! No loaded format instance", isatabInstance);
@@ -168,6 +178,19 @@ public class ISATABLoaderTest {
 
         out.println("\n\n_________Validating__________\n\n\n");
         ISATABValidator validator = new ISATABValidator(isatabInstance);
+
+        validator.validate();
+        
+        Investigation investigation = validator.getStore().valueOfType(Investigation.class);
+        for(Study study : investigation.getStudies()) {
+            for (AssayResult assayResult : study.getAssayResults()) {
+                File file = new File(assayResult.getData().getUrl());
+
+                BioEntity newEntity = new BioEntity("","");
+                assayResult.addBioEntity(newEntity);
+            }
+        }
+        
         GUIInvokerResult result =validator.validate();
         
         out.println("Result is " + result);

@@ -58,6 +58,8 @@ import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.tablib.utils.BIIObjectStore;
 import org.junit.Test;
+import uk.ac.ebi.bioinvindex.model.Investigation;
+import uk.ac.ebi.bioinvindex.model.Study;
 
 import static java.lang.System.out;
 import static org.junit.Assert.assertFalse;
@@ -73,7 +75,7 @@ public class ConverterTest {
 		String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/JCastrillo-BII-I-1";
 
 		GUIISATABValidator validator = new GUIISATABValidator();
-		assertFalse("Validator returns ERRROR!", GUIInvokerResult.ERROR == validator.validate(subDir));
+		assertFalse("Validator returns ERROR!", GUIInvokerResult.ERROR == validator.validate(subDir));
 
 
 		BIIObjectStore store = validator.getStore();

@@ -58,6 +58,10 @@ import org.isatools.tablib.schema.FormatSetInstance;
 import org.isatools.tablib.utils.BIIObjectStore;
 import org.junit.Test;
 import uk.ac.ebi.bioinvindex.dao.ejb3.DaoFactory;
+import uk.ac.ebi.bioinvindex.model.AssayResult;
+import uk.ac.ebi.bioinvindex.model.BioEntity;
+import uk.ac.ebi.bioinvindex.model.Investigation;
+import uk.ac.ebi.bioinvindex.model.Study;
 import uk.ac.ebi.bioinvindex.utils.test.TransactionalDBUnitEJB3DAOTest;
 
 import java.sql.Timestamp;
@@ -68,71 +72,71 @@ import static org.junit.Assert.assertTrue;
 
 public class ISATABPersistenceTest extends TransactionalDBUnitEJB3DAOTest {
 
-	public ISATABPersistenceTest() throws Exception {
-		super();
-	}
+    public ISATABPersistenceTest() throws Exception {
+        super();
+    }
 
-	protected void prepareSettings() {
-		beforeTestOperations.add(DatabaseOperation.CLEAN_INSERT);
-		dataSetLocation = "test-data/isatab/db_datasets/test_persistence.xml";
-	}
+    protected void prepareSettings() {
+        beforeTestOperations.add(DatabaseOperation.CLEAN_INSERT);
+        dataSetLocation = "test-data/isatab/db_datasets/test_persistence.xml";
+    }
 
-	@Test
-	public void testPersistenceTxOnly() throws Exception {
-		out.println("\n\n_______________________ ISATAB Persistence Test (TX) _______________________\n\n");
+    @Test
+    public void testPersistenceTxOnly() throws Exception {
+        out.println("\n\n_______________________ ISATAB Persistence Test (TX) _______________________\n\n");
 
-		String baseDir = System.getProperty("basedir");
-		String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab/example_tx";
-		ISATABLoader loader = new ISATABLoader(filesPath);
-		FormatSetInstance isatabInstance = loader.load();
+        String baseDir = System.getProperty("basedir");
+        String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab/example_tx";
+        ISATABLoader loader = new ISATABLoader(filesPath);
+        FormatSetInstance isatabInstance = loader.load();
 
-		BIIObjectStore store = new BIIObjectStore();
-		ISATABMapper isatabMapper = new ISATABMapper(store, isatabInstance);
+        BIIObjectStore store = new BIIObjectStore();
+        ISATABMapper isatabMapper = new ISATABMapper(store, isatabInstance);
 
-		isatabMapper.map();
+        isatabMapper.map();
 
-		assertTrue("Oh no! No mapped object! ", store.size() > 0);
+        assertTrue("Oh no! No mapped object! ", store.size() > 0);
 
-		// out.println ( "\n_____________ Persisting the objects:\n" + store.toStringVerbose () );
-		out.println("\n_____________ Persisting " + store.size() + " objects:\n");
+        // out.println ( "\n_____________ Persisting the objects:\n" + store.toStringVerbose () );
+        out.println("\n_____________ Persisting " + store.size() + " objects:\n");
 
-		ISATABPersister persister = new ISATABPersister(store, DaoFactory.getInstance(entityManager));
-		Timestamp ts = persister.persist(filesPath);
-		transaction.commit();
-		session.flush();
+        ISATABPersister persister = new ISATABPersister(store, DaoFactory.getInstance(entityManager));
+        Timestamp ts = persister.persist(filesPath);
+        transaction.commit();
+        session.flush();
 
-		out.println("\n\n\n\n________________ Done, Submission TS: " + ts.getTime() + " (" + ts + " + " + ts.getNanos() + "ns)");
-		//out.println ( "  Results:\n" + store.toStringVerbose () );
-		out.println("\n\n___________________ /end: ISATAB Persistence Test (TX) ___________________\n\n");
-	}
+        out.println("\n\n\n\n________________ Done, Submission TS: " + ts.getTime() + " (" + ts + " + " + ts.getNanos() + "ns)");
+        //out.println ( "  Results:\n" + store.toStringVerbose () );
+        out.println("\n\n___________________ /end: ISATAB Persistence Test (TX) ___________________\n\n");
+    }
 
-	@Test
-	public void testPersistence() throws Exception {
-		out.println("\n\n_______________________ ISATAB Persistence Test _______________________\n\n");
+    @Test
+    public void testPersistence() throws Exception {
+        out.println("\n\n_______________________ ISATAB Persistence Test _______________________\n\n");
 
-		String baseDir = System.getProperty("basedir");
-		String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab/example";
-		ISATABLoader loader = new ISATABLoader(filesPath);
-		FormatSetInstance isatabInstance = loader.load();
+        String baseDir = System.getProperty("basedir");
+        String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab/example";
+        ISATABLoader loader = new ISATABLoader(filesPath);
+        FormatSetInstance isatabInstance = loader.load();
 
-		BIIObjectStore store = new BIIObjectStore();
-		ISATABMapper isatabMapper = new ISATABMapper(store, isatabInstance);
+        BIIObjectStore store = new BIIObjectStore();
+        ISATABMapper isatabMapper = new ISATABMapper(store, isatabInstance);
 
-		isatabMapper.map();
+        isatabMapper.map();
 
-		assertTrue("Oh no! No mapped object! ", store.size() > 0);
+        assertTrue("Oh no! No mapped object! ", store.size() > 0);
 
-		// out.println ( "\n_____________ Persisting the objects:\n" + store.toStringVerbose () );
-		out.println("\n_____________ Persisting " + store.size() + " objects:\n");
+        // out.println ( "\n_____________ Persisting the objects:\n" + store.toStringVerbose () );
+        out.println("\n_____________ Persisting " + store.size() + " objects:\n");
 
-		ISATABPersister persister = new ISATABPersister(store, DaoFactory.getInstance(entityManager));
-		Timestamp ts = persister.persist(filesPath);
-		transaction.commit();
-		session.flush();
+        ISATABPersister persister = new ISATABPersister(store, DaoFactory.getInstance(entityManager));
+        Timestamp ts = persister.persist(filesPath);
+        transaction.commit();
+        session.flush();
 
-		out.println("\n\n\n\n________________ Done, Submission TS: " + ts.getTime() + " (" + ts + " + " + ts.getNanos() + "ns)");
-		//out.println ( "  Results:\n" + store.toStringVerbose () );
-		out.println("\n\n___________________ /end: ISATAB Persistence Test ___________________\n\n");
-	}
+        out.println("\n\n\n\n________________ Done, Submission TS: " + ts.getTime() + " (" + ts + " + " + ts.getNanos() + "ns)");
+        //out.println ( "  Results:\n" + store.toStringVerbose () );
+        out.println("\n\n___________________ /end: ISATAB Persistence Test ___________________\n\n");
+    }
 
 }

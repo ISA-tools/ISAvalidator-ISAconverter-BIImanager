@@ -6,7 +6,7 @@
     <groupId>org.isatools</groupId>
     <artifactId>import_layer</artifactId>
     <packaging>jar</packaging>
-    <version>1.5</version>
+    <version>1.6-SNAPSHOT</version>
     <name>ISA Import Layer and Command Line Tools</name>
     <url>http://isatab.sf.net/</url>
     <description>
@@ -45,7 +45,7 @@
 
         <repository>
             <id>oerc</id>
-            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/releases/</url>
+            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/groups/oerc</url>
         </repository>
 
     </repositories>
@@ -586,6 +586,12 @@
             <name>OeRC Maven repository</name>
             <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/releases/</url>
         </repository>
+
+        <snapshotRepository>
+            <id>oerc-snapshot</id>
+            <name>OeRC Snapshot Repo</name>
+            <url>http://frog.oerc.ox.ac.uk:8080/nexus-2.1.2/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
 </project>

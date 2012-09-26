@@ -76,6 +76,7 @@ public class ValidatorTest {
 		GUIISATABValidator validator = new GUIISATABValidator();
 		GUIInvokerResult result = validator.validate(subDir);
 
+
 		out.println("Results:");
 		out.println(result == GUIInvokerResult.ERROR ? "Validation failed!" : validator.report());
 
