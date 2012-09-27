@@ -24,6 +24,11 @@ public class SlimMaProcessedDataTabMapper extends DataNodeTabMapper {
 
         // "Derived Array Data File" is the starting node
         super(store, sectionInstance, fieldIndex, endField);
+
+        this.mappingHelpersConfig.put("Derived Array Data File", new MappingHelperConfig<StringPropertyMappingHelper>(
+                StringPropertyMappingHelper.class, new String[][]{{"propertyName", "url"}}
+        ));
+
         this.mappingHelpersConfig.put("Derived Array Data Matrix File", new MappingHelperConfig<StringPropertyMappingHelper>(
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "dataMatrixUrl"}}
         ));

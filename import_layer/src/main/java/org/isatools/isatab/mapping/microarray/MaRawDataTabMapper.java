@@ -79,7 +79,6 @@ public class MaRawDataTabMapper extends DataNodeTabMapper {
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "dataMatrixUrl"}}
         ));
 
-        //TODO: Do we need a specific property for this?
         this.mappingHelpersConfig.put("Image File", new MappingHelperConfig<AnnotationMappingHelper>(
                 AnnotationMappingHelper.class, new String[][]{{"propertyName", "imageFile"}}
         ));
@@ -92,9 +91,6 @@ public class MaRawDataTabMapper extends DataNodeTabMapper {
      */
     @Override
     public Data newMappedObject() throws InstantiationException, IllegalAccessException {
-        // TODO: we need proper constants for the roles
-        // TODO: fix to use real ReferenceSource
-        //
         return new Data(
                 "", new DataType("bii:microarray_raw_data", "Microarray Raw Data", new ReferenceSource("bii:data_types", "bii:data_types"))
         );

@@ -55,6 +55,8 @@ package org.isatools.isatab_v1;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.operation.DatabaseOperation;
 import org.isatools.isatab.ISATABPersister;
+import org.isatools.isatab.ISATABValidator;
+import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.isatab_v1.mapping.ISATABMapper;
 import org.isatools.tablib.schema.FormatSetInstance;
 import org.isatools.tablib.utils.BIIObjectStore;
@@ -100,7 +102,7 @@ public class ISATABPersistenceTest extends TransactionalDBUnitEJB3DAOTest {
 		ISATABLoader loader = new ISATABLoader(filesPath);
 		FormatSetInstance isatabInstance = loader.load();
 
-		BIIObjectStore store = new BIIObjectStore();
+        BIIObjectStore store = new BIIObjectStore();
 		ISATABMapper isatabMapper = new ISATABMapper(store, isatabInstance);
 
 		isatabMapper.map();
@@ -109,23 +111,14 @@ public class ISATABPersistenceTest extends TransactionalDBUnitEJB3DAOTest {
 
 		DotGraphGenerator dotter = new DotGraphGenerator(store.values(Processing.class));
 		String dotPath = filesPath + "/graph.dot";
-		// WILL NEVER WORK WITH THIS CAUSE IT ASSIGNS IDs!!!
-//		dotter.createGraph ( dotPath );
-//		out.println ( "Graph saved into " + dotPath );
-
 		out.println("\n_____________ Persisting the objects:\n" + isatabMapper.report(store));
 
 		// Test the repository too
 		String repoPath = baseDir + "/target/bii_test_repo/meta_data";
-//		File repoDir = new File ( repoPath );
-//		if ( !repoDir.exists () )
-//			FileUtils.forceMkdir ( repoDir );
 
 		ISATABPersister persister = new ISATABPersister(store, DaoFactory.getInstance(entityManager));
 		Timestamp ts = persister.persist(filesPath);
 		transaction.commit();
-
-		// TODO: close sesssion, retrieve objects from DB, check they correspond to the submission
 
 		Study study2 = store.getType(Study.class, "S:GG200810:2");
 		String study2FileName = "study_" + DataLocationManager.getObfuscatedStudyFileName(study2);

@@ -48,36 +48,76 @@
 
 package org.isatools.isatab.mapping.generic_assay;
 
-import org.isatools.isatab.mapping.assay_common.ExtractTabMapper;
-import org.isatools.isatab.mapping.assay_common.LabeledExtractTabMapper;
-import org.isatools.isatab.mapping.studyFile.SampleTabMapper;
-import org.isatools.tablib.mapping.pipeline.GenericProtocolApplicationTabMapper;
-import org.isatools.tablib.mapping.pipeline.ProcessingsTabMapper;
+import org.apache.commons.lang.StringUtils;
+import org.isatools.isatab.mapping.attributes.AnnotationMappingHelper;
+import org.isatools.tablib.mapping.pipeline.DataNodeTabMapper;
 import org.isatools.tablib.schema.SectionInstance;
 import org.isatools.tablib.utils.BIIObjectStore;
+import uk.ac.ebi.bioinvindex.model.Data;
+import uk.ac.ebi.bioinvindex.model.term.DataType;
+import uk.ac.ebi.bioinvindex.model.xref.ReferenceSource;
 
 /**
- * Tries to map the generic assay.
+ * Maps generic raw data nodes.
  * <p/>
- * Jan 2009
+ * TODO: The raw data file is actually an attribute of the assay, so we should be able to associate a data node too to
+ * the assay, then make the run become a data-node, not material node.
+ * <p/>
+ * TODO: For generic assay case, I am assuming that raw data is always specified and that no factors occur downstream
+ * raw data. We must fix this.
+ * <p/>
+ * Feb 2008
  *
  * @author brandizi
  */
-public class GenericAssayProcessingTabMapper extends ProcessingsTabMapper {
+public class GenericProcessedDataTabMapper extends DataNodeTabMapper {
 
-    public GenericAssayProcessingTabMapper(BIIObjectStore store, SectionInstance sectionInstance) {
-        super(store, sectionInstance);
+    @SuppressWarnings("unchecked")
+    public GenericProcessedDataTabMapper(BIIObjectStore store, SectionInstance sectionInstance, int fieldIndex, int endField) {
+        super(store, sectionInstance, fieldIndex, endField);
 
-        nodeMappersConfig.put("Sample Name", SampleTabMapper.class);
-        nodeMappersConfig.put("Protocol REF", GenericProtocolApplicationTabMapper.class);
-        nodeMappersConfig.put("Extract Name", ExtractTabMapper.class);
-        nodeMappersConfig.put("Labeled Extract Name", LabeledExtractTabMapper.class);
-        nodeMappersConfig.put("Assay Name", GenericAssayTabMapper.class);
-
-        nodeMappersConfig.put("Derived Data File", GenericProcessedDataTabMapper.class);
-        nodeMappersConfig.put("Raw Data File", GenericRawDataTabMapper.class);
-        nodeMappersConfig.put("Normalization Name", GenericNormalizationTabMapper.class);
-        nodeMappersConfig.put("Data Transformation Name", GenericDataTransformationTabMapper.class);
+        // First column is "Derived Data File"
     }
+
+
+    @Override
+    public Data map(int recordIndex) {
+        Data data = super.map(recordIndex);
+        SectionInstance sectionInstance = getSectionInstance();
+        String dataFileName = StringUtils.trimToEmpty(sectionInstance.getString(recordIndex, getFieldIndex()));
+        data.setUrl(dataFileName);
+
+        // TODO Remove
+        // createAssayResult ( data );
+
+        return data;
+    }
+
+
+    /**
+     * Provides a new data object
+     */
+    @Override
+    public Data newMappedObject() throws InstantiationException, IllegalAccessException {
+        // TODO: we need proper constants for the roles
+        // TODO: fix to use real ReferenceSource
+        //
+        return new Data(
+                "", new DataType("bii:generic_assay_derived_data", "Generic Derived Data", new ReferenceSource("bii:data_types", "bii:data_types"))
+        );
+    }
+
+
+    /**
+     * Links assay name and data file name
+     */
+    @Override
+    protected String getName(int recordIndex, Data mappedObject) {
+        SectionInstance sectionInstance = getSectionInstance();
+        String dataFileName = StringUtils.trimToEmpty(sectionInstance.getString(recordIndex, getFieldIndex()));
+        String assayName = StringUtils.trimToEmpty(sectionInstance.getString(recordIndex, "Assay Name"));
+        return dataFileName + " (" + assayName + ")";
+    }
+
 
 }

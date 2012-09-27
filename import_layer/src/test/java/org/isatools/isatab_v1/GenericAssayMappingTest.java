@@ -109,6 +109,7 @@ public class GenericAssayMappingTest {
 			}
 		});
 
+
 		assertEquals("Ouch! Wrong no of assay results from the generic assay file!", 12, ars.size());
 		assertEquals("Ouch! Wrong no of factor values from the generic assay file!", 24, fvs.size());
 		assertEquals("Ouch! Wrong no of unique factor values from the generic assay file!", 3,

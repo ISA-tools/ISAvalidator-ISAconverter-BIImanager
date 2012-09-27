@@ -25,6 +25,10 @@ public class SlimMaRawDataTabMapper extends DataNodeTabMapper {
 
         // "Array Data File" is the first field
 
+        this.mappingHelpersConfig.put("Array Data File", new MappingHelperConfig<StringPropertyMappingHelper>(
+                StringPropertyMappingHelper.class, new String[][]{{"propertyName", "url"}}
+        ));
+
         this.mappingHelpersConfig.put("Array Data Matrix File", new MappingHelperConfig<StringPropertyMappingHelper>(
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "dataMatrixUrl"}}
         ));

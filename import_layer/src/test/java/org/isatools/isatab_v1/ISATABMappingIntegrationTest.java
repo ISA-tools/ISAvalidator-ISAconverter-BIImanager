@@ -62,10 +62,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.bioinvindex.model.*;
 import uk.ac.ebi.bioinvindex.model.processing.Assay;
-import uk.ac.ebi.bioinvindex.model.processing.MaterialNode;
 import uk.ac.ebi.bioinvindex.model.processing.Processing;
-import uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication;
-import uk.ac.ebi.bioinvindex.model.term.*;
+import uk.ac.ebi.bioinvindex.model.term.Design;
+import uk.ac.ebi.bioinvindex.model.term.FactorValue;
+import uk.ac.ebi.bioinvindex.model.term.PropertyValue;
+import uk.ac.ebi.bioinvindex.model.term.ProtocolType;
 import uk.ac.ebi.bioinvindex.model.xref.ReferenceSource;
 import uk.ac.ebi.bioinvindex.utils.DotGraphGenerator;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
@@ -89,7 +90,7 @@ public class ISATABMappingIntegrationTest {
         out.println("\n\n__________ ISATAB Mapping Test __________\n\n");
 
         String baseDir = System.getProperty("basedir");
-        String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_v1_200810/griffin_gauguier_200810";
+        String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/JCastrillo-BII-I-1";
 
         ISATABLoader loader = new ISATABLoader(filesPath);
         FormatSetInstance isatabInstance = loader.load();
@@ -100,117 +101,25 @@ public class ISATABMappingIntegrationTest {
         isatabMapper.map();
         assertTrue("Oh no! No mapped object! ", store.size() > 0);
 
-
-        Study study1 = store.getType(Study.class, "S:GG200810:1");
-        assertNotNull("Oh no! Study S:GG200810:1 not found in the results!", study1);
+        Study study1 = store.getType(Study.class, "BII-S-1");
+        assertNotNull("Oh no! Study BII-S-2 not found in the results!", study1);
 
         Collection<Design> designs = study1.getDesigns();
         assertNotNull("Oh no! Study has no designs!", designs);
         assertEquals("Oh no! Study has bad no. of designs!", 1, designs.size());
 
-        Study study2 = store.getType(Study.class, "S:GG200810:2");
-        assertNotNull("Oh no! Study S:GG200810:2 not found in the results!", study2);
-
+        Study study2 = store.getType(Study.class, "BII-S-2");
+        assertNotNull("Oh no! Study BII-S-1 not found in the results!", study2);
 
         Collection<Protocol> protos = study2.getProtocols();
         assertNotNull("Oh no! No protocol mapped to the study!", protos);
-        assertEquals("Oh no! Wrong no. of protocols mapped to the study!", 13, protos.size());
-
-        {
-            final String pname = "standard procedure 1";
-            Protocol proto = (Protocol) CollectionUtils.find(protos, new Predicate() {
-                public boolean evaluate(Object proto) {
-                    return pname.equals(((Protocol) proto).getName());
-                }
-            });
-            assertNotNull("Argh! Protocol '" + pname + "' not found!", proto);
-            //		assertEquals ( "Ops! Wrong version for the protocol '" + pname + "'", "v1.0", proto.getVersion () );
-
-            ProtocolType ptype = proto.getType();
-            assertNotNull("Urp! Protocol type for '" + pname + "' should not be null!", ptype);
-            assertEquals("Argh! Wrong protocol type for '" + pname + "'!", "animal procedure", ptype.getName());
-            ReferenceSource ptypeSrc = ptype.getSource();
-            assertNotNull("Argh No protocol type source for '" + pname + "' / " + ptype + " !", ptypeSrc);
-            assertEquals("Argh! Protocol type source is wrong for '" + pname + "' / " + ptype + " !", "BII:NULL-SOURCE", ptypeSrc.getAcc());
-        }
-
-
-        {
-            final String pname = "P-BMAP-2";
-            Protocol proto = (Protocol) CollectionUtils.find(protos, new Predicate() {
-                public boolean evaluate(Object proto) {
-                    return pname.equals(((Protocol) proto).getName());
-                }
-            });
-            assertNotNull("Argh! Protocol '" + pname + "' not found!", proto);
-            //		assertEquals ( "Ops! Wrong version for the protocol '" + pname + "'", "v1.0", proto.getVersion () );
-
-            ProtocolType ptype = proto.getType();
-            assertNotNull("Urp! Protocol type for '" + pname + "' should not be null!", ptype);
-            assertEquals("Argh! Wrong protocol type for '" + pname + "'!", "nucleic_acid_extraction", ptype.getName());
-            ReferenceSource ptypeSrc = ptype.getSource();
-            assertNotNull("Argh No protocol type source for '" + pname + "' / " + ptype + " !", ptypeSrc);
-            assertEquals("Argh! Protocol type source is wrong for '" + pname + "' / " + ptype + " !", "OBI", ptypeSrc.getAcc());
-        }
-
-
-        Collection<Assay> assays = study1.getAssays();
-        out.println("__ ASSAYS: __  ");
-        for (Assay assay : assays) {
-            out.println(assay);
-        }
-
-        final String assayAcc = "S:GG200810:1:assay:Study1.animal3.sample1.extract1.le1.hyb1";
-        Assay assay = (Assay) CollectionUtils.find(assays, new Predicate() {
-            public boolean evaluate(Object assay) {
-                return StringUtils.trimToEmpty(((Assay) assay).getAcc()).startsWith(assayAcc);
-            }
-        });
-        assertNotNull("Gulp! Assay '" + assayAcc + "' not found!", assay);
+        assertEquals("Oh no! Wrong no. of protocols mapped to the study!", 5, protos.size());
 
         Collection<AssayResult> ars = study1.getAssayResults();
-        out.println("\n__ ASSAY RESULTS: __  ");
-        for (AssayResult ar : ars) {
-            out.println(ar);
-        }
-        assertEquals("Oh no! Wrong no. of AssayResult(s)", 48, ars.size());
+        assertEquals("Oh no! Wrong no. of AssayResult(s)", 175, ars.size());
 
-        ars = ProcessingUtils.findAssayResultsFromAssay(assay);
-        assertEquals("Urp! Wrong no. of AssayResult(s) for assay test case", 1, ars.size());
-        AssayResult ar = ars.iterator().next();
-
-        out.println("__ CASCADED VALUES ON THE TEST CASE: __  ");
-        Collection<PropertyValue> arProps = ar.filterRepeatedPropertyValues(ar.getCascadedPropertyValues());
-        for (PropertyValue<?> v : arProps) {
-            out.println("    " + v);
-        }
-        assertEquals("Urp! Wrong number of cascaded properties returned by mapped assay!", 12, arProps.size());
-
-        {
-            final String protoName = "Affymetrix Hybridization SOP";
-            Collection<ProtocolApplication> papps = ProcessingUtils.findBackwardProtocolApplications(ar.getData().getProcessingNode(), null, protoName, false);
-            assertTrue("Argh! No node using the protocol '" + protoName + "' found!", !papps.isEmpty());
-            ProtocolApplication papp = papps.iterator().next();
-            Collection<ParameterValue> pvals = papp.getParameterValuesByType("Date");
-            assertEquals("Argh! Wrong no of 'Date' parameter values in '" + protoName + "'!", 1, pvals.size());
-            assertEquals("Argh! Wrong Date for '" + protoName + "'!", "10/11/2008", pvals.iterator().next().getValue());
-        }
-
-        {
-            final String protoName = "RNA Extraction SOP";
-            Collection<ProtocolApplication> papps = ProcessingUtils.findBackwardProtocolApplications(ar.getData().getProcessingNode(), null, protoName, false);
-            assertTrue("Argh! No node using the protocol '" + protoName + "' found!", !papps.isEmpty());
-            ProtocolApplication papp = papps.iterator().next();
-            Collection<ParameterValue> pvals = papp.getParameterValuesByType("Performer");
-            assertEquals("Argh! Wrong no of 'Performer' parameter values in '" + protoName + "'!", 1, pvals.size());
-            assertEquals("Argh! Wrong Performer for '" + protoName + "'!", "Mister Lab Technician", pvals.iterator().next().getValue());
-        }
-
-
-        Collection<MaterialNode> mnodes = ProcessingUtils.findBackwardMaterialNodes(ar.getData().getProcessingNode(), "source", false);
-        assertTrue("Ops! No Source Material found!", !mnodes.isEmpty());
-        Material src = mnodes.iterator().next().getMaterial();
-        assertEquals("Argh! Wrong provider for source material!", "Charles River", src.getSingleAnnotationValue("provider"));
+        Collection<AssayResult> ars2 = study2.getAssayResults();
+        assertEquals("Oh no! Wrong no. of AssayResult(s)", 14, ars2.size());
 
         out.println("\n\n__ RESULTS: __  ");
         out.println(store.toStringVerbose());

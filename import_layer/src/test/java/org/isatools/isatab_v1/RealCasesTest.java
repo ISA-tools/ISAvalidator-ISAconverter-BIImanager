@@ -50,6 +50,7 @@ import org.isatools.isatab.gui_invokers.GUIISATABUnloader;
 import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.tablib.utils.BIIObjectStore;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.bioinvindex.model.Identifiable;
 import uk.ac.ebi.bioinvindex.model.Study;
@@ -67,7 +68,6 @@ import static org.junit.Assert.assertTrue;
 public class RealCasesTest extends TransactionalDBUnitEJB3DAOTest {
 	private String baseDir;
 	private String testsPath;
-	;
 
 
 	public RealCasesTest() throws Exception {
@@ -155,7 +155,7 @@ public class RealCasesTest extends TransactionalDBUnitEJB3DAOTest {
 		runSingleTest(testsPath + "harvard-CD133");
 	}
 
-	@Test
+	@Ignore
 	public void testBII_I_1_v201001_Light() throws Exception {
 		System.setProperty(Persister.LIGHT_PERSISTENCE_PROPERTY, "true");
 		runSingleTest(testsPath + "BII-I-1_v201001");

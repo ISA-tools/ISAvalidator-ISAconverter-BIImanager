@@ -72,14 +72,17 @@ public class MaNormalizationTabMapper extends DataNodeTabMapper {
 
         // "Normalization Name" is the first column.
 
+        this.mappingHelpersConfig.put("Derived Array Data File", new MappingHelperConfig<StringPropertyMappingHelper>(
+                StringPropertyMappingHelper.class, new String[][]{{"propertyName", "url"}}
+        ));
         this.mappingHelpersConfig.put("Derived Array Data Matrix File", new MappingHelperConfig<StringPropertyMappingHelper>(
                 StringPropertyMappingHelper.class, new String[][]{{"propertyName", "dataMatrixUrl"}}
         ));
+
         this.mappingHelpersConfig.put("Factor Value",
                 new MappingHelperConfig<AssayResultFVMappingHelper>(
                         AssayResultFVMappingHelper.class, new String[][]{{"lookAllHeaders", "true"}})
         );
-
     }
 
 
@@ -88,9 +91,7 @@ public class MaNormalizationTabMapper extends DataNodeTabMapper {
      */
     @Override
     public Data newMappedObject() throws InstantiationException, IllegalAccessException {
-        // TODO: we need proper constants for the roles
-        // TODO: fix to use real ReferenceSource
-        //
+
         return new Data(
                 "", new DataType("bii:microarray_normalized_data", "Microarray Normalized Data", new ReferenceSource("bii:data_types", "bii:data_types"))
         );

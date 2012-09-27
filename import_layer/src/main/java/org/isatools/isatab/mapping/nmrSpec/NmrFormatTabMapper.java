@@ -55,6 +55,7 @@ import org.isatools.tablib.utils.BIIObjectStore;
 public class NmrFormatTabMapper extends FormatTabMapper {
     public NmrFormatTabMapper(BIIObjectStore store, FormatInstance formatInstance) {
         super(store, formatInstance);
+        log.info("In NmrFormatTabMapper...");
         sectionMappersConfig.put("nmr_spec_pipeline", NmrProcessingTabMapper.class);
     }
 }

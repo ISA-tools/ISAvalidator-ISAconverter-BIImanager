@@ -81,9 +81,9 @@ public class GUIISATABUnloader extends AbstractGUIInvokerWithStudySelection {
      */
     public GUIInvokerResult unload(final Collection<Study> studies) {
         Set<String> studyAccs = new HashSet<String>();
-        int i = 0;
 
         for (Study s : studies) {
+            System.out.println("Unloading " + s.getAcc());
             studyAccs.add(s.getAcc());
         }
 

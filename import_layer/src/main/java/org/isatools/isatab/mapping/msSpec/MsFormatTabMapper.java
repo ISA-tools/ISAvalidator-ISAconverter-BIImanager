@@ -55,6 +55,7 @@ import org.isatools.tablib.utils.BIIObjectStore;
 public class MsFormatTabMapper extends FormatTabMapper {
     public MsFormatTabMapper(BIIObjectStore store, FormatInstance formatInstance) {
         super(store, formatInstance);
+        log.info("In MsFormatTabMapper...");
         sectionMappersConfig.put("ms_spec_pipeline", MsProcessingTabMapper.class);
     }
 }

@@ -77,7 +77,6 @@ public class MaProcessingTabMapper extends ProcessingsTabMapper {
         boolean dataTransformationNameExists = checkSectionInstanceForFieldPresence(sectionInstance, "Data Transformation Name");
         boolean normalizationNameExists = checkSectionInstanceForFieldPresence(sectionInstance, "Normalization Name");
 
-
         nodeMappersConfig.put("Sample Name", SampleTabMapper.class);
         nodeMappersConfig.put("Protocol REF", GenericProtocolApplicationTabMapper.class);
         nodeMappersConfig.put("Extract Name", ExtractTabMapper.class);
@@ -95,12 +94,6 @@ public class MaProcessingTabMapper extends ProcessingsTabMapper {
         // derived data file should be enough. So we need to have slimmed down mappings. SlimMaDataTransformationTabMapper
         nodeMappersConfig.put(dataTransformationNameExists ? "Data Transformation Name" : "Derived Array Data Matrix File",
                 dataTransformationNameExists ? MaDataTransformationTabMapper.class : SlimMaProcessedDataTabMapper.class);
-    }
-
-    private boolean checkSectionInstanceForFieldPresence(SectionInstance sectionInstance, String fieldName) {
-        boolean fieldExists = sectionInstance.getFieldByHeader(fieldName) != null;
-        log.info("Do we have a " + fieldName + "? " + fieldExists);
-        return fieldExists;
     }
 
 

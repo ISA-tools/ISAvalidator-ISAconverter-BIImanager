@@ -677,6 +677,7 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         for (ProcessingEntityTabMapper<?> mapper : this.getNodeMappers()) {
             result.addAll(mapper.getMatchedFieldIndexes());
         }
+
         return result;
     }
 
@@ -688,6 +689,13 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         List<Field> fields = sectionInstance.getFields();
         int ncols = fields.size();
         List<Integer> matchedCols = getMatchedFieldIndexes();
+
+        // leave commented in case it's required later for debugging.
+//        System.out.println("Matched columns");
+//        for(int matchColumn : matchedCols) {
+//            System.out.println("\t*** " + sectionInstance.getField(matchColumn).getId());
+//        }
+
         for (int i = 0; i < ncols; i++) {
             if (!matchedCols.contains(i)) {
                 log.warn(i18n.msg("wrong_field_or_position", sectionInstance.getField(i).getId(), i));
@@ -695,6 +703,12 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
             }
         }
         return result;
+    }
+
+    public boolean checkSectionInstanceForFieldPresence(SectionInstance sectionInstance, String fieldName) {
+        boolean fieldExists = sectionInstance.getFieldByHeader(fieldName) != null;
+        log.info("Do we have a " + fieldName + "? " + fieldExists);
+        return fieldExists;
     }
 
 }
