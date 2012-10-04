@@ -58,12 +58,8 @@ import uk.ac.ebi.bioinvindex.model.term.MaterialRole;
 import uk.ac.ebi.bioinvindex.model.term.OntologyTerm;
 import uk.ac.ebi.bioinvindex.model.xref.ReferenceSource;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
-import uk.ac.ebi.embl.era.sra.xml.AttributeType;
-import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType;
-import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType.*;
-import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType.POOL.MEMBER;
-import uk.ac.ebi.embl.era.sra.xml.SampleSetType;
-import uk.ac.ebi.embl.era.sra.xml.SampleType;
+import uk.ac.ebi.embl.era.sra.xml.*;
+import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType.POOL;
 import uk.ac.ebi.embl.era.sra.xml.SampleType.SAMPLEATTRIBUTES;
 import uk.ac.ebi.embl.era.sra.xml.SampleType.SAMPLENAME;
 
@@ -82,6 +78,8 @@ import java.util.regex.Pattern;
  *         <b>date</b>: Jul 20, 2009, upgraded to SRA 1.0 on June 2010
  */
 abstract class SraExportSampleComponent extends SraPipelineExportUtils {
+
+    private Set<String> addedSources = new HashSet<String>();
 
     protected SraExportSampleComponent(BIIObjectStore store, String sourcePath, String exportPath) {
         super(store, sourcePath, exportPath);
@@ -108,7 +106,6 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         MaterialNode baseMatNode = null;
 
         // Check left (backward) materials until you meet a sample. We cannot have pooling until then.
-        //
         while (true) {
             Collection<MaterialNode> leftMaterialNodes = ProcessingUtils.findBackwardMaterialNodes(materialNode, "", true);
             if (leftMaterialNodes.size() != 1) {
@@ -132,6 +129,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
             }
 
             MaterialRole leftMatTypeObj = leftMat.getType();
+
             String leftMatType = leftMatTypeObj.getAcc();
             if (StringUtils.contains(leftMatType, "sample")) {
                 // OK, we have the sample, check the pooling
@@ -151,16 +149,20 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 SampleDescriptorType xSampledescriptor = SampleDescriptorType.Factory.newInstance();
                 xSampledescriptor.setRefname(xsample.getAlias());
 
-                sampleSet.addNewSAMPLE();
-                sampleSet.setSAMPLEArray(sampleSet.getSAMPLEArray().length - 1, xsample);
+
+                if (xsample.getAlias() != null && !addedSources.contains(xsample.getAlias())) {
+                    sampleSet.addNewSAMPLE();
+                    sampleSet.setSAMPLEArray(sampleSet.getSAMPLEArray().length - 1, xsample);
+                    addedSources.add(xsample.getAlias());
+                }
 
                 // If the pool is not empty, add it to the sample descriptor
                 // TODO: READ_LABEL and multiplexed experiments not supported yet.
-                //
                 if (xpoolMembers.size() > 0) {
                     POOL xpool = xSampledescriptor.addNewPOOL();
                     for (SampleType xpoolMember : xpoolMembers) {
-                        MEMBER xmember = xpool.addNewMEMBER();
+
+                        PoolMemberType xmember = xpool.addNewMEMBER();
                         xmember.setRefname(xpoolMember.getAlias());
                     }
                 }
@@ -195,47 +197,21 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
         SAMPLEATTRIBUTES sampleAttrs = SAMPLEATTRIBUTES.Factory.newInstance();
 
-        MaterialRole sampleType = sample.getType();
-
-        if (StringUtils.containsIgnoreCase(sampleType.getAcc(), "sample")) {
-            xsample.setAlias(sample.getAcc());
-
-            String sampleName = StringUtils.trimToNull(sample.getName());
-            if (sampleName != null) {
-                // TODO: Common name is a GeneBank identifier and not supported for the moment
-                // xsampleName.setCOMMONNAME ( sampleName );
-                xsample.setTITLE(sampleName);
-
-            }
-        }
-
-        extractNCBITaxonomyInformation(sample, sampleAttrs, xsampleName);
+        populateSampleAttributes(sample, sampleAttrs, xsampleName);
 
         // Lookup the sample this sample derives from and and collect all their characteristics. We think it makes sense to
         // do that cause we're not sure the sample members (in a pool) will be taken into account
         // by SRA software recipients. Moreover, we merge together biomaterials that are not samples (extracts,
         // labeled extracts).
-        //
         Collection<MaterialNode> backwardNodes = ProcessingUtils.findBackwardMaterialNodes(sampleNode, "", false);
-        for (MaterialNode backwardNode : backwardNodes) {
-            Material backwardMaterial = backwardNode.getMaterial();
+        String sourceName = getSourceName(backwardNodes);
 
-            sampleType = backwardMaterial.getType();
-            if (StringUtils.trimToNull(xsample.getAlias()) == null && StringUtils.containsIgnoreCase(sampleType.getAcc(), "sample")) {
-                xsample.setAlias(backwardMaterial.getAcc());
-
-                String sampleName = StringUtils.trimToNull(backwardMaterial.getName());
-                if (sampleName != null) {
-                    xsample.setTITLE(sampleName);
-                }
-            }
-
-
-            extractNCBITaxonomyInformation(backwardMaterial, sampleAttrs, xsampleName);
+        for (MaterialNode backwardMaterialNode : backwardNodes) {
+            populateSampleAttributes(backwardMaterialNode.getMaterial(), sampleAttrs, xsampleName);
         }
 
-        // TODO: should we check that xsample.getAlias () is not null?
-        //
+        xsample.setAlias(sourceName);
+        xsample.setTITLE(sourceName);
         xsample.setSAMPLENAME(xsampleName);
 
         if (sampleAttrs.sizeOfSAMPLEATTRIBUTEArray() > 0) {
@@ -245,15 +221,29 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         if (xsampleDescription.length() != 0) {
             xsample.setDESCRIPTION(xsampleDescription);
         }
-
         return xsample;
     }
 
-    private void extractNCBITaxonomyInformation(Material material, SAMPLEATTRIBUTES sampleAttrs, SAMPLENAME xsampleName) {
-        for (CharacteristicValue cvalue : material.getCharacteristicValues()) {
-            AttributeType xattr = characteristicValue2SampleAttr(cvalue);
 
+    private String getSourceName(Collection<MaterialNode> backwardNodes) {
+        for (MaterialNode backwardNode : backwardNodes) {
+            Material backwardMaterial = backwardNode.getMaterial();
+            if (StringUtils.containsIgnoreCase(backwardMaterial.getType().getAcc(), "source")) {
+                return backwardMaterial.getAcc();
+            }
+        }
+        return null;
+    }
+
+    private void populateSampleAttributes(Material material, SAMPLEATTRIBUTES sampleAttrs, SAMPLENAME xsampleName) {
+        for (CharacteristicValue cvalue : material.getCharacteristicValues()) {
+
+
+            AttributeType xattr = characteristicValue2SampleAttr(cvalue);
+            System.out.println("cvalue = " + cvalue.getType().getValue());
             boolean isOrganismTag = checkCharacteristicValue(cvalue, "(?i)tax|(?i)organism");
+
+            System.out.println("Is an organism tag? " + isOrganismTag);
 
             if (xattr != null) {
                 if (!isOrganismTag) {
@@ -262,34 +252,42 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 }
             }
 
-            // Set the NCBI term if found. TODO: factorize
-            for (OntologyTerm oe : cvalue.getOntologyTerms()) {
-                ReferenceSource src = oe.getSource();
-                if (src == null) {
-                    break;
-                }
-                if ((!StringUtils.containsIgnoreCase(src.getDescription(), "NCBI")) || (!StringUtils.containsIgnoreCase(src.getDescription(), "Taxonomy"))) {
-                    break;
-                }
-                String taxon = oe.getAcc();
-                if (taxon == null) {
-                    break;
-                }
-                try {
+            if (isOrganismTag) {
+                for (OntologyTerm oe : cvalue.getOntologyTerms()) {
 
-                    log.info("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+                    ReferenceSource src = oe.getSource();
 
-                    if (isOrganismTag) {
-                        xsampleName.setTAXONID(Integer.parseInt(taxon));
-                        xsampleName.setSCIENTIFICNAME(oe.getName());
+                    if (src == null) {
+                        break;
                     }
 
-                } catch (NumberFormatException ex) {
-                    nonRepeatedMessages.add("Invalid NCBI ID '" + taxon + "', ignoring it");
-                }
-                break; // Only the first one
-            }
+                   // wrong logic here. Was OR, should have been AND. In the case where both statements are true,
+                   // the overriding conclusion is false due to the negation operation.
+                    if ((!StringUtils.containsIgnoreCase(src.getDescription(), "ncbi")) && (!StringUtils.containsIgnoreCase(src.getDescription(), "taxonomy"))) {
+                        break;
+                    }
 
+                    String taxon = oe.getAcc();
+                    System.out.println("taxon = " + taxon);
+                    if (taxon == null) {
+                        break;
+                    }
+                    try {
+
+                       // log.info("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+                       // System.out.println("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
+
+                        xsampleName.setTAXONID(Integer.parseInt(taxon));
+                        xsampleName.setSCIENTIFICNAME(oe.getName());
+                       // System.out.println("xattr: " + xattr + oe.getName());
+
+
+                    } catch (NumberFormatException ex) {
+                        nonRepeatedMessages.add("Invalid NCBI ID '" + taxon + "', ignoring it");
+                    }
+                    break; // Only the first one
+                }
+            }
         } // for ( cvalue )
     }
 
@@ -357,13 +355,17 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 Collection<MaterialNode> leftLeftNodes = ProcessingUtils.findBackwardMaterialNodes(leftNode, "", true);
                 if (leftLeftNodes.size() == 0) {
                     // OK, doesn't have sources, strange, but let's say the left node is a pool member
-                    result.add(buildSingleExportedSample(leftNode));
+                    SampleType sample = buildSingleExportedSample(leftNode);
+                    if (sample != null) {
+                        result.add(sample);
+                    }
                     continue;
                 }
 
                 MaterialNode leftLeftNode = leftLeftNodes.iterator().next();
                 Material leftLeftMaterial = leftLeftNode.getMaterial();
                 MaterialRole leftLeftRole = leftLeftMaterial.getType();
+
                 if (!StringUtils.containsIgnoreCase(leftLeftRole.getAcc(), "source")) {
                     String msg = MessageFormat.format(
                             "The assay file of type {0} / {1} for study {2} has nested pooled samples, this is not supported by "
@@ -392,7 +394,10 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 }
 
                 // OK, the structure is fine, let's add a new sample
-                result.add(buildSingleExportedSample(leftNode));
+                SampleType sample = buildSingleExportedSample(leftNode);
+                if (sample != null) {
+                    result.add(sample);
+                }
             } else {
                 // It's a source: check we have all sources on the left and that they are the first nodes.
                 //
