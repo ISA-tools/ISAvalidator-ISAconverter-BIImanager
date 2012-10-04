@@ -79,7 +79,7 @@ abstract class SraExportComponent {
     /**
      * All the SRA documents are headed with these
      */
-    protected String centerName = null, brokerName = null;
+    protected String centerName = "", brokerName = "ISAcreator";
 
     protected static final Logger log = Logger.getLogger(SraExporter.class);
     protected static final TabNDC ndc = TabNDC.getInstance();
@@ -98,6 +98,7 @@ abstract class SraExportComponent {
      *                   In each of these directories you'll have a set of SRA files corresponding to one submission and to the BII study.
      */
     protected SraExportComponent(final BIIObjectStore store, final String sourcePath, final String exportPath) {
+
         this.store = store;
         this.sourcePath = sourcePath;
         this.exportPath = exportPath + "/sra";
