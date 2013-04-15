@@ -135,6 +135,7 @@ public class ISAConfiguratorValidator {
             ndc.pushObject(ag.getStudy());
 
             // The Sample file
+
             SectionInstance sampleSection = ag.getSampleSectionInstance();
             if (!processedSampleSections.contains(sampleSection)) {
                 IsaTabConfigurationType cfg = isaConfigSet.getConfig("[sample]", "");
@@ -153,6 +154,13 @@ public class ISAConfiguratorValidator {
                             result = GUIInvokerResult.WARNING;
                         }
                     }
+
+                    StudyToAssayLinkageValidator sampleNameLinkValidator = new StudyToAssayLinkageValidator();
+                    GUIInvokerResult sampleNameLinkResult = sampleNameLinkValidator.validate(sampleSection, ag);
+                    if (sampleNameLinkResult == GUIInvokerResult.ERROR) {
+                        throw new TabValidationException(i18n.msg("sample_link_check_failed"));
+                    }
+
                     ndc.popTabDescriptor();
                 }
 

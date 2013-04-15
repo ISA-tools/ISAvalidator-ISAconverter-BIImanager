@@ -25,7 +25,7 @@
  * To contact the developers: isatools@googlegroups.com
  *
  * To report bugs: http://sourceforge.net/tracker/?group_id=215183&atid=1032649
- * To request enhancements: Êhttp://sourceforge.net/tracker/?group_id=215183&atid=1032652
+ * To request enhancements: ï¿½http://sourceforge.net/tracker/?group_id=215183&atid=1032652
  *
  *
  * __________
@@ -163,5 +163,20 @@ public class ValidatorTest {
 
 		out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
 	}
+
+    @Test
+    public void testValidatorForUnreferencedSamples() {
+        out.println("\n\n" + StringUtils.center("Testing validator for the unreference sample name case", 120, "-") + "\n");
+
+        String baseDir = System.getProperty("basedir");
+        String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/MTBLS35";
+
+        GUIISATABValidator validator = new GUIISATABValidator();
+
+        GUIInvokerResult result = validator.validate(subDir);
+        assertEquals("Validation should have failed!", GUIInvokerResult.ERROR, result);
+
+        out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
+    }
 
 }

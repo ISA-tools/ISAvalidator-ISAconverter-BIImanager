@@ -60,13 +60,17 @@ import org.isatools.tablib.schema.Record;
 import org.isatools.tablib.schema.SectionInstance;
 import org.junit.Ignore;
 import org.junit.Test;
-import uk.ac.ebi.bioinvindex.model.AssayResult;
-import uk.ac.ebi.bioinvindex.model.BioEntity;
-import uk.ac.ebi.bioinvindex.model.Investigation;
-import uk.ac.ebi.bioinvindex.model.Study;
+import uk.ac.ebi.bioinvindex.model.*;
 import uk.ac.ebi.bioinvindex.model.processing.Assay;
+import uk.ac.ebi.bioinvindex.model.processing.DataNode;
+import uk.ac.ebi.bioinvindex.model.processing.GraphElement;
+import uk.ac.ebi.bioinvindex.utils.processing.ExperimentalPipelineVisitor;
+import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
+import uk.ac.ebi.bioinvindex.utils.processing.ProcessingVisitAction;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import static java.lang.System.load;
@@ -179,20 +183,20 @@ public class ISATABLoaderTest {
         out.println("\n\n_________Validating__________\n\n\n");
         ISATABValidator validator = new ISATABValidator(isatabInstance);
 
-        validator.validate();
+        GUIInvokerResult result =validator.validate();
         
         Investigation investigation = validator.getStore().valueOfType(Investigation.class);
         for(Study study : investigation.getStudies()) {
-            for (AssayResult assayResult : study.getAssayResults()) {
-                File file = new File(assayResult.getData().getUrl());
 
-                BioEntity newEntity = new BioEntity("","");
-                assayResult.addBioEntity(newEntity);
+            for (Assay assay : study.getAssays()) {
+                Collection<AssayResult> results = ProcessingUtils.findAllDataInAssay(assay);
+
+                for(AssayResult assayResult : results) {
+                    out.println(assayResult.getData().getType().getName() + " > " + assayResult.getData().getUrl() + " (meas:" + assay.getMeasurement().getName() + ", tech: " + assay.getTechnologyName() + ")");
+                }
             }
         }
-        
-        GUIInvokerResult result =validator.validate();
-        
+
         out.println("Result is " + result);
         
         assertTrue("Oh, validation was successful without any warnings.", result == GUIInvokerResult.WARNING);
@@ -200,7 +204,8 @@ public class ISATABLoaderTest {
         out.println("\n\n_________ /end: Advanced ISATAB Loading Test __________\n\n\n");
     }
 
-    @Test
+
+    @Ignore
     public void loadAndValidateSlimTest() throws Exception {
         out.println("\n\n__________ loadAndValidateSlimTest__________\n\n");
 
