@@ -48,6 +48,7 @@
 
 package org.isatools.isatab.export.sra;
 
+
 import org.apache.commons.lang.StringUtils;
 import org.isatools.tablib.exceptions.TabInvalidValueException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
@@ -61,6 +62,7 @@ import uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication;
 import uk.ac.ebi.bioinvindex.model.term.*;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
+import uk.ac.ebi.embl.era.sra.*;
 import uk.ac.ebi.embl.era.sra.xml.AttributeType;
 
 import java.text.MessageFormat;

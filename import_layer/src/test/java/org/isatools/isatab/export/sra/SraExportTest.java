@@ -62,6 +62,7 @@ import org.isatools.tablib.utils.BIIObjectStore;
 import org.junit.Test;
 import uk.ac.ebi.embl.era.sra.xml.*;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -138,8 +139,9 @@ public class SraExportTest {
     private Map<String, String> getTestData() {
         Map<String, String> testData = new HashMap<String, String>();
 
-        testData.put("BII-S-4", "BII-S-4");
-        //testData.put("TEST", "TEST");
+        //testData.put("BII-S-4", "BII-S-4");
+        //testData.put("TEST", "LTR_ARC");
+        testData.put("wheat-genome-test1","BPA-Wheat-Cultivars");
 
         return testData;
 
