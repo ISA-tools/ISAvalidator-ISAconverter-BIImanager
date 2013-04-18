@@ -84,7 +84,7 @@ public abstract class AbstractValidatorComponent {
      * This does the job. It might need:
      *
      * @param table the spreadsheet to be validated. Other ISATAB elements are possibly accessed from there.
-     * @param cfg   The ISA configuration to be used for this spreadsheed, which is usually found via {@link ISAConfigurationSet}.
+     * @param cfg   The ISA configuration to be used for this spreadsheet, which is usually found via {@link ISAConfigurationSet}.
      * @return true if the validation went well, without errors or warnings.
      */
     public abstract GUIInvokerResult validate(SectionInstance table, IsaTabConfigurationType cfg);

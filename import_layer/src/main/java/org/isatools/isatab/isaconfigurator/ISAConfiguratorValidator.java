@@ -125,7 +125,8 @@ public class ISAConfiguratorValidator {
                 new FieldValuesValidator(store, isaConfigSet, messages),
                 new OntologyValidator(store, isaConfigSet, messages),
                 new UnitFieldsValidator(store, isaConfigSet, messages),
-                new ProtocolFieldsValidator(store, isaConfigSet, messages)
+                new ProtocolFieldsValidator(store, isaConfigSet, messages),
+                new FactorValuePresenceValidator(store, isaConfigSet, messages)
         };
 
 
@@ -155,7 +156,7 @@ public class ISAConfiguratorValidator {
                         }
                     }
 
-                    StudyToAssayLinkageValidator sampleNameLinkValidator = new StudyToAssayLinkageValidator();
+                    SampleNameValidator sampleNameLinkValidator = new SampleNameValidator();
                     GUIInvokerResult sampleNameLinkResult = sampleNameLinkValidator.validate(sampleSection, ag);
                     if (sampleNameLinkResult == GUIInvokerResult.ERROR) {
                         throw new TabValidationException(i18n.msg("sample_link_check_failed"));

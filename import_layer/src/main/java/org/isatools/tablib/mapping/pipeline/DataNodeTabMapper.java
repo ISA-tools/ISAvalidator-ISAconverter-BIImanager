@@ -115,7 +115,7 @@ public abstract class DataNodeTabMapper extends ProcessingNodeTabMapper<Data> {
         }
 
         if (isLastMapper)
-        // So, if you're the last one, create an assayResult and attach it to this data object
+//        // So, if you're the last one, create an assayResult and attach it to this data object
         {
             createAssayResult(data);
         }

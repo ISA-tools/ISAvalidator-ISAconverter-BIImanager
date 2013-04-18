@@ -97,7 +97,7 @@
             <groupId>org.isatools</groupId>
             <artifactId>import_layer</artifactId>
             <type>jar</type>
-            <version>1.6-SNAPSHOT</version>
+            <version>1.6</version>
         </dependency>
 
 

@@ -62,13 +62,11 @@ import uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication;
 import uk.ac.ebi.bioinvindex.model.term.*;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
-import uk.ac.ebi.embl.era.sra.*;
 import uk.ac.ebi.embl.era.sra.xml.AttributeType;
 
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**

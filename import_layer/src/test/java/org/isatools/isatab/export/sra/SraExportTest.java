@@ -141,7 +141,7 @@ public class SraExportTest {
 
         //testData.put("BII-S-4", "BII-S-4");
         //testData.put("TEST", "LTR_ARC");
-        testData.put("wheat-genome-test1","BPA-Wheat-Cultivars");
+        testData.put("BPA-Wheat-Genome","BPA-Wheat-Cultivars");
 
         return testData;
 

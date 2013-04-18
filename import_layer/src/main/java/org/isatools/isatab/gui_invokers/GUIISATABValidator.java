@@ -77,6 +77,14 @@ public class GUIISATABValidator extends AbstractGUIInvoker {
      * Do the job, the log returned by {@link #getLog()} is reset by this call.
      */
     public GUIInvokerResult validate(String isatabSubmissionPath) {
+        return validate(isatabSubmissionPath, false);
+    }
+
+    /**
+     * Do the job, the log returned by {@link #getLog()} is reset by this call.
+     * @param reportWarnings - return WARNING whenever they occur
+     */
+    public GUIInvokerResult validate(String isatabSubmissionPath, boolean reportWarnings) {
         try {
             // Save there the log file
             AbstractImportLayerShellCommand.setupLog4JPath(isatabSubmissionPath + "/isatools.log");
@@ -85,14 +93,15 @@ public class GUIISATABValidator extends AbstractGUIInvoker {
             FormatSetInstance isatabInstance = isatabLoader.load();
 
             ISATABValidator validator = new ISATABValidator(isatabInstance);
-            if (GUIInvokerResult.WARNING == validator.validate()) {
+            GUIInvokerResult result = validator.validate();
+            if (GUIInvokerResult.WARNING == result) {
                 vlog.warn("ISA-Configurator Validation reported problems, see the messages above or the log file");
             }
 
             this.store = validator.getStore();
             this.isatabSubmissionPath = isatabSubmissionPath;
 
-            return GUIInvokerResult.SUCCESS;
+            return reportWarnings ? result : GUIInvokerResult.SUCCESS;
         } catch (Exception e) {
             vlog.error(e.getMessage(), e);
             return GUIInvokerResult.ERROR;

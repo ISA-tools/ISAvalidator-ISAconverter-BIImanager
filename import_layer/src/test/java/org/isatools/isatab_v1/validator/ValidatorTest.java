@@ -53,11 +53,13 @@
 package org.isatools.isatab_v1.validator;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Level;
 import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.System.out;
@@ -115,22 +117,6 @@ public class ValidatorTest {
 		out.println("\n" + StringUtils.center("/end:Testing the validator with Castrillo submission", 120, "-") + "\n\n");
 	}
 
-//    @Test
-//    public void testValidatorOnFileWithInvestigationComments() throws Exception {
-//        out.println("\n\n" + StringUtils.center("Testing validator for the case where comments are in the investigation file", 120, "-") + "\n");
-//
-//		String baseDir = System.getProperty("basedir");
-//		String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/test-bii-s-3";
-//
-//		GUIISATABValidator validator = new GUIISATABValidator();
-//		GUIInvokerResult result = validator.validate(subDir);
-//
-//		assertEquals("Validation should have failed!", GUIInvokerResult.SUCCESS, result);
-//
-//
-//		out.println("\n" + StringUtils.center("/end:Testing validator for the comment in investigation file case", 120, "-") + "\n\n");
-//    }
-
 	@Test
 	public void testValidatorDupeFiles() throws Exception {
 		out.println("\n\n" + StringUtils.center("Testing validator for the dupe files case", 120, "-") + "\n");
@@ -175,6 +161,28 @@ public class ValidatorTest {
 
         GUIInvokerResult result = validator.validate(subDir);
         assertEquals("Validation should have failed!", GUIInvokerResult.ERROR, result);
+
+        out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
+    }
+
+    @Test
+    public void testValidatorForMissingFactorValues() {
+        out.println("\n\n" + StringUtils.center("Testing validator for the unreference sample name case", 120, "-") + "\n");
+
+        String baseDir = System.getProperty("basedir");
+        String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/JCastrillo-BII-I-1-Missing-Factors";
+
+        GUIISATABValidator validator = new GUIISATABValidator();
+
+        GUIInvokerResult result = validator.validate(subDir);
+        assertEquals("Validation should have failed!", GUIInvokerResult.SUCCESS, result);
+
+        System.out.println(validator.report());
+
+        for (TabLoggingEventWrapper event : validator.getLog()) {
+            System.out.println(event.getFormattedMessage());
+
+        }
 
         out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
     }

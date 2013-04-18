@@ -14,28 +14,22 @@ import java.util.Set;
  * This code checks if all Assays have their sample name defined in the Study Sample file.
  * @author: Eamonn Maguire (eamonnmag@gmail.com)
  */
-public class StudyToAssayLinkageValidator {
+public class SampleNameValidator {
 
-    protected static final Logger log = Logger.getLogger(StudyToAssayLinkageValidator.class);
+    protected static final Logger log = Logger.getLogger(SampleNameValidator.class);
 
     public GUIInvokerResult validate(SectionInstance studySampleTable, AssayGroup assayGroup) {
 
         SectionInstance assayTable = assayGroup.getAssaySectionInstance();
 
         Field studySampleNameField = studySampleTable.getFieldByHeader("Sample Name");
-
         Field assaySampleNameField = assayTable.getFieldByHeader("Sample Name");
 
         Set<String> assaySamples = new HashSet<String>();
         Set<String> studySamples = new HashSet<String>();
 
-        for(Record assayRecord : assayTable.getRecords()) {
-            assaySamples.add(assayRecord.get(assaySampleNameField.getIndex()).toString());
-        }
-
-        for(Record studySampleRecord : studySampleTable.getRecords()) {
-            studySamples.add(studySampleRecord.get(studySampleNameField.getIndex()).toString());
-        }
+        getFields(assayTable, assaySampleNameField, assaySamples);
+        getFields(studySampleTable, studySampleNameField, studySamples);
 
         boolean errors = false;
         for(String assaySample : assaySamples) {
@@ -46,5 +40,11 @@ public class StudyToAssayLinkageValidator {
         }
 
         return errors ? GUIInvokerResult.ERROR : GUIInvokerResult.SUCCESS;
+    }
+
+    private void getFields(SectionInstance table, Field field, Set<String> set) {
+        for(Record assayRecord : table.getRecords()) {
+            set.add(assayRecord.get(field.getIndex()).toString());
+        }
     }
 }

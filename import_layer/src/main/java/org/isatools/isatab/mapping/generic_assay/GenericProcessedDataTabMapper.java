@@ -87,9 +87,6 @@ public class GenericProcessedDataTabMapper extends DataNodeTabMapper {
         String dataFileName = StringUtils.trimToEmpty(sectionInstance.getString(recordIndex, getFieldIndex()));
         data.setUrl(dataFileName);
 
-        // TODO Remove
-        // createAssayResult ( data );
-
         return data;
     }
 
@@ -99,9 +96,6 @@ public class GenericProcessedDataTabMapper extends DataNodeTabMapper {
      */
     @Override
     public Data newMappedObject() throws InstantiationException, IllegalAccessException {
-        // TODO: we need proper constants for the roles
-        // TODO: fix to use real ReferenceSource
-        //
         return new Data(
                 "", new DataType("bii:generic_assay_derived_data", "Generic Derived Data", new ReferenceSource("bii:data_types", "bii:data_types"))
         );
