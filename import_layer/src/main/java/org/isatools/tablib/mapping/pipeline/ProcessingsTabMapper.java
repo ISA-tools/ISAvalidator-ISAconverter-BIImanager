@@ -107,7 +107,7 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
     /**
      * The node mapper's configuration. For each node mapper, this processing mapper expect to find information
      * to feed the node mapper with, starting from the field named by the key in this Java map.
-
+     * <p/>
      * we do not do checkings on the order of node types (e.g.: a source precedes a sample), this is left
      * to the validator.
      */
@@ -165,8 +165,7 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
             for (int i = 0; i < sz; i++) {
                 this.map(i);
             }
-        }
-        finally {
+        } finally {
             log.trace(logpref + "returning with " + store.size() + " objects \n\n");
             ndc.popTabDescriptor();
         }
@@ -504,10 +503,9 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
                 ProcessingEntityTabMapper<?> nodeMapper;
                 try {
                     nodeMapper = (ProcessingEntityTabMapper<?>) ConstructorUtils.invokeConstructor(previousNodeMapperClass,
-                                    new Object[]{getStore(), sectionInstance, previousFieldIndex, fieldIndex},
-                                    new Class<?>[]{BIIObjectStore.class, SectionInstance.class, Integer.class, Integer.class});
-                }
-                catch (Exception ex) {
+                            new Object[]{getStore(), sectionInstance, previousFieldIndex, fieldIndex},
+                            new Class<?>[]{BIIObjectStore.class, SectionInstance.class, Integer.class, Integer.class});
+                } catch (Exception ex) {
                     throw new TabInternalErrorException(
                             "Error while creating the node mapper for " + previousFieldName + ": " + ex.getMessage(),
                             ex
@@ -690,14 +688,8 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         int ncols = fields.size();
         List<Integer> matchedCols = getMatchedFieldIndexes();
 
-        // leave commented in case it's required later for debugging.
-//        System.out.println("Matched columns");
-//        for(int matchColumn : matchedCols) {
-//            System.out.println("\t*** " + sectionInstance.getField(matchColumn).getId());
-//        }
-
         for (int i = 0; i < ncols; i++) {
-            if (!matchedCols.contains(i)) {
+            if (!matchedCols.contains(i) && !checkAllowForInterchangeableOntologyQualifier(fields, i)) {
                 log.warn(i18n.msg("wrong_field_or_position", sectionInstance.getField(i).getId(), i));
                 result = false;
             }
@@ -705,10 +697,12 @@ public abstract class ProcessingsTabMapper extends SectionTabMapper {
         return result;
     }
 
+    private boolean checkAllowForInterchangeableOntologyQualifier(List<Field> fields, int fieldId) {
+        return fields.get(fieldId).getId().startsWith("Term");
+    }
+
     public boolean checkSectionInstanceForFieldPresence(SectionInstance sectionInstance, String fieldName) {
-        boolean fieldExists = sectionInstance.getFieldByHeader(fieldName) != null;
-        log.info("Do we have a " + fieldName + "? " + fieldExists);
-        return fieldExists;
+        return sectionInstance.getFieldByHeader(fieldName) != null;
     }
 
 }
