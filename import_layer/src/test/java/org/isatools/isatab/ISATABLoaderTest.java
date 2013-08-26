@@ -25,7 +25,7 @@
  * To contact the developers: isatools@googlegroups.com
  *
  * To report bugs: http://sourceforge.net/tracker/?group_id=215183&atid=1032649
- * To request enhancements: Êhttp://sourceforge.net/tracker/?group_id=215183&atid=1032652
+ * To request enhancements: ï¿½http://sourceforge.net/tracker/?group_id=215183&atid=1032652
  *
  *
  * __________
@@ -104,7 +104,7 @@ public class ISATABLoaderTest {
 
 
 		List<FormatInstance> txInstances = isatabInstance.getFormatInstances("transcriptomics_assay");
-		assertNotNull("Urp! No transcriptomics file loadd", txInstances);
+		assertNotNull("Urp! No transcriptomics file loaded", txInstances);
 		assertEquals("Ops! Bad # of TX formats loaded", 1, txInstances.size());
 		SectionInstance txPipelineInstance = txInstances.get(0).getSectionInstance("transcriptomics_pipeline");
 		assertNotNull("Oh no! No transcriptomics pipeline in the TX file", txPipelineInstance);

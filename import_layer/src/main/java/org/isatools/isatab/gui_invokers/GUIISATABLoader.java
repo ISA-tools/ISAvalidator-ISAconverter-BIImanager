@@ -108,16 +108,16 @@ public class GUIISATABLoader extends AbstractGUIInvoker {
     }
 
     public GUIInvokerResult persist(BIIObjectStore store, String isatabSubmissionPath, EntityManager entityManager, Properties hibProps) {
+        EntityTransaction transaction = entityManager.getTransaction();
+
         try {
             vlog.info("Persisting " + store.size() + " object(s)");
 
             ISATABPersister persister = new ISATABPersister(store, DaoFactory.getInstance(entityManager));
 
-            EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             Timestamp ts = persister.persist(isatabSubmissionPath);
             transaction.commit();
-            entityManager.close();
 
             PersistenceShellCommand.reindexStudies(store, hibProps);
 
@@ -130,7 +130,17 @@ public class GUIISATABLoader extends AbstractGUIInvoker {
             return GUIInvokerResult.SUCCESS;
         } catch (Exception ex) {
             vlog.error(ex.getMessage(), ex);
+
+            if (transaction.isActive()) {
+                vlog.error("Rolling back transaction.");
+                transaction.rollback();
+            }
+
             return GUIInvokerResult.ERROR;
+        } finally {
+            vlog.error("Closing entity manager.");
+            entityManager.close();
+
         }
     }
 }

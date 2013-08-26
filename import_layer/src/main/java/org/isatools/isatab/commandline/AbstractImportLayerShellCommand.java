@@ -255,16 +255,27 @@ public class AbstractImportLayerShellCommand {
         String cfgPath = getConfigPath(),
                 hibCfgPath = cfgPath + "hibernate.properties";
 
+        System.out.println("Configuration path is: " + cfgPath);
+
         try {
             File hibCfgFile = new File(hibCfgPath);
+            System.out.println(hibCfgFile.getAbsolutePath());
             Properties props = new Properties();
             props.load(new FileInputStream(hibCfgFile));
+            System.out.println("Loaded properties");
+
+            for(String property : props.stringPropertyNames()) {
+                System.out.println(property + " - " + props.getProperty(property));
+            }
+
             return props;
         }
         catch (FileNotFoundException e) {
+            log.info(e.getMessage());
             throw new TabMissingResourceException(i18n.msg("hibernate_file_not_found", cfgPath), e);
         }
         catch (IOException e) {
+            log.info(e.getMessage());
             throw new TabIOException(i18n.msg("hibernate_file_not_found", cfgPath, e.getMessage()), e);
         }
     }

@@ -22,6 +22,11 @@ public class SampleNameValidator {
 
         SectionInstance assayTable = assayGroup.getAssaySectionInstance();
 
+        System.out.println("Fields...");
+        for(Field field : assayTable.getFields()) {
+            System.out.println("\t" + field.getId());
+        }
+
         Field studySampleNameField = studySampleTable.getFieldByHeader("Sample Name");
         Field assaySampleNameField = assayTable.getFieldByHeader("Sample Name");
 

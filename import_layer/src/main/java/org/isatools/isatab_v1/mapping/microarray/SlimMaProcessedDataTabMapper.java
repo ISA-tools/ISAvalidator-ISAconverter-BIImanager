@@ -36,6 +36,7 @@ public class SlimMaProcessedDataTabMapper extends DataNodeTabMapper {
                 new MappingHelperConfig<AssayResultFVMappingHelper>(
                         AssayResultFVMappingHelper.class, new String[][]{{"lookAllHeaders", "true"}})
         );
+
     }
 
 

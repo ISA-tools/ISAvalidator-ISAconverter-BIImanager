@@ -127,16 +127,14 @@ public class ISAConfiguratorValidator {
                 new UnitFieldsValidator(store, isaConfigSet, messages),
                 new ProtocolFieldsValidator(store, isaConfigSet, messages),
                 new FactorValuePresenceValidator(store, isaConfigSet, messages)
+//                new ISATABNanoMaterialFileValidator(store, isaConfigSet, messages)
         };
 
-
         Set<SectionInstance> processedSampleSections = new HashSet<SectionInstance>();
-
         for (AssayGroup ag : store.valuesOfType(AssayGroup.class)) {
             ndc.pushObject(ag.getStudy());
 
             // The Sample file
-
             SectionInstance sampleSection = ag.getSampleSectionInstance();
             if (!processedSampleSections.contains(sampleSection)) {
                 IsaTabConfigurationType cfg = isaConfigSet.getConfig("[sample]", "");

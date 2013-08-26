@@ -138,13 +138,19 @@ public class SimpleManager {
 
     }
 
+    public void closeEntityManager() {
+        if (sharedEntityManager != null) {
+            sharedEntityManager.close();
+        }
+    }
+
     /**
      * Initial version of ISAtab reloading code. Can be extended to take in the configuration directory as well
      *
-     * @param studyId    - ID of study to unload
-     * @param isatabFile - directory for ISAtab to be reloaded
+     * @param studyId                - ID of study to unload
+     * @param isatabFile             - directory for ISAtab to be reloaded
      * @param configurationDirectory - where the configuration files are
-     * @param userName   - username of submitter to be assigned as the owner of the submission
+     * @param userName               - username of submitter to be assigned as the owner of the submission
      */
     public void reloadISAtab(String studyId, String isatabFile, String configurationDirectory, String userName) {
         loadConfiguration(configurationDirectory);

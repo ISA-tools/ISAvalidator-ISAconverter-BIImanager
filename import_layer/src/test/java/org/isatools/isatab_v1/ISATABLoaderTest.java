@@ -25,7 +25,7 @@
  * To contact the developers: isatools@googlegroups.com
  *
  * To report bugs: http://sourceforge.net/tracker/?group_id=215183&atid=1032649
- * To request enhancements: Êhttp://sourceforge.net/tracker/?group_id=215183&atid=1032652
+ * To request enhancements: ï¿½http://sourceforge.net/tracker/?group_id=215183&atid=1032652
  *
  *
  * __________
@@ -62,25 +62,18 @@ import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.bioinvindex.model.*;
 import uk.ac.ebi.bioinvindex.model.processing.Assay;
-import uk.ac.ebi.bioinvindex.model.processing.DataNode;
-import uk.ac.ebi.bioinvindex.model.processing.GraphElement;
-import uk.ac.ebi.bioinvindex.utils.processing.ExperimentalPipelineVisitor;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
-import uk.ac.ebi.bioinvindex.utils.processing.ProcessingVisitAction;
 
-import java.io.File;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
-import static java.lang.System.load;
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ISATABLoaderTest {
-	@Test
+
 	@Ignore
 	// TODO: we have to take the new GG example and prepare a version that includes MS/SPEC and PRIDE.
 	public void testLoader() throws Exception {
@@ -90,8 +83,6 @@ public class ISATABLoaderTest {
 		String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_v1rc1/griffin_gauguier";
 		ISATABLoader loader = new ISATABLoader(filesPath);
 		FormatSetInstance isatabInstance = loader.load();
-        
-        
 
 		assertNotNull("Oh no! No loaded format instance", isatabInstance);
 
@@ -222,4 +213,41 @@ public class ISATABLoaderTest {
 
         out.println("\n\n_________ /end: loadAndValidateSlimTest __________\n\n\n");
     }
+
+    @Test
+    public void loadAndTestCommentPersistenceTest() throws Exception {
+        out.println("\n\n__________ loadAndTestCommentPersistenceTest__________\n\n");
+
+        String baseDir = System.getProperty("basedir");
+        String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/MTBLS35";
+        ISATABLoader loader = new ISATABLoader(filesPath);
+        FormatSetInstance isatabInstance = loader.load();
+
+        out.println("\n\n_________Validating__________\n\n\n");
+        ISATABValidator validator = new ISATABValidator(isatabInstance);
+        GUIInvokerResult result =validator.validate();
+
+        assertTrue("Oh, validation was successful without any warnings.", result == GUIInvokerResult.WARNING);
+
+        Investigation investigation = validator.getStore().valueOfType(Investigation.class);
+        for(Study study : investigation.getStudies()) {
+
+            for (Assay assay : study.getAssays()) {
+                Collection<AssayResult> results = ProcessingUtils.findAllDataInAssay(assay);
+                System.out.println("ANNOTATIONS");
+                for(Annotation annotation : assay.getMaterial().getAnnotations()) {
+
+                    System.out.println(annotation.getType().getValue() + " > " + annotation.getText());
+                }
+                System.out.println("-----");
+
+                for(AssayResult assayResult : results) {
+                    out.println(assayResult.getData().getType().getName() + " > " + assayResult.getData().getUrl() + " (meas:" + assay.getMeasurement().getName() + ", tech: " + assay.getTechnologyName() + ")");
+                }
+            }
+        }
+
+        out.println("\n\n_________ /end: loadAndTestCommentPersistenceTest __________\n\n\n");
+    }
+
 }

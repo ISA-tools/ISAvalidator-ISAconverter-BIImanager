@@ -179,10 +179,23 @@ public class ValidatorTest {
 
         System.out.println(validator.report());
 
-        for (TabLoggingEventWrapper event : validator.getLog()) {
-            System.out.println(event.getFormattedMessage());
+        out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
+    }
 
-        }
+
+    @Test
+    public void testValidatorForMissingDataTransformationName() {
+        out.println("\n\n" + StringUtils.center("Testing validator for missing Data Transformation Name", 120, "-") + "\n");
+
+        String baseDir = System.getProperty("basedir");
+        String subDir = "/Users/eamonnmaguire/Downloads/E-GEOD-10433";
+
+        GUIISATABValidator validator = new GUIISATABValidator();
+
+        GUIInvokerResult result = validator.validate(subDir);
+        assertEquals("Validation should have failed!", GUIInvokerResult.SUCCESS, result);
+
+        System.out.println(validator.report());
 
         out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
     }

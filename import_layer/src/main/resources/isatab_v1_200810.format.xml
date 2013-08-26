@@ -257,7 +257,6 @@
 
     </format>
 
-
     <format id="transcriptomics_assay" label="Transcriptomics Assay File">
 
         <section id="transcriptomics_pipeline" type='many-in-rows' header="ASSAYS"

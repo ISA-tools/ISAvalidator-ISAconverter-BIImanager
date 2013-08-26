@@ -51,6 +51,7 @@ package org.isatools.tablib.parser;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.isatools.isatab.ISATABPersister;
+import org.isatools.isatab_nano.NANOFormatWrapper;
 import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.exceptions.TabStructureError;
 import org.isatools.tablib.schema.*;
@@ -283,7 +284,10 @@ public class TabLoader {
                         status = ParserState.WAITING_SECTION_BEGIN;
                     } else {
                         // Accumulate the lines for the section
+
+                        NANOFormatWrapper.processFileHeader(csvLine);
                         csvLines.add(csvLine);
+
                         log.trace("Added the line:\n" + Arrays.toString(csvLine) + "\nlen: " + csvLine.length);
                     }
 
