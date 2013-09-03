@@ -537,7 +537,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             String locus = getParameterValue(assay, papp, "target_gene", true);
 
             //This is a new requirement starting from SRA.1.3 schema that a database Xref be provided, we are now checking this in.
-            String pcrPrimersXref = getParameterValue(assay, papp, "pcr_primers_identifier", true);
+            String pcrPrimersXref = getParameterValue(assay, papp, "pcr_primers_identifier", false);
 
             XRefType locusXref = XRefType.Factory.newInstance();
 
@@ -550,32 +550,32 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             if (locus != null) {
                 if (locus.toLowerCase().contains("16s")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.X_16_S_R_RNA);
-                    xlocus.setPROBESET(locusXref);
+                   // xlocus.setPROBESET(locusXref);
                 }
                 else if (locus.toLowerCase().contains("18s")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.X_18_S_R_RNA);
-                    xlocus.setPROBESET(locusXref);
+                   // xlocus.setPROBESET(locusXref);
                 }
 
                 else if (locus.toLowerCase().contains("cox")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.COX_1);
-                    xlocus.setPROBESET(locusXref);
+                  //  xlocus.setPROBESET(locusXref);
                 }
                 else if (locus.toLowerCase().contains("its")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.ITS_1_5_8_S_ITS_2);
-                    xlocus.setPROBESET(locusXref);
+                 //  xlocus.setPROBESET(locusXref);
                 }
                 else if (locus.toLowerCase().contains("matk")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.MAT_K);
-                    xlocus.setPROBESET(locusXref);
+                  //  xlocus.setPROBESET(locusXref);
                 }
                 else if (locus.toLowerCase().contains("rbcl")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.RBCL);
-                    xlocus.setPROBESET(locusXref);
+                   // xlocus.setPROBESET(locusXref);
                 }
                 else {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.OTHER);
-                    xlocus.setDescription(locus);
+                   // xlocus.setDescription(locus);
                 }
             }
 
