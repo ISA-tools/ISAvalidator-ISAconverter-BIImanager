@@ -68,8 +68,6 @@ import uk.ac.ebi.bioinvindex.model.xref.Xref;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
 import uk.ac.ebi.embl.era.sra.xml.*;
-import uk.ac.ebi.embl.era.sra.xml.LibraryType;
-import uk.ac.ebi.embl.era.sra.xml.ExperimentType.PROCESSING;
 import uk.ac.ebi.embl.era.sra.xml.ExperimentType.STUDYREF;
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK;
 import uk.ac.ebi.embl.era.sra.xml.RunType.DATABLOCK.FILES;
@@ -81,12 +79,13 @@ import uk.ac.ebi.utils.io.IOUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+//import uk.ac.ebi.embl.era.sra.xml.ExperimentType.PROCESSING;
 
 //testing to see whether it pulls md5
 
@@ -125,7 +124,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      *
      * @return true if it could successfully build the exported items.
      */
-    protected boolean buildExportedAssay(Assay assay, SubmissionType.FILES xsubFiles, RunSetType xrunSet, ExperimentSetType xexperimentSet, SampleSetType xsampleSet) {
+    protected boolean buildExportedAssay(Assay assay, /*SubmissionType.FILES xsubFiles,*/ RunSetType xrunSet, ExperimentSetType xexperimentSet, SampleSetType xsampleSet) {
 
 
         String assayAcc = assay.getAcc();
@@ -170,7 +169,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
             Map<SequencingProperties, String> sequencingProperties = getSequencingInstrumentAndLayout(assay);
 
-            xexp.setPROCESSING(buildExportedProcessing(assay, sequencingProperties));
+            //xexp.setPROCESSING(buildExportedProcessing(assay, sequencingProperties));
 
 
             STUDYREF xstudyRef = STUDYREF.Factory.newInstance();
@@ -310,7 +309,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 xrun.addNewDATABLOCK();
                 xrun.setDATABLOCK(dataBlock);
 
-                addExportedSubmissionFile(xsubFiles, url);
+                //addExportedSubmissionFile(xsubFiles, url);
                 // TODO: remove, it's deprecated now xrun.setTotalDataBlocks ( BigInteger.ONE );
                 xrun.setEXPERIMENTREF(xexpRef);
                 xrunSet.addNewRUN();
@@ -631,7 +630,8 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         String pooling = getParameterValue(assay, papp, "mid", false);
         if (pooling != null) {
             LibraryDescriptorType.POOLINGSTRATEGY xpoolingstrategy = LibraryDescriptorType.POOLINGSTRATEGY.Factory.newInstance();
-            xlib.setPOOLINGSTRATEGY(LibraryDescriptorType.POOLINGSTRATEGY.MULTIPLEXED_LIBRARIES);
+            //xlib.setPOOLINGSTRATEGY(LibraryDescriptorType.POOLINGSTRATEGY.MULTIPLEXED_LIBRARIES);
+            xlib.setPOOLINGSTRATEGY(xpoolingstrategy.getStringValue());
 
         }
               return xlib;
@@ -790,81 +790,81 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
      * Some of these parameters are mandatory in SRA, and/or constrained to certain values, so the method raises an
      * exception in case they're not defined.
      */
-    protected PROCESSING buildExportedProcessing(final Assay assay, Map<SequencingProperties, String> sequencingProperties) {
-        ProtocolApplication pApp = getProtocol(assay, "nucleic acid sequencing");
-
-        SRATemplate sraTemplateToInject = getSRATemplateToInject(SRASection.PROCESSING, sequencingProperties);
-
-        String seqSpaceStr = "";
-
-        seqSpaceStr = getParameterValue(assay, pApp, "Sequence space", false);
-
-
-        String baseCaller = "";
-        baseCaller = getParameterValue(assay, pApp, "Base caller", false);
-
-        String qualityScorer = "";
-
-        qualityScorer = getParameterValue(assay, pApp, "Quality scorer", false);
-
-        String numberOfLevels = "";
-        numberOfLevels = getParameterValue(assay, pApp, "Number of levels", false);
-
-        String multiplier = "";
-        multiplier = getParameterValue(assay, pApp, "Multiplier", false);
-
-        Map<SRAAttributes, String> userDefinedAttributes = new HashMap<SRAAttributes, String>();
-
-        if (!StringUtils.isEmpty(seqSpaceStr)) {
-            userDefinedAttributes.put(SRAAttributes.SEQUENCE_SPACE, seqSpaceStr);
-        }
-
-        if (!StringUtils.isEmpty(baseCaller)) {
-            userDefinedAttributes.put(SRAAttributes.BASE_CALLER, baseCaller);
-        }
-
-        if (!StringUtils.isEmpty(qualityScorer)) {
-            userDefinedAttributes.put(SRAAttributes.QUALITY_SCORER, qualityScorer);
-        }
-
-        if (!StringUtils.isEmpty(numberOfLevels)) {
-            userDefinedAttributes.put(SRAAttributes.NUMBER_OF_LEVELS, numberOfLevels);
-        }
-
-        if (!StringUtils.isEmpty(multiplier)) {
-            userDefinedAttributes.put(SRAAttributes.MULTIPLIER, multiplier);
-        }
-
-
-        // TODO: modify to pull out the technology and library using Parameter Value[platform] & ParameterValue[library layout] respectively
-        // TODO: PRS-> according to new configuration for sequencing, Parameter Value[library layout] is moved to the library construction protocol
-        // TODO: PRS-> replace Parameter Value[platform] with Parameter Value[sequencing instrument] and checks on values.
-        // TODO: PRS-> add support for Immunoprecipitation techniques, requires detection of Protocol
-        // TODO: PRS-> add support for 'Targeted Loci' in SRA experiment and find in ISA-TAB file if assay is environmental gene survey
-
-
-        try {
-            String sraTemplate = sraTemplateLoader.getSRAProcessingTemplate(sraTemplateToInject, userDefinedAttributes);
-
-            XmlOptions xmlOptions = new XmlOptions();
-            xmlOptions.setDocumentType(PROCESSING.Factory.newInstance().schemaType());
-
-            PROCESSING processing = PROCESSING.Factory.newInstance();
-
-            XmlObject processingObject = XmlObject.Factory.parse(sraTemplate, xmlOptions);
-
-            processing.set(processingObject);
-            return processing;
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (XmlException e) {
-            e.printStackTrace();
-        }
-
-        return PROCESSING.Factory.newInstance();
-
-    }
+//    protected PROCESSING buildExportedProcessing(final Assay assay, Map<SequencingProperties, String> sequencingProperties) {
+//        ProtocolApplication pApp = getProtocol(assay, "nucleic acid sequencing");
+//
+//        SRATemplate sraTemplateToInject = getSRATemplateToInject(SRASection.PROCESSING, sequencingProperties);
+//
+//        String seqSpaceStr = "";
+//
+//        seqSpaceStr = getParameterValue(assay, pApp, "Sequence space", false);
+//
+//
+//        String baseCaller = "";
+//        baseCaller = getParameterValue(assay, pApp, "Base caller", false);
+//
+//        String qualityScorer = "";
+//
+//        qualityScorer = getParameterValue(assay, pApp, "Quality scorer", false);
+//
+//        String numberOfLevels = "";
+//        numberOfLevels = getParameterValue(assay, pApp, "Number of levels", false);
+//
+//        String multiplier = "";
+//        multiplier = getParameterValue(assay, pApp, "Multiplier", false);
+//
+//        Map<SRAAttributes, String> userDefinedAttributes = new HashMap<SRAAttributes, String>();
+//
+//        if (!StringUtils.isEmpty(seqSpaceStr)) {
+//            userDefinedAttributes.put(SRAAttributes.SEQUENCE_SPACE, seqSpaceStr);
+//        }
+//
+//        if (!StringUtils.isEmpty(baseCaller)) {
+//            userDefinedAttributes.put(SRAAttributes.BASE_CALLER, baseCaller);
+//        }
+//
+//        if (!StringUtils.isEmpty(qualityScorer)) {
+//            userDefinedAttributes.put(SRAAttributes.QUALITY_SCORER, qualityScorer);
+//        }
+//
+//        if (!StringUtils.isEmpty(numberOfLevels)) {
+//            userDefinedAttributes.put(SRAAttributes.NUMBER_OF_LEVELS, numberOfLevels);
+//        }
+//
+//        if (!StringUtils.isEmpty(multiplier)) {
+//            userDefinedAttributes.put(SRAAttributes.MULTIPLIER, multiplier);
+//        }
+//
+//
+//        // TODO: modify to pull out the technology and library using Parameter Value[platform] & ParameterValue[library layout] respectively
+//        // TODO: PRS-> according to new configuration for sequencing, Parameter Value[library layout] is moved to the library construction protocol
+//        // TODO: PRS-> replace Parameter Value[platform] with Parameter Value[sequencing instrument] and checks on values.
+//        // TODO: PRS-> add support for Immunoprecipitation techniques, requires detection of Protocol
+//        // TODO: PRS-> add support for 'Targeted Loci' in SRA experiment and find in ISA-TAB file if assay is environmental gene survey
+//
+//
+//        try {
+//            String sraTemplate = sraTemplateLoader.getSRAProcessingTemplate(sraTemplateToInject, userDefinedAttributes);
+//
+//            XmlOptions xmlOptions = new XmlOptions();
+//            xmlOptions.setDocumentType(PROCESSING.Factory.newInstance().schemaType());
+//
+//            PROCESSING processing = PROCESSING.Factory.newInstance();
+//
+//            XmlObject processingObject = XmlObject.Factory.parse(sraTemplate, xmlOptions);
+//
+//            processing.set(processingObject);
+//            return processing;
+//
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (XmlException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return PROCESSING.Factory.newInstance();
+//
+//    }
 
 
     /**
@@ -910,8 +910,8 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString("unspecified"));
             }
 
-            ls454.setFLOWSEQUENCE("TACG");
-            ls454.setFLOWCOUNT(BigInteger.valueOf(800));
+            //ls454.setFLOWSEQUENCE("TACG");
+            //ls454.setFLOWCOUNT(BigInteger.valueOf(800));
             xplatform.setLS454(ls454);
         } else if (sequencinginst.toLowerCase().contains("illumina")) {
 
@@ -950,8 +950,8 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString("unspecified"));
             }
 
-            helicos.setFLOWSEQUENCE(getParameterValue(assay, pApp, "Flow Sequence", true));
-            helicos.setFLOWCOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Flow Count", true))));
+            //helicos.setFLOWSEQUENCE(getParameterValue(assay, pApp, "Flow Sequence", true));
+            //helicos.setFLOWCOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Flow Count", true))));
             xplatform.setHELICOS(helicos);
 
 
@@ -992,36 +992,36 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString("unspecified"));
             }
 
-            {
-                String colorMatrix = getParameterValue(assay, pApp, "Color Matrix", false);
+            //{
+                //String colorMatrix = getParameterValue(assay, pApp, "Color Matrix", false);
                 // single dibase colours are semicolon-separated
-                if (colorMatrix != null) {
-                    PlatformType.ABISOLID.COLORMATRIX xcolorMatrix = PlatformType.ABISOLID.COLORMATRIX.Factory.newInstance();
-                    String dibases[] = colorMatrix.split("\\;");
-                    if (dibases != null && dibases.length > 0) {
-                        PlatformType.ABISOLID.COLORMATRIX.COLOR xcolors[] = new PlatformType.ABISOLID.COLORMATRIX.COLOR[dibases.length];
-                        int i = 0;
-                        for (String dibase : dibases) {
-                            PlatformType.ABISOLID.COLORMATRIX.COLOR xcolor = PlatformType.ABISOLID.COLORMATRIX.COLOR.Factory.newInstance();
-                            xcolor.setDibase(dibase);
-                            xcolors[i++] = xcolor;
-                        }
-                        xcolorMatrix.setCOLORArray(xcolors);
-                        abisolid.setCOLORMATRIX(xcolorMatrix);
-                    }
-                }
-            }
+                //if (colorMatrix != null) {
+                    //PlatformType.ABISOLID.COLORMATRIX xcolorMatrix = PlatformType.ABISOLID.COLORMATRIX.Factory.newInstance();
+                    //String dibases[] = colorMatrix.split("\\;");
+                    //if (dibases != null && dibases.length > 0) {
+                        //PlatformType.ABISOLID.COLORMATRIX.COLOR xcolors[] = new PlatformType.ABISOLID.COLORMATRIX.COLOR[dibases.length];
+                        //int i = 0;
+                        //for (String dibase : dibases) {
+                            //PlatformType.ABISOLID.COLORMATRIX.COLOR xcolor = PlatformType.ABISOLID.COLORMATRIX.COLOR.Factory.newInstance();
+                            //xcolor.setDibase(dibase);
+                            //xcolors[i++] = xcolor;
+                        //}
+                        //xcolorMatrix.setCOLORArray(xcolors);
+                        //abisolid.setCOLORMATRIX(xcolorMatrix);
+                    //}
+                //}
+            //}
 
-            {
-                String colorMatrixCode = getParameterValue(assay, pApp, "Color Matrix Code", false);
-                if (colorMatrixCode != null) {
-                    abisolid.setCOLORMATRIXCODE(colorMatrixCode);
-                }
-            }
+            //{
+            //    String colorMatrixCode = getParameterValue(assay, pApp, "Color Matrix Code", false);
+            //    if (colorMatrixCode != null) {
+            //        abisolid.setCOLORMATRIXCODE(colorMatrixCode);
+            //    }
+            //}
 
             // TODO: remove, deprecated abisolid.setCYCLECOUNT ( new BigInteger ( getParameterValue ( assay, papp, "Cycle Count", true ) ) );
 
-            abisolid.setSEQUENCELENGTH(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Cycle Count", false))));
+            //abisolid.setSEQUENCELENGTH(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Cycle Count", false))));
 
             xplatform.setABISOLID(abisolid);
         }

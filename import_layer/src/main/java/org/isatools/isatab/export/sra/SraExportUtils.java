@@ -48,17 +48,11 @@
 
 package org.isatools.isatab.export.sra;
 
-import org.isatools.tablib.exceptions.TabIOException;
-import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.utils.BIIObjectStore;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES.FILE;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES.FILE.ChecksumMethod;
-import uk.ac.ebi.utils.io.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
+//import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES;
+//import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES.FILE;
+//import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILE.ChecksumMethod;
 
 /**
  * SRA-exporter miscellanea functions. See {@link SraExportComponent} for further information on how the SRA exporter
@@ -80,7 +74,7 @@ abstract class SraExportUtils extends SraExportComponent {
      * @param fileName  the data file path. It is usually relative to sourcePath, we never tested the case of files in
      *                  subdirectories that are under the source path.
      * @return the file that was added, in case you need for further processing.
-     */
+
     protected FILE addExportedSubmissionFile(final FILES xsubFiles, final String fileName) {
         FILE xfile = FILE.Factory.newInstance();
         xfile.setFilename(fileName);
@@ -113,4 +107,5 @@ abstract class SraExportUtils extends SraExportComponent {
         xsubFiles.setFILEArray(xsubFiles.sizeOfFILEArray() - 1, xfile);
         return xfile;
     }
+     */
 }
