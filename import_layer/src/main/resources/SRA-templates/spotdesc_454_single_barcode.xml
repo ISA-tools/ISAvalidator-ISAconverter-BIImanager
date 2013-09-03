@@ -5,7 +5,6 @@ Multiplex: barcode  -> ParameterValue[barcode] (read_group_tag)
 NOTE: this is a not yet fully stable!
  -->
 <SPOT_DECODE_SPEC>
-    <NUMBER_OF_READS_PER_SPOT>3</NUMBER_OF_READS_PER_SPOT>
     <READ_SPEC>
         <READ_INDEX>0</READ_INDEX>
         <READ_CLASS>Technical Read</READ_CLASS>
