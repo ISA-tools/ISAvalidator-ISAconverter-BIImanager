@@ -640,18 +640,31 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
     private Map<SequencingProperties, String> getSequencingInstrumentAndLayout(Assay assay) {
 
+        Map<SequencingProperties, String> properties = new HashMap<SequencingProperties, String>();
+
         ProtocolApplication sequencingPApp = getProtocol(assay, "nucleic acid sequencing");
 
-        String sequencingPlatform = getParameterValue(assay, sequencingPApp, SequencingProperties.SEQUENCING_PLATFORM.toString(), true);
+        if (sequencingPApp == null) {
+            throw new TabInternalErrorException(
+                    "No protocol of type 'nucleic acid sequencing' found '"
+            );
+        } else {
+
+
+            String sequencingPlatform = getParameterValue(assay, sequencingPApp, SequencingProperties.SEQUENCING_PLATFORM.toString(), true);
+            properties.put(SequencingProperties.SEQUENCING_PLATFORM, sequencingPlatform);
+        }
 
         ProtocolApplication libConstructionPApp = getProtocol(assay, "library construction");
 
-        String sequencingLibrary = getParameterValue(assay, libConstructionPApp, SequencingProperties.LIBRARY_LAYOUT.toString(), true);
-
-        Map<SequencingProperties, String> properties = new HashMap<SequencingProperties, String>();
-
-        properties.put(SequencingProperties.LIBRARY_LAYOUT, sequencingLibrary);
-        properties.put(SequencingProperties.SEQUENCING_PLATFORM, sequencingPlatform);
+        if (libConstructionPApp == null) {
+            throw new TabInternalErrorException(
+                    "No protocol of type 'library construction' found '"
+            );
+        }  else {
+            String sequencingLibrary = getParameterValue(assay, libConstructionPApp, SequencingProperties.LIBRARY_LAYOUT.toString(), true);
+            properties.put(SequencingProperties.LIBRARY_LAYOUT, sequencingLibrary);
+        }
 
         return properties;
     }
