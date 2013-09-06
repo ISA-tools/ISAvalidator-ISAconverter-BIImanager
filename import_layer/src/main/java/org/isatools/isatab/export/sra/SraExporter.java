@@ -172,8 +172,9 @@ public class SraExporter extends SraExportPipelineComponent {
 
             String labName = null; //StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Lab Name"));
             if (labName == null) {
-                labName=centerName;
-                xsubmission.setLabName(labName);
+//                labName=centerName;
+//                xsubmission.setLabName(labName);
+
 //                log.warn(MessageFormat.format(
 //                        "The study ''{0}'' has no 'SRA Lab Name'",
 //                        study.getAcc()
@@ -397,7 +398,8 @@ public class SraExporter extends SraExportPipelineComponent {
 
         xdescriptor.setCENTERNAME(centerName);
         xstudy.setCenterName(centerName);
-        xstudy.setBrokerName(brokerName);
+        if (!brokerName.equals(""))
+            xstudy.setBrokerName(brokerName);
 
 
         String centerPrjName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Center Project Name"));
@@ -415,6 +417,11 @@ public class SraExporter extends SraExportPipelineComponent {
         String title = StringUtils.trimToNull(study.getTitle());
         if (title != null) {
             xdescriptor.setSTUDYTITLE(title);
+        }
+
+        String studyAbstract = StringUtils.trimToNull(study.getDescription());
+        if (studyAbstract!=null){
+            xdescriptor.setSTUDYABSTRACT(studyAbstract);
         }
 
         STUDYATTRIBUTES xattrs = STUDYATTRIBUTES.Factory.newInstance();
