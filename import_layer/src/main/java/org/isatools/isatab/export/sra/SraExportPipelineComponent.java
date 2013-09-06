@@ -472,6 +472,37 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             }
         }
 
+        if (measurement.equalsIgnoreCase("metagenome sequencing") &&
+                    technology.equalsIgnoreCase("nucleotide sequencing")) {
+
+            // xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC);
+
+            String selection = getParameterValue(assay, papp, "library selection", true);
+            String strategy = getParameterValue(assay, papp, "library strategy", true);
+            xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.METAGENOMIC);
+
+            if (("WGS".equalsIgnoreCase(strategy)) || ("OTHER".equalsIgnoreCase(strategy))) {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.Enum.forString(strategy));
+            } else {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + strategy);
+            }
+
+            if (("RANDOM".equalsIgnoreCase(selection)) || ("UNSPECIFIED".equalsIgnoreCase(selection))) {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.Enum.forString(selection));
+            } else {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.UNSPECIFIED);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + selection);
+            }
+
+            ProtocolApplication pappIp = getProtocol(assay, "library construction");
+            if (pappIp == null) {
+                    return null;
+            }
+
+            }
+
+
 
         //HERE, we handle the MIMARKS annotation for library construction in environmental gene survey and map those to SRA objects
         //reliance on ISA parameters tagged to INSDC codes 'target taxon,target_gene,target_subfragment, mid,
@@ -718,7 +749,10 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         if (barcodes.length > 0 && !StringUtils.isEmpty(barcodes[0])) {
             System.out.println("BARCODE IN SPOT: " + barcodes[0] );
             userDefinedAttributes.put(SRAAttributes.READ_GROUP_TAG, barcodes[0]);
+            userDefinedAttributes.put(SRAAttributes.MIN_MATCH, ""+barcodes[0].length());
         }
+
+
 
         try {
             String sraTemplate = sraTemplateLoader.getSRAProcessingTemplate(sraTemplateToInject, userDefinedAttributes);
