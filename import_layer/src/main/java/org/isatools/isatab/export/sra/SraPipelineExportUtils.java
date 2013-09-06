@@ -146,7 +146,6 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
         return pvalues == null || pvalues.length == 0 ? null : pvalues[0];
     }
 
-
     /**
      * Gets the parameter values of a particular parameter type that have been used for a particular protocol application.
      * <p/>
@@ -179,6 +178,25 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
             result[i++] = pvalue.getValue();
         }
         return result;
+    }
+
+    protected String getParameterValue(
+            final Assay assay, final ProtocolApplication papp, final String[] paramTypeArray, final boolean isMandatory) {
+        String[] pvalues = null;
+        for(int i=0; i<paramTypeArray.length; i++){
+            pvalues = getParameterValues(assay, papp, paramTypeArray[i], false);
+            if (pvalues!=null && pvalues.length!=0) return pvalues[0];
+        }
+        if (isMandatory){
+            throw new TabMissingValueException(
+                    i18n.msg(
+                            "sra_missing_param", assay.getMeasurement().getName(), assay.getTechnologyName(),
+                            assay.getStudy().getAcc(), paramTypeArray[0]
+                    )
+            );
+        }
+
+        return null;
     }
 
     /**

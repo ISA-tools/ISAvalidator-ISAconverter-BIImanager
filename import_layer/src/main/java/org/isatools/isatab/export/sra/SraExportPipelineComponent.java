@@ -516,9 +516,9 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.PCR);
 
             //dealing with MIMARKS requirements in ISA_TAB and dumping those in SRA Library Construction Protocol section
-            String pBibRef = getParameterValue(assay, papp, "nucl_acid_amp", false);
+            String pBibRef = getParameterValue(assay, papp, INSDC.nuclAcidAmp, false);
             if (pBibRef != null) {
-                protocol.append("\n nucl_acid_amp: ").append(pBibRef);
+                protocol.append("\n "+INSDC.nuclAcidAmp[0]+": ").append(pBibRef);
             }
 
             String pUrl = getParameterValue(assay, papp, "url", false);
@@ -528,23 +528,23 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             }
 
             String targetTaxon = "";
-            targetTaxon = getParameterValue(assay, papp, "target_taxon", false);
+            targetTaxon = getParameterValue(assay, papp, INSDC.targetTaxon, false);
             if (targetTaxon != null) {
-                protocol.append("\n target_taxon: ").append(targetTaxon);
+                protocol.append("\n "+INSDC.targetTaxon[0]+": ").append(targetTaxon);
                 xlib.setLIBRARYNAME(assay.getAcc() + "_" + targetTaxon);
             }
 
-            String targetGene = getParameterValue(assay, papp, "target_gene", true);
+            String targetGene = getParameterValue(assay, papp, INSDC.targetGene, true);
             if (targetGene != null) {
-                protocol.append("\n target_gene: ").append(targetGene);
+                protocol.append("\n "+INSDC.targetGene[0]+": ").append(targetGene);
             }
 
-            String targetSubfrag = getParameterValue(assay, papp, "target_subfragment", true);
+            String targetSubfrag = getParameterValue(assay, papp, INSDC.targetSubfragment, true);
             if (targetSubfrag != null) {
                 protocol.append("\n target_subfragment: ").append(targetSubfrag);
             }
 
-            String pcrPrimers = getParameterValue(assay, papp, "pcr_primers", true);
+            String pcrPrimers = getParameterValue(assay, papp, INSDC.pcrPrimers, true);
             if (pcrPrimers != null) {
                 protocol.append("\n pcr_primers: ").append(pcrPrimers.replaceAll("=", ":"));
             }
@@ -552,7 +552,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
 
 
-            String pcrConditions = getParameterValue(assay, papp, "pcr_cond", true);
+            String pcrConditions = getParameterValue(assay, papp, INSDC.pcrCond, true);
             if (pcrConditions != null) {
                 protocol.append("\n pcr_cond: ").append(pcrConditions.replaceAll("=", ":"));
             }
@@ -565,10 +565,10 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
             LibraryDescriptorType.TARGETEDLOCI.LOCUS xlocus = LibraryDescriptorType.TARGETEDLOCI.LOCUS.Factory.newInstance();
 
-            String locus = getParameterValue(assay, papp, "target_gene", true);
+            String locus = getParameterValue(assay, papp, INSDC.targetGene, true);
 
             //This is a new requirement starting from SRA.1.3 schema that a database Xref be provided, we are now checking this in.
-            String pcrPrimersXref = getParameterValue(assay, papp, "pcr_primers_identifier", false);
+            String pcrPrimersXref = getParameterValue(assay, papp, INSDC.pcrPrimersIdentifier, false);
 
             XRefType locusXref = XRefType.Factory.newInstance();
 
