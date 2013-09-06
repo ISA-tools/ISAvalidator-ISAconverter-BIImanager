@@ -55,7 +55,6 @@ import org.apache.xmlbeans.XmlOptions;
 import org.isatools.isatab.export.sra.templateutil.SRAUtils;
 import org.isatools.isatab.mapping.AssayTypeEntries;
 import org.isatools.tablib.exceptions.TabIOException;
-import org.isatools.tablib.exceptions.TabInternalErrorException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Contact;
@@ -79,18 +78,17 @@ import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.ADD;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS.CONTACT;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES.FILE;
-import uk.ac.ebi.utils.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+
+//import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES;
+//import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES.FILE;
 
 
 /**
@@ -145,7 +143,6 @@ public class SraExporter extends SraExportPipelineComponent {
 
             // Prepare the submission
 
-
             SubmissionType xsubmission = SubmissionType.Factory.newInstance();
 
             centerName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Center Name"));
@@ -175,8 +172,9 @@ public class SraExporter extends SraExportPipelineComponent {
 
             String labName = null; //StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Lab Name"));
             if (labName == null) {
-                labName=centerName;
-                xsubmission.setLabName(labName);
+//                labName=centerName;
+//                xsubmission.setLabName(labName);
+
 //                log.warn(MessageFormat.format(
 //                        "The study ''{0}'' has no 'SRA Lab Name'",
 //                        study.getAcc()
@@ -197,12 +195,12 @@ public class SraExporter extends SraExportPipelineComponent {
             buildStudyActions(xsubmission, study);
 
 
-            FILES xsubFiles = FILES.Factory.newInstance();
+            //FILES xsubFiles = FILES.Factory.newInstance();
             RunSetType runSet = RunSetType.Factory.newInstance();
             ExperimentSetType expSet = ExperimentSetType.Factory.newInstance();
             SampleSetType sampleSet = SampleSetType.Factory.newInstance();
 
-            final int minFiles = xsubFiles.sizeOfFILEArray();
+            //final int minFiles = xsubFiles.sizeOfFILEArray();
 
             STUDYDocument xstudyDoc = null;
 
@@ -220,7 +218,7 @@ public class SraExporter extends SraExportPipelineComponent {
 
 
                     // Adds up the information built with the assay
-                    if (!buildExportedAssay(assay, xsubFiles, runSet, expSet, sampleSet)) {
+                    if (!buildExportedAssay(assay, /*xsubFiles,*/ runSet, expSet, sampleSet)) {
                         isAssayOk = false;
                         // Skip all the assay file if only a single assay is wrong, a partial export is too dangerous
                         break;
@@ -234,79 +232,79 @@ public class SraExporter extends SraExportPipelineComponent {
             // submission per study
             //
             if (isAssayOk && xstudyDoc != null) {
-                int xfileSz = xsubFiles.sizeOfFILEArray();
+                //int xfileSz = xsubFiles.sizeOfFILEArray();
 
                 // It doesn't make sense that we don't have at least one data file. This should prevent
                 // any case of missing experimental elements (e.g.: only the samples are reported).
                 //
-                if (xfileSz <= minFiles) {
-                    log.warn(MessageFormat.format(
-                            "No data file defined for the study {0}, no SRA exporting done for this study",
-                            study.getAcc()
-                    ));
-                } else {
+                //if (xfileSz <= minFiles) {
+                //    log.warn(MessageFormat.format(
+                //            "No data file defined for the study {0}, no SRA exporting done for this study",
+                //            study.getAcc()
+                //    ));
+                //} else {
                     String xSubmissionPath = exportPath + "/" + DataLocationManager.accession2FileName(studyAcc);
                     try {
 
 
-                        log.debug("SRA exporter: copying SRA data files for study " + studyAcc);
-                        for (int fileCount = 0; fileCount < xfileSz; fileCount++) {
-                            FILE xfile = xsubFiles.getFILEArray(fileCount);
-                            String fileName = xfile.getFilename();
-
-                            xfile.setChecksumMethod(FILE.ChecksumMethod.MD_5);
-
-                            String md5;
-
-                            if (!fileToMD5.containsKey(fileName)) {
-
-                                try {
-                                    md5 = IOUtils.getMD5(new File(this.sourcePath + "/" + fileName));
-                                    fileToMD5.put(fileName, md5);
-
-
-                                    xfile.setChecksum(md5);
-                                    System.out.println("MD5@submission: " + md5 + xsubFiles.getFILEArray(fileCount).getChecksum());
-
-                                } catch (NoSuchAlgorithmException e) {
-                                    throw new TabInternalErrorException(
-                                            "Problem while trying to compute the MD5 for '" + fileName + "': " + e.getMessage(), e
-                                    );
-                                } catch (IOException e) {
-                                    throw new TabIOException(
-                                            "I/O problem while trying to compute the MD5 for '" + fileName + "': " + e.getMessage(), e
-                                    );
-
-                                }
-                            } else {
-
-                                String checksum = fileToMD5.get(fileName);
-                                xfile.setChecksum(checksum);
-
-                                System.out.println("SUBMISSION@MD5checksum: " + fileToMD5.get(fileName));
-                                System.out.println(xfile.getChecksum());
-                            }
-
-
-                            xsubmission.setFILES(xsubFiles);
-
-
-                            String filePath = sourcePath + "/" + fileName;
-                            File srcFile = new File(filePath);
-                            if (!srcFile.exists()) {
-                                log.debug("WARNING: source data file '" + filePath + "' not found, ignoring");
-                                continue;
-                            }
-                            String targetFilePath = xSubmissionPath + "/" + fileName;
-                            File targetFile = new File(targetFilePath);
-                            log.trace("Copying the file '" + filePath + "' to '" + targetFilePath + "'...");
-                            FileUtils.copyFile(srcFile, targetFile, true);
-                            // needed, there's a bug in the previous function
-                            targetFile.setLastModified(srcFile.lastModified());
-                            log.trace("...done");
-                        }
-
-                        xsubmission.setFILES(xsubFiles);
+//                        log.debug("SRA exporter: copying SRA data files for study " + studyAcc);
+//                        for (int fileCount = 0; fileCount < xfileSz; fileCount++) {
+//                            FILE xfile = xsubFiles.getFILEArray(fileCount);
+//                            String fileName = xfile.getFilename();
+//
+//                            xfile.setChecksumMethod(FILE.ChecksumMethod.MD_5);
+//
+//                            String md5;
+//
+//                            if (!fileToMD5.containsKey(fileName)) {
+//
+//                                try {
+//                                    md5 = IOUtils.getMD5(new File(this.sourcePath + "/" + fileName));
+//                                    fileToMD5.put(fileName, md5);
+//
+//
+//                                    xfile.setChecksum(md5);
+//                                    System.out.println("MD5@submission: " + md5 + xsubFiles.getFILEArray(fileCount).getChecksum());
+//
+//                                } catch (NoSuchAlgorithmException e) {
+//                                    throw new TabInternalErrorException(
+//                                            "Problem while trying to compute the MD5 for '" + fileName + "': " + e.getMessage(), e
+//                                    );
+//                                } catch (IOException e) {
+//                                    throw new TabIOException(
+//                                            "I/O problem while trying to compute the MD5 for '" + fileName + "': " + e.getMessage(), e
+//                                    );
+//
+//                                }
+//                            } else {
+//
+//                                String checksum = fileToMD5.get(fileName);
+//                                xfile.setChecksum(checksum);
+//
+//                                System.out.println("SUBMISSION@MD5checksum: " + fileToMD5.get(fileName));
+//                                System.out.println(xfile.getChecksum());
+//                            }
+//
+//
+//                            xsubmission.setFILES(xsubFiles);
+//
+//
+//                            String filePath = sourcePath + "/" + fileName;
+//                            File srcFile = new File(filePath);
+//                            if (!srcFile.exists()) {
+//                                log.debug("WARNING: source data file '" + filePath + "' not found, ignoring");
+//                                continue;
+//                            }
+//                            String targetFilePath = xSubmissionPath + "/" + fileName;
+//                            File targetFile = new File(targetFilePath);
+//                            log.trace("Copying the file '" + filePath + "' to '" + targetFilePath + "'...");
+//                            FileUtils.copyFile(srcFile, targetFile, true);
+//                            // needed, there's a bug in the previous function
+//                            targetFile.setLastModified(srcFile.lastModified());
+//                            log.trace("...done");
+//                        }
+//
+//                        xsubmission.setFILES(xsubFiles);
 
 
                         File xsubmissionDir = new File(xSubmissionPath);
@@ -353,7 +351,7 @@ public class SraExporter extends SraExportPipelineComponent {
                         SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/run_set_initial.xml"), "SRA.run.xsd", "<RUN_SET>");
 
 
-                    }
+                    //}
                     SRAXMLSchemaInjector.delete(new File(xSubmissionPath + "/submission_initial.xml"));
                     SRAXMLSchemaInjector.delete(new File(xSubmissionPath + "/study_initial.xml"));
                     SRAXMLSchemaInjector.delete(new File(xSubmissionPath + "/sample_set_initial.xml"));
@@ -400,7 +398,8 @@ public class SraExporter extends SraExportPipelineComponent {
 
         xdescriptor.setCENTERNAME(centerName);
         xstudy.setCenterName(centerName);
-        xstudy.setBrokerName(brokerName);
+        if (!brokerName.equals(""))
+            xstudy.setBrokerName(brokerName);
 
 
         String centerPrjName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Center Project Name"));
@@ -418,6 +417,11 @@ public class SraExporter extends SraExportPipelineComponent {
         String title = StringUtils.trimToNull(study.getTitle());
         if (title != null) {
             xdescriptor.setSTUDYTITLE(title);
+        }
+
+        String studyAbstract = StringUtils.trimToNull(study.getDescription());
+        if (studyAbstract!=null){
+            xdescriptor.setSTUDYABSTRACT(studyAbstract);
         }
 
         STUDYATTRIBUTES xattrs = STUDYATTRIBUTES.Factory.newInstance();

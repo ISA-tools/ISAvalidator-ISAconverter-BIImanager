@@ -49,7 +49,8 @@ package org.isatools.isatab.export.sra.templateutil;
 public enum SRAAttributes {
 	NUMBER_OF_READS_PER_SPOT("number_of_reads_per_spot"),
 	ADAPTER_SPEC("adapter_spec"),
-	EXPECTED_BASECALL("expected_basecall"),
+	EXPECTED_BASECALL_TABLE("expected_basecall_table"),
+    MIN_MATCH("min_match"),
 	SEQUENCE_SPACE("sequence_space"),
 	BASE_CALLER("base_caller"),
 	QUALITY_SCORER("quality_scorer"),
