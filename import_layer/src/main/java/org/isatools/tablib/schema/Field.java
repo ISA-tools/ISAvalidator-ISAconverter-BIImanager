@@ -128,13 +128,14 @@ public class Field extends SchemaNode implements Cloneable {
 
         // REs are our friends here
         //
-        String pattern = "^ *(" + ID_PATTERN + ") *(?:\\[ *(" + ID_PATTERN + ")* *(?:\\( *(" + ID_PATTERN + "|" + WORDS_PATTERN + "|" + URL_PATTERN  + ") *\\))?\\])? *$";
+        String pattern = "^ *(" + ID_PATTERN + ") *(?:\\[ *(" + ID_PATTERN + ")* *(?:\\( *(" + ID_PATTERN + "|" + WORDS_PATTERN + "|" + URL_PATTERN + ") *\\))?\\])? *$";
 
         log.trace("Field.parseHeader( '" + header + "' ), using the pattern: '" + pattern + "'");
         String bits[] = new RegEx(pattern, isCaseSensitive ? 0 : Pattern.CASE_INSENSITIVE).groups(header);
 
         log.trace(String.format("Field.parseHeaderRawResult('%s'), bits are: %s", header, Arrays.toString(bits)));
         if (bits == null || bits.length < 2) {
+            log.error("Field.parseHeader(): bad syntax for the header: " + header);
             throw new TabInvalidValueException("Field.parseHeader(): bad syntax for the header: " + header);
         }
 
@@ -150,7 +151,7 @@ public class Field extends SchemaNode implements Cloneable {
 
     /**
      * Parses a possibly complex header and sets up corresponding bits in the field, for instance
-     * "Factor[Grow Condition](media)" is splitted into id = Factor, type = GC, type1 = media
+     * "Factor[Grow Condition (media)]" is splitted into id = Factor, type = GC, type1 = media
      * <p/>
      * Pass the col parameter to store the column in the TAB where this header was matched.
      * <p/>
@@ -189,15 +190,27 @@ public class Field extends SchemaNode implements Cloneable {
         if (bits.length > 2 && bits[2] != null) {
             String type = bits[2].trim();
             clone.setAttr("type", type);
-            builtHeader += " [" + type + "]";
+            builtHeader += " [" + type + "$ACCESSION]";
         }
 
         // Setup the sub-type
         if (bits.length > 3 && bits[3] != null) {
             String supposedAccession = bits[3].trim();
             clone.setAttr("accession", supposedAccession);
-            builtHeader += " (" + supposedAccession + ")";
+
+            if (bits[3].contains(":")) {
+                builtHeader = builtHeader.replace("$ACCESSION", "");
+                builtHeader += "(" + supposedAccession + ")";
+            } else {
+                builtHeader = builtHeader.replace("$ACCESSION", " (" + supposedAccession + ")");
+            }
+        } else {
+            builtHeader = builtHeader.replace("$ACCESSION", "");
         }
+
+
+        System.out.println("Original header was " + header);
+        System.out.println("Built header is " + builtHeader);
 
         clone.setAttr("header", builtHeader);
 
