@@ -81,6 +81,7 @@ public class Field extends SchemaNode implements Cloneable {
      * How we match an header, either in X or in X[Y](Z), X,Y,Z must match this pattern
      */
     public static final String ID_PATTERN = "[\\w_]+(?: *[\\w/_\\-\\: ]+)? *";
+    public static final String WORDS_PATTERN = "[\\w_\\s,/\\-#\\(\\)]+";
     public static final String URL_PATTERN = "\\b(((\\S+)?)(@|mailto\\:|(news|(ht|f)tp(s?))\\://)\\S+)\\b";
 
     public Field() {
@@ -113,7 +114,7 @@ public class Field extends SchemaNode implements Cloneable {
      * <p/>
      * Returns the array returned by the RE matcher, with the values:
      * <pre>
-     *   0 - the whole parameter string ( "Factor[Grow Condition](media)" )
+     *   0 - the whole parameter string ( "Factor[Grow Condition(media)]" )
      *   1 - Factor
      *   2 - Grow Condition
      *   3 - media
@@ -127,12 +128,11 @@ public class Field extends SchemaNode implements Cloneable {
 
         // REs are our friends here
         //
-        String
-                // Used to match the whole header
-                pattern = "^ *(" + ID_PATTERN + ") *(?:\\[ *(" + ID_PATTERN + ")* *(?:\\( *(" + ID_PATTERN + "|" + URL_PATTERN  + ") *\\))?\\])? *$";
+        String pattern = "^ *(" + ID_PATTERN + ") *(?:\\[ *(" + ID_PATTERN + ")* *(?:\\( *(" + ID_PATTERN + "|" + WORDS_PATTERN + "|" + URL_PATTERN  + ") *\\))?\\])? *$";
 
         log.trace("Field.parseHeader( '" + header + "' ), using the pattern: '" + pattern + "'");
         String bits[] = new RegEx(pattern, isCaseSensitive ? 0 : Pattern.CASE_INSENSITIVE).groups(header);
+
         log.trace(String.format("Field.parseHeaderRawResult('%s'), bits are: %s", header, Arrays.toString(bits)));
         if (bits == null || bits.length < 2) {
             throw new TabInvalidValueException("Field.parseHeader(): bad syntax for the header: " + header);
