@@ -214,7 +214,7 @@ public class ISATABLoaderTest {
         out.println("\n\n_________ /end: loadAndValidateSlimTest __________\n\n\n");
     }
 
-    @Test
+    @Ignore
     public void loadAndTestCommentPersistenceTest() throws Exception {
         out.println("\n\n__________ loadAndTestCommentPersistenceTest__________\n\n");
 
