@@ -57,6 +57,7 @@ import org.apache.log4j.Level;
 import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -182,13 +183,12 @@ public class ValidatorTest {
         out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
     }
 
-
     @Test
-    public void testValidatorForMissingDataTransformationName() {
-        out.println("\n\n" + StringUtils.center("Testing validator for missing Data Transformation Name", 120, "-") + "\n");
+    public void testValidatorForOntologyHeaders() {
+        out.println("\n\n" + StringUtils.center("Testing validator when using ontology value to define headers", 120, "-") + "\n");
 
         String baseDir = System.getProperty("basedir");
-        String subDir = "/Users/eamonnmaguire/Downloads/E-GEOD-10433";
+        String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/BII-I-1-OntologyHeaders";
 
         GUIISATABValidator validator = new GUIISATABValidator();
 

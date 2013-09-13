@@ -150,6 +150,7 @@
             <enumeration value="generic_assay"/>
             <enumeration value="transcriptomics_assay"/>
             <enumeration value="ms_spec_assay"/>
+            <enumeration value="nano_assay"/>
             <enumeration value="nmr_spec_assay"/>
             <enumeration value="gel_electrophoresis_assay"/>
         </restriction>

@@ -80,7 +80,8 @@ public class Field extends SchemaNode implements Cloneable {
     /**
      * How we match an header, either in X or in X[Y](Z), X,Y,Z must match this pattern
      */
-    public static final String ID_PATTERN = "[\\w_]+(?: *[\\w/_\\-\\: ]+)? *";
+    public static final String ID_PATTERN = "" +
+            "[\\w_]+(?: *[\\w/_\\-\\:\\.\\, ]+)? *";
     public static final String WORDS_PATTERN = "[\\w_\\s,/\\-#\\(\\)]+";
     public static final String URL_PATTERN = "\\b(((\\S+)?)(@|mailto\\:|(news|(ht|f)tp(s?))\\://)\\S+)\\b";
 
@@ -109,7 +110,7 @@ public class Field extends SchemaNode implements Cloneable {
 
     /**
      * Parses a possibly complex header and sets up corresponding bits in the field, for instance
-     * "Factor Value[Grow Condition(obi:media)" is splitted into Factor, GC, obi:media or Factor Value[Grow Condition(http://purl.org/obi/12133) is split
+     * "Characteristics [Grow Condition(obi:13123)] " is splitted into Factor, GC, obi:media or Characteristics[Grow Condition(http://purl.org/obi/12133)] is split
      * into Factor Value, GC, http://purl.org/obi/12133
      * <p/>
      * Returns the array returned by the RE matcher, with the values:
@@ -132,7 +133,6 @@ public class Field extends SchemaNode implements Cloneable {
 
         log.trace("Field.parseHeader( '" + header + "' ), using the pattern: '" + pattern + "'");
         String bits[] = new RegEx(pattern, isCaseSensitive ? 0 : Pattern.CASE_INSENSITIVE).groups(header);
-
         log.trace(String.format("Field.parseHeaderRawResult('%s'), bits are: %s", header, Arrays.toString(bits)));
         if (bits == null || bits.length < 2) {
             log.error("Field.parseHeader(): bad syntax for the header: " + header);
@@ -151,7 +151,7 @@ public class Field extends SchemaNode implements Cloneable {
 
     /**
      * Parses a possibly complex header and sets up corresponding bits in the field, for instance
-     * "Factor[Grow Condition (media)]" is splitted into id = Factor, type = GC, type1 = media
+     * "Factor[Grow Condition (media)]" is split into id = Factor, type = GC, type1 = media
      * <p/>
      * Pass the col parameter to store the column in the TAB where this header was matched.
      * <p/>
@@ -186,19 +186,33 @@ public class Field extends SchemaNode implements Cloneable {
         // Rebuild the header, we need it with the case that has been defined
         String builtHeader = id;
 
+        String supposedAccession = "";
+        if (bits.length > 3 && bits[3] != null) {
+            supposedAccession = bits[3].trim();
+        }
+
         // Setup the type
         if (bits.length > 2 && bits[2] != null) {
             String type = bits[2].trim();
-            clone.setAttr("type", type);
+
+            if (type.contains(",")) {
+                String[] ontologyParts = type.split(",");
+                clone.setAttr("type", ontologyParts[0]);
+                type = ontologyParts[0];
+                supposedAccession = ontologyParts[1];
+            } else {
+                clone.setAttr("type", type);
+            }
+
             builtHeader += " [" + type + "$ACCESSION]";
         }
 
         // Setup the sub-type
-        if (bits.length > 3 && bits[3] != null) {
-            String supposedAccession = bits[3].trim();
+        if (!supposedAccession.isEmpty()) {
+
             clone.setAttr("accession", supposedAccession);
 
-            if (bits[3].contains(":")) {
+            if (supposedAccession.contains(":")) {
                 builtHeader = builtHeader.replace("$ACCESSION", "");
                 builtHeader += "(" + supposedAccession + ")";
             } else {
