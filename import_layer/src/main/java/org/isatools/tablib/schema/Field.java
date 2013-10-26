@@ -222,10 +222,6 @@ public class Field extends SchemaNode implements Cloneable {
             builtHeader = builtHeader.replace("$ACCESSION", "");
         }
 
-
-        System.out.println("Original header was " + header);
-        System.out.println("Built header is " + builtHeader);
-
         clone.setAttr("header", builtHeader);
 
         // Track back the position

@@ -144,7 +144,7 @@ public class AssayTypeEntries {
 
 
     public static String getAssayFormatIdFromLabels(String measurmentTypeLabel, String technologyTypeLabel) {
-        measurmentTypeLabel = convertMeasurmentTypeLabel(measurmentTypeLabel);
+        measurmentTypeLabel = convertMeasurementTypeLabel(measurmentTypeLabel);
         technologyTypeLabel = convertTechnologyLabel(technologyTypeLabel);
 
         // First try with the stuff in the ISA Configuration's Configurator
@@ -163,7 +163,7 @@ public class AssayTypeEntries {
                 return StringUtils.trimToNull(entry[COL_ASSAY_FORMAT_ID]);
             }
         }
-        return null;
+        return "generic_assay";
     }
 
     public static String getAssayFormatIdFromLabels(Assay assay) {
@@ -181,12 +181,13 @@ public class AssayTypeEntries {
      * @return
      */
     public static String getDispatchTargetIdFromLabels(String measurmentTypeLabel, String technologyTypeLabel) {
-        measurmentTypeLabel = convertMeasurmentTypeLabel(measurmentTypeLabel);
+        measurmentTypeLabel = convertMeasurementTypeLabel(measurmentTypeLabel);
         technologyTypeLabel = convertTechnologyLabel(technologyTypeLabel);
 
         // First try with the stuff in the ISA Configuration's Configurator
         //
         IsaTabConfigurationType cfg = isaConfiguratorCfg.getConfig(measurmentTypeLabel, technologyTypeLabel);
+
         if (cfg != null) {
             String conversionTarget = StringUtils.trimToNull(cfg.getIsatabConversionTarget());
             if (conversionTarget != null) {
@@ -210,7 +211,7 @@ public class AssayTypeEntries {
                     dispatchTarget = "prideml";
                 } else if (StringUtils.containsIgnoreCase(dispatchTarget, "BII metabolomic")) {
                     dispatchTarget = "meda";
-                } else if (StringUtils.containsIgnoreCase(dispatchTarget, "BII conventional assay")) {
+                } else {
                     dispatchTarget = "generic";
                 }
 
@@ -230,7 +231,7 @@ public class AssayTypeEntries {
 
 
     public static Measurement getMeasurementTypeFromLabel(String label) {
-        label = convertMeasurmentTypeLabel(label);
+        label = convertMeasurementTypeLabel(label);
 
         // First try with what you have in the ISA Configurator Information
         //
@@ -346,7 +347,7 @@ public class AssayTypeEntries {
      * Converts the label into something that is compatible with the mappings defined into {@value #ASSAY_TYPE_ENTRIES_FILE_NAME},
      * for instance, "Metabolite Quantitation", defined in old test cases, is converted to "metabolite profiling".
      */
-    private static String convertMeasurmentTypeLabel(String label) {
+    private static String convertMeasurementTypeLabel(String label) {
         label = StringUtils.trimToEmpty(label);
         if ("Metabolite Quantitation".equalsIgnoreCase(label)) {
             return "metabolite profiling";
@@ -459,51 +460,4 @@ public class AssayTypeEntries {
             }
         }
     }
-
-    /**
-     * Dirty procedure that converts old version of the configuration.
-     */
-    private static void fixIsaConfig() {
-        String baseDir = "/Users/brandizi/Documents/Work/ebi/biomap/svn/isatools/import_layer";
-        String cfgPath = baseDir + "/target/test-classes/config/isa_configurator";
-        ISAConfigurationSet.setConfigPath(cfgPath);
-        ISAConfigurationSet cfgSet = new ISAConfigurationSet();
-
-        for (String[] entry : getEntries()) {
-            String ep = entry[COL_MEASURMENT_LABEL], tech = entry[COL_TECHNOLOGY_LABEL];
-            if (ep == null && tech == null) {
-                continue;
-            }
-
-            String isatabType = StringUtils.trimToNull(getAssayFormatIdFromLabels(ep, tech));
-            String dispatchTargetId = StringUtils.trimToNull(getDispatchTargetIdFromLabels(ep, tech));
-            if (isatabType == null && dispatchTargetId == null) {
-                continue;
-            }
-
-            IsaTabConfigurationType cfg = cfgSet.getConfig(ep, tech);
-            if (cfg == null) {
-                continue;
-            }
-
-            IsaTabAssayType.Enum ctype = cfg.getIsatabAssayType();
-            String ctypes = ctype == null ? null : ctype.toString();
-            String ctarget = StringUtils.trimToNull(cfg.getIsatabConversionTarget());
-
-            if (ctypes != null || ctarget != null) {
-                continue;
-            }
-
-            cfg.setIsatabAssayType(IsaTabAssayType.Enum.forString(isatabType));
-            cfg.setIsatabConversionTarget(dispatchTargetId);
-        }
-
-        cfgSet.saveConfigurationSet();
-    }
-
-
-    public static void main(String args[]) {
-        fixIsaConfig();
-    }
-
 }

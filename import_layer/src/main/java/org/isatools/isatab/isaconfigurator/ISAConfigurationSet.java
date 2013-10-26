@@ -199,7 +199,14 @@ public class ISAConfigurationSet {
     public IsaTabConfigurationType getConfig(String measurementType, String technologyType) {
         measurementType = StringUtils.trimToEmpty(measurementType).toLowerCase();
         technologyType = StringUtils.trimToEmpty(technologyType).toLowerCase();
-        return getIsaTabConfigs().get(measurementType + "//" + technologyType);
+
+        IsaTabConfigurationType config = getIsaTabConfigs().get(measurementType + "//" + technologyType);
+
+        if (config == null) {
+            config = getIsaTabConfigs().get("*//*");
+        }
+
+        return config;
     }
 
     /**
