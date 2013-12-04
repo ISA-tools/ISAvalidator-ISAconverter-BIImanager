@@ -4,14 +4,14 @@
     <groupId>org.isatools</groupId>
     <artifactId>val_conv_manager_gui</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.2</version>
+    <version>1.6.3</version>
     <name>ISAvalidator, ISAconverter and BII Data Management tool GUI code</name>
     <url>http://maven.apache.org</url>
 
     <parent>
         <groupId>org.isatools</groupId>
         <artifactId>val_conv_manager</artifactId>
-        <version>1.6.2</version>
+        <version>1.6.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -104,7 +104,7 @@
             <groupId>org.isatools</groupId>
             <artifactId>import_layer</artifactId>
             <type>jar</type>
-            <version>1.6.2</version>
+            <version>1.6.3</version>
         </dependency>
 
 

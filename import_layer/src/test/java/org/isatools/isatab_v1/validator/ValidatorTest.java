@@ -56,6 +56,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Level;
 import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
+import org.isatools.isatab.isaconfigurator.ISAConfigurationSet;
 import org.isatools.tablib.utils.logging.TabLoggingEventWrapper;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -187,8 +188,9 @@ public class ValidatorTest {
     public void testValidatorForOntologyHeaders() {
         out.println("\n\n" + StringUtils.center("Testing validator when using ontology value to define headers", 120, "-") + "\n");
 
+        ISAConfigurationSet.setConfigPath("/Users/eamonnmaguire/git/isarepo/ISAcreator/Configurations/isaconfig-default_v2013-02-13/");
         String baseDir = System.getProperty("basedir");
-        String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/BII-I-1-OntologyHeaders";
+        String subDir = "/Users/eamonnmaguire/Dropbox/ISATAB-datasets/SCIDATA-sample2-ISA-tab_metadata";
 
         GUIISATABValidator validator = new GUIISATABValidator();
 
