@@ -71,14 +71,12 @@ import java.util.*;
  * see XSD file that defines the latter.
  */
 public class ISAConfigurationSet {
-    public final static String
-            NS_CFG = "http://www.ebi.ac.uk/bii/isatab_configuration#";
-    // "http://www.w3.org/2005/02/xpath-functions/#";
+    public final static String NS_CFG = "http://www.ebi.ac.uk/bii/isatab_configuration#";
 
     private static String configPath = AbstractImportLayerShellCommand.getConfigPath() + "/isa_configurator";
 
-    private Map<String, IsaTabConfigFileType> _isaConfigFiles;
-    private Map<String, IsaTabConfigurationType> _isaConfigs;
+    private static Map<String, IsaTabConfigFileType> _isaConfigFiles;
+    private static Map<String, IsaTabConfigurationType> _isaConfigs;
 
     protected static final Logger log = Logger.getLogger(ISAConfigurationSet.class);
 
@@ -87,6 +85,8 @@ public class ISAConfigurationSet {
      */
     public static void setConfigPath(String configPath) {
         ISAConfigurationSet.configPath = configPath;
+        _isaConfigFiles = null;
+        _isaConfigs = null;
     }
 
     /**
