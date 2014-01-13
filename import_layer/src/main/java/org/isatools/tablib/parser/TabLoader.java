@@ -203,7 +203,7 @@ public class TabLoader {
      *
      * @param fileId   used to store it in the resulting format instance.
      * @param reader   the TSV stream to read lines from
-     * @param formatId the name of format expected in the reader
+     * @param format the name of format expected in the reader
      */
     public FormatInstance parse(String fileId, Reader reader, Format format)
             throws IOException {

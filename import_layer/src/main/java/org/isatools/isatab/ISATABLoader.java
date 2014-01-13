@@ -192,10 +192,13 @@ public class ISATABLoader extends TabLoader {
     protected void loadAssays() throws IOException {
         FormatSetInstance formatSetInstance = getFormatSetInstance();
         List<SectionInstance> assayInstances = formatSetInstance.getSectionInstances("investigation", "assays");
+
         for (SectionInstance assayInstance : assayInstances) {
+
             int endPointIdx = assayInstance.getField("Measurements/Endpoints Name").getIndex();
             int technologyFieldIdx = assayInstance.getField("Technology Type").getIndex();
             int assayFileNameIdx = assayInstance.getField("Assay File Name").getIndex();
+
             for (Record record : assayInstance.getRecords()) {
                 String endPoint = record.getString(endPointIdx);
                 String technology = record.getString(technologyFieldIdx);
