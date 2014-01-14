@@ -114,7 +114,8 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
             if (epAcc == null) {
                 // If we don't have an accession, try to get the term from predefined entries.
                 measurement = AssayTypeEntries.getMeasurementTypeFromLabel(epLabel);
-                if (measurement == null) {
+
+                if (measurement == null ) {
                      throw new TabInvalidValueException(i18n.msg("isatab_unknown_measurement_type", epLabel));
                 }
             } else {

@@ -274,7 +274,8 @@ public class AssayTypeEntries {
 
             return new Measurement(acc, label, getOBISource());
         }
-        return null;
+
+        return new Measurement("", label, null);
     }
 
     public static AssayTechnology getAssayTechnologyFromLabel(String label) {
@@ -322,7 +323,7 @@ public class AssayTypeEntries {
             return new AssayTechnology(acc, label, getOBISource());
         }
 
-        return null;
+        return new AssayTechnology("", label, null);
     }
 
 

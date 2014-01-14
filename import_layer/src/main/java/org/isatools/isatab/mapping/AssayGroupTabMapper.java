@@ -107,7 +107,6 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
             throw new TabMissingValueException(i18n.msg("missing_measurement", rval.getFilePath()));
         }
 
-        // TODO: We need to define constants for EP and Technology
         measurement.setAcc(measurement.getName());
         rval.setMeasurement(measurement);
 
@@ -119,10 +118,7 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
                 "Technology Type Term Source REF",
                 AssayTechnology.class
         );
-//		if ( technology == null )
-//			throw new TabMissingValueException ( i18n.msg ( "missing_technology", rval.getFilePath () ));
 
-        // TODO: We need to define constants for EP and Technology
         technology.setAcc(technology.getName());
         rval.setTechnology(technology);
 
