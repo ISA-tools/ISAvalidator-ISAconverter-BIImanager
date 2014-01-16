@@ -115,9 +115,7 @@ public class RowSectionParser implements TabParser<SectionInstance> {
             Field field = section.getFieldByHeader(header, false);
 
             if (field == null) {
-//                if (!header.startsWith("Material"))
-                    throw new TabValidationException(i18n.msg("unexpected_field_in_section_error", header, sectionId));
-
+                throw new TabValidationException(i18n.msg("unexpected_field_in_section_error", header, sectionId));
             }
 
             // Let's add a new real field on the basis of the header. The new field created gets its id from the

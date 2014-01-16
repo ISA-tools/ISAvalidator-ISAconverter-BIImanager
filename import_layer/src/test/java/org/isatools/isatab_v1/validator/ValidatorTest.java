@@ -184,22 +184,40 @@ public class ValidatorTest {
         out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
     }
 
-    @Test
-    public void testValidatorForOntologyHeaders() {
-        out.println("\n\n" + StringUtils.center("Testing validator when using ontology value to define headers", 120, "-") + "\n");
-
-        ISAConfigurationSet.setConfigPath("/Users/eamonnmaguire/git/isarepo/ISAcreator/Configurations/isaconfig-default_v2013-02-13/");
-        String baseDir = System.getProperty("basedir");
-        String subDir = "/Users/eamonnmaguire/Dropbox/ISATAB-datasets/SCIDATA-sample2-ISA-tab_metadata";
-
-        GUIISATABValidator validator = new GUIISATABValidator();
-
-        GUIInvokerResult result = validator.validate(subDir);
-        assertEquals("Validation should have failed!", GUIInvokerResult.SUCCESS, result);
-
-        System.out.println(validator.report());
-
-        out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
-    }
+//    @Test
+//    public void testValidatorForOntologyHeaders() {
+//        out.println("\n\n" + StringUtils.center("Testing validator when using ontology value to define headers", 120, "-") + "\n");
+//
+//        ISAConfigurationSet.setConfigPath("/Users/eamonnmaguire/git/isarepo/ISAcreator/Configurations/isaconfig-default_v2013-02-13/");
+//        String baseDir = System.getProperty("basedir");
+//        String subDir = "/Users/eamonnmaguire/Dropbox/ISATAB-datasets/SCIDATA-sample2-ISA-tab_metadata";
+//
+//        GUIISATABValidator validator = new GUIISATABValidator();
+//
+//        GUIInvokerResult result = validator.validate(subDir);
+//        assertEquals("Validation should have succeeded.", GUIInvokerResult.SUCCESS, result);
+//
+//        System.out.println(validator.report());
+//
+//        out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
+//    }
+//
+//
+//    @Test
+//    public void testValidatorForFallbackCase() {
+//        out.println("\n\n" + StringUtils.center("Testing validator when using fallback generic assay to validate failed", 120, "-") + "\n");
+//
+//        ISAConfigurationSet.setConfigPath("/Users/eamonnmaguire/git/isarepo/ISAcreator/Configurations/isaconfig-scidata-eamonn/");
+//        String subDir = "/Users/eamonnmaguire/Dropbox/ISATAB-datasets/SCIDATA-sample1-ISA-tab_metadata";
+//
+//        GUIISATABValidator validator = new GUIISATABValidator();
+//
+//        GUIInvokerResult result = validator.validate(subDir);
+//        assertEquals("Validation should have failed.", GUIInvokerResult.ERROR, result);
+//
+//        System.out.println(validator.report());
+//
+//        out.println("\n" + StringUtils.center("/end:Testing validator when using fallback generic assay to validate failed", 120, "-") + "\n\n");
+//    }
 
 }

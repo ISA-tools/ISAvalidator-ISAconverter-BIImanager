@@ -50,9 +50,11 @@ package org.isatools.isatab_v1;
 
 import org.apache.commons.lang.StringUtils;
 import org.isatools.isatab.ISATABPersister;
+import org.isatools.isatab.isaconfigurator.ISAConfigurationSet;
 import org.isatools.isatab.mapping.AssayTypeEntries;
 import org.isatools.tablib.exceptions.TabDuplicatedValueException;
 import org.isatools.tablib.exceptions.TabMissingValueException;
+import org.isatools.tablib.exceptions.TabValidationException;
 import org.isatools.tablib.mapping.FormatSetTabMapper;
 import org.isatools.tablib.schema.*;
 import org.isatools.tablib.utils.logging.TabNDC;
@@ -66,7 +68,7 @@ import java.util.List;
 
 /**
  * The specific loader to be used with the ISATAB format.
- *
+ * <p/>
  * PLEASE NOTE: This is *not* the GUI Loader, mentioned in the end-user documentation. That loader is actually
  * a wrapper of {@link ISATABPersister}. This loader refers to the first in-memory loading of the ISATAB structure,
  * which produces an object model that reflects the strucure in the spreadsheet files (named the Tabular View).
@@ -148,7 +150,13 @@ public class ISATABLoader extends org.isatools.isatab.ISATABLoader {
                                     "The file " + assayFileName + " has already been loaded as " + alreadyLoadedLabel
                             );
                         }
-                        FormatInstance assayFileInstance = load(assayFileName, assayFormatId);
+                        FormatInstance assayFileInstance;
+                        try {
+                            assayFileInstance = load(assayFileName, assayFormatId);
+                        } catch (TabValidationException tve) {
+                            assayFileInstance = load(assayFileName, "generic_assay");
+                        }
+
                         formatSetInstance.addFormatInstance(assayFileInstance);
                         alreadyLoadedFiles.put(assayFileName, "as assay file for an assay");
                         ndc.popTabDescriptor();

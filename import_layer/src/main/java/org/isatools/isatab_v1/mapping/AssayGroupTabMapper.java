@@ -166,7 +166,6 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
                         "Study Assay Technology Type Term Source REF",
                         AssayTechnology.class
                 );
-
             }
         }
 
