@@ -6,7 +6,7 @@
     <groupId>org.isatools</groupId>
     <artifactId>import_layer</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.5</version>
+    <version>1.6.7</version>
     <name>ISA Import Layer and Command Line Tools</name>
     <url>http://isatab.sf.net/</url>
     <description>
@@ -18,8 +18,6 @@
         <groupId>uk.ac.ebi</groupId>
         <artifactId>bioinvindex</artifactId>
         <version>1.6</version>
-
-        <!-- TODO: will we need to move the import layer under the BII hat? -->
         <!-- relativePath>../../bii/pom.xml</relativePath -->
     </parent>
 
