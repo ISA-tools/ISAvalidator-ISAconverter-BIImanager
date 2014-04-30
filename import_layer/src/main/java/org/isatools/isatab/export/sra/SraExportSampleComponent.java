@@ -369,7 +369,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 if (!StringUtils.containsIgnoreCase(leftLeftRole.getAcc(), "source")) {
                     String msg = MessageFormat.format(
                             "The assay file of type {0} / {1} for study {2} has nested pooled samples, this is not supported by "
-                                    + "the SRA format. Please review the ISATAB/SRA formatting guidelines",
+                                    + "the SRA format. Please review the ISATAB/SRA formatting guidelines.",
                             assay.getMeasurement().getName(),
                             assay.getTechnologyName(),
                             assay.getStudy().getAcc()
@@ -383,7 +383,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                     String msg = MessageFormat.format(
                             "The assay file of type {0} / {1} for study {2} has an experimental graph structure that is not "
                                     + "compatible with the SRA format (sources with derived nodes). Please review the ISATAB/SRA "
-                                    + "formatting guidelines",
+                                    + "formatting guidelines.",
                             assay.getMeasurement().getName(),
                             assay.getTechnologyName(),
                             assay.getStudy().getAcc()
@@ -406,7 +406,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                     String msg = MessageFormat.format(
                             "The assay file of type {0} / {1} for study {2} has an experimental graph structure that is not "
                                     + "compatible with the SRA format (irregular pooling structure). "
-                                    + "Please review the ISATAB/SRA formatting guidelines",
+                                    + "Please review the ISATAB/SRA formatting guidelines.",
                             assay.getMeasurement().getName(),
                             assay.getTechnologyName(),
                             assay.getStudy().getAcc()
@@ -420,7 +420,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                     String msg = MessageFormat.format(
                             "The assay file of type {0} / {1} for study {2} has an experimental graph structure that is not "
                                     + "compatible with the SRA format (sources with derived nodes). "
-                                    + "Please review the ISATAB/SRA formatting guidelines",
+                                    + "Please review the ISATAB/SRA formatting guidelines.",
                             assay.getMeasurement().getName(),
                             assay.getTechnologyName(),
                             assay.getStudy().getAcc()

@@ -104,11 +104,4 @@ public class SRAXMLSchemaInjector {
                  + e.getMessage() + ")");
      }
  }
-
-    public static void main(String[] args) {
-        addNameSpaceToFile(new File("/Users/prs/git/ValidatorConverterManager/ISAvalidator-ISAconverter-BIImanager/import_layer/target/export/sra/VS-454-MBL/run_set.xml"),
-                "SRA.run.xsd", "<RUN_SET>");
-    }
-
-
 }

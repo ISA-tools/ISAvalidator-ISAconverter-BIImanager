@@ -56,9 +56,7 @@ import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.AssayResult;
 import uk.ac.ebi.bioinvindex.model.Data;
 import uk.ac.ebi.bioinvindex.model.Protocol;
-import uk.ac.ebi.bioinvindex.model.processing.Assay;
-import uk.ac.ebi.bioinvindex.model.processing.DataNode;
-import uk.ac.ebi.bioinvindex.model.processing.ProtocolApplication;
+import uk.ac.ebi.bioinvindex.model.processing.*;
 import uk.ac.ebi.bioinvindex.model.term.*;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
@@ -85,8 +83,6 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
 
     /**
      * Get a particular protocol type that has been used to produce the parameter assay.
-     * <p/>
-     * TODO: move to Model?
      *
      * @param typeStr: a string that is contained in the protocol type (free text part). Matching is case-insensitive.
      */
@@ -96,10 +92,26 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
             return null;
         }
 
-        // TODO: gets the first assay and the first protocol only. We should add a check/message on that
-
         AssayResult ar = ars.iterator().next();
         Data data = ar.getData();
+
+        if (data.getType().getName().contains("Derived")) {
+            log.info("We've detected a Derived Data File. We're going to find the Raw Data File and use this instead.");
+            // we need to get the node back, the raw data file.
+            for (Processing dp : data.getProcessingNode().getDownstreamProcessings()) {
+                for (Object dn : dp.getInputNodes()) {
+                    if (dn instanceof DataNode) {
+                        log.info("Using Raw Data file instead of Derived Data File.");
+                        if (((DataNode) dn).getData().getType().getName().contains("Raw")) {
+                            data = ((DataNode) dn).getData();
+                        }
+                    }
+                }
+            }
+
+            System.out.println("\n");
+        }
+
         DataNode dataNode = data.getProcessingNode();
 
         // Take the sequencing protocol
@@ -127,6 +139,7 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
                 continue;
             }
             ProtocolType ptype = proto.getType();
+
             if (ptype == null) {
                 continue;
             }
@@ -183,11 +196,11 @@ abstract class SraPipelineExportUtils extends SraExportUtils {
     protected String getParameterValue(
             final Assay assay, final ProtocolApplication papp, final String[] paramTypeArray, final boolean isMandatory) {
         String[] pvalues = null;
-        for(int i=0; i<paramTypeArray.length; i++){
+        for (int i = 0; i < paramTypeArray.length; i++) {
             pvalues = getParameterValues(assay, papp, paramTypeArray[i], false);
-            if (pvalues!=null && pvalues.length!=0) return pvalues[0];
+            if (pvalues != null && pvalues.length != 0) return pvalues[0];
         }
-        if (isMandatory){
+        if (isMandatory) {
             throw new TabMissingValueException(
                     i18n.msg(
                             "sra_missing_param", assay.getMeasurement().getName(), assay.getTechnologyName(),
