@@ -268,7 +268,13 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                     }
 
                     String taxon = oe.getAcc();
+
+                    //dealing with accesssions as URLs
+                    int index_underscore = taxon.indexOf('_');
+                    if (index_underscore!=-1)
+                        taxon = taxon.substring(index_underscore+1);
                     System.out.println("taxon = " + taxon);
+
                     if (taxon == null) {
                         break;
                     }
