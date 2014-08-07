@@ -748,8 +748,8 @@ public class SraExporter extends SraExportPipelineComponent {
     }
 
     /**
-     * Builds the ACTION elements for the submission of the parameter study. These are taken from certain ISATAB comments
-     * in the ISATAB study. At least one action must be defined in SRA, so the procedure raises an exception in case this
+     * Builds the ACTION elements for the submission of the parameter study. These are taken from certain ISA-Tab comments
+     * in the ISA-Tab study. At least one action must be defined in SRA, so the procedure raises an exception in case this
      * does not happen.
      *
      * @param xsub  appends the result to this SRA submission.
@@ -762,7 +762,6 @@ public class SraExporter extends SraExportPipelineComponent {
         String action = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Submission Action"));
 
         if ("ADD".equalsIgnoreCase(action)) {
-            // TODO: What the hell is analysis?
             final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};//, "analysis" could be added when needed
             final ADD.Schema.Enum[] schemas = new ADD.Schema.Enum[]{
                     ADD.Schema.STUDY, ADD.Schema.SAMPLE, ADD.Schema.EXPERIMENT, ADD.Schema.RUN
@@ -786,7 +785,6 @@ public class SraExporter extends SraExportPipelineComponent {
         }
 
         if ("MODIFY".equalsIgnoreCase(action)) {
-            // TODO: What the hell is analysis?
             final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};//, "analysis" could be added when needed
             final MODIFY.Schema.Enum[] schemas = new MODIFY.Schema.Enum[]{
                     MODIFY.Schema.STUDY, MODIFY.Schema.SAMPLE, MODIFY.Schema.EXPERIMENT, MODIFY.Schema.RUN
@@ -809,6 +807,28 @@ public class SraExporter extends SraExportPipelineComponent {
             xsub.setACTIONS(xactions);
         }
 
+        if ("VALIDATE".equalsIgnoreCase(action)) {
+            final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};//, "analysis" could be added when needed
+            final VALIDATE.Schema.Enum[] schemas = new VALIDATE.Schema.Enum[]{
+                    VALIDATE.Schema.STUDY, VALIDATE.Schema.SAMPLE, VALIDATE.Schema.EXPERIMENT, VALIDATE.Schema.RUN
+            };
+
+            for (int i = 0; i < schemas.length; i++) {
+                VALIDATE xvalidateAction = VALIDATE.Factory.newInstance();
+                //source and schema are mandatory
+                xvalidateAction.setSchema(schemas[i]);
+                xvalidateAction.setSource(sources[i] + ".xml");
+                ACTION xaction = xactions.addNewACTION();
+                xaction.setVALIDATE(xvalidateAction);
+            }
+
+            if (xactions.sizeOfACTIONArray() == 0) {
+                throw new TabMissingValueException(MessageFormat.format(
+                        "The study ''{0}'' has no SRA Submission Action, cannot export to SRA", study.getAcc()));
+            }
+
+            xsub.setACTIONS(xactions);
+        }
 
     }
 }
