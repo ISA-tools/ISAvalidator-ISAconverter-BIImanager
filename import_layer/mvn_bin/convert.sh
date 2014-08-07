@@ -1,3 +1,4 @@
+#!/bin/sh
 CONV_TARGET=$1
 SOURCEPATH=$2
 

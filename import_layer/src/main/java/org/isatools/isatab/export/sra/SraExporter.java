@@ -66,16 +66,32 @@ import uk.ac.ebi.bioinvindex.model.term.ContactRole;
 import uk.ac.ebi.bioinvindex.model.term.Design;
 import uk.ac.ebi.bioinvindex.model.term.PublicationStatus;
 import uk.ac.ebi.bioinvindex.utils.datasourceload.DataLocationManager;
-import uk.ac.ebi.embl.era.sra.xml.*;
+
+import uk.ac.ebi.embl.era.sra.xml.AttributeType;
+import uk.ac.ebi.embl.era.sra.xml.EXPERIMENTSETDocument;
+import uk.ac.ebi.embl.era.sra.xml.ExperimentSetType;
+import uk.ac.ebi.embl.era.sra.xml.LinkType;
 import uk.ac.ebi.embl.era.sra.xml.LinkType.ENTREZLINK;
 import uk.ac.ebi.embl.era.sra.xml.LinkType.URLLINK;
+import uk.ac.ebi.embl.era.sra.xml.RUNSETDocument;
+import uk.ac.ebi.embl.era.sra.xml.RunSetType;
+import uk.ac.ebi.embl.era.sra.xml.SAMPLESETDocument;
+import uk.ac.ebi.embl.era.sra.xml.STUDYDocument;
+import uk.ac.ebi.embl.era.sra.xml.SUBMISSIONDocument;
+import uk.ac.ebi.embl.era.sra.xml.SampleSetType;
+import uk.ac.ebi.embl.era.sra.xml.StudyType;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.DESCRIPTOR.STUDYTYPE;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.DESCRIPTOR.STUDYTYPE.ExistingStudyType;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.STUDYATTRIBUTES;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.STUDYLINKS;
+import uk.ac.ebi.embl.era.sra.xml.SubmissionType;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.ADD;
+import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.MODIFY;
+import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.VALIDATE;
+import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.HOLD;
+import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.CANCEL;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS.CONTACT;
 
@@ -87,22 +103,23 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
-//import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES;
-//import uk.ac.ebi.embl.era.sra.xml.SubmissionType.FILES.FILE;
-
 
 /**
- * The SRA exporter. Makes SRA submissions (http://www.ebi.ac.uk/embl/Documentation/ENA-Reads.html). One
+ * The SRA exporter. Makes SRA submissions (http://www.ebi.ac.uk/ena/). One
  * SRA submission is made for every study that has at least one assay file of type "sra" (to be specified in the
  * isatab_dispatch_mappings.csv file).
  *
  * @author brandizi
- *         <b>date</b>: Jul 20, 2009
+ * @author eamonnmag
+ * @author agbeltran
+ * @author proccaserra
+ *
+ * <b>date</b>: Jul 20, 2009
  */
 public class SraExporter extends SraExportPipelineComponent {
     /**
      * @param store      the object store that contains the BII model to be converted into SRA submissions
-     * @param sourcePath the directory of the ISATAB submission
+     * @param sourcePath the directory of the ISA-Tab submission
      * @param exportPath the directory where the SRA files are saved. We create the "sra/" directory under this path.
      *                   We further create one submission per ISATAB study, naming it with the study accession (e.g.: export/sra/BII-S-4/).
      *                   In each of these directories you'll have a set of SRA files corresponding to one submission and to the BII study.
@@ -742,7 +759,7 @@ public class SraExporter extends SraExportPipelineComponent {
 
         ACTIONS xactions = ACTIONS.Factory.newInstance();
 
-        String action = "ADD";
+        String action = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Submission Action"));
 
         if ("ADD".equalsIgnoreCase(action)) {
             // TODO: What the hell is analysis?
@@ -753,6 +770,7 @@ public class SraExporter extends SraExportPipelineComponent {
 
             for (int i = 0; i < schemas.length; i++) {
                 ADD xaddAction = ADD.Factory.newInstance();
+                //source and schema are mandatory
                 xaddAction.setSchema(schemas[i]);
                 xaddAction.setSource(sources[i] + ".xml");
                 ACTION xaction = xactions.addNewACTION();
@@ -766,5 +784,31 @@ public class SraExporter extends SraExportPipelineComponent {
 
             xsub.setACTIONS(xactions);
         }
+
+        if ("MODIFY".equalsIgnoreCase(action)) {
+            // TODO: What the hell is analysis?
+            final String[] sources = new String[]{"study", "sample_set", "experiment_set", "run_set"};//, "analysis" could be added when needed
+            final MODIFY.Schema.Enum[] schemas = new MODIFY.Schema.Enum[]{
+                    MODIFY.Schema.STUDY, MODIFY.Schema.SAMPLE, MODIFY.Schema.EXPERIMENT, MODIFY.Schema.RUN
+            };
+
+            for (int i = 0; i < schemas.length; i++) {
+                MODIFY xmodifyAction = MODIFY.Factory.newInstance();
+                //source and schema are mandatory
+                xmodifyAction.setSchema(schemas[i]);
+                xmodifyAction.setSource(sources[i] + ".xml");
+                ACTION xaction = xactions.addNewACTION();
+                xaction.setMODIFY(xmodifyAction);
+            }
+
+            if (xactions.sizeOfACTIONArray() == 0) {
+                throw new TabMissingValueException(MessageFormat.format(
+                        "The study ''{0}'' has no SRA Submission Action, cannot export to SRA", study.getAcc()));
+            }
+
+            xsub.setACTIONS(xactions);
+        }
+
+
     }
 }

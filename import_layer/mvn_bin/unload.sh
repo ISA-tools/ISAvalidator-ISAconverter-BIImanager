@@ -1,3 +1,4 @@
+#!/bin/sh
 SOURCEPATH=$1
 if [ "$SOURCEPATH" == "" ]; then 
   cat <<EOT

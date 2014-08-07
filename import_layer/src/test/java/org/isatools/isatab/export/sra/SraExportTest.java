@@ -60,7 +60,12 @@ import org.isatools.isatab_v1.mapping.ISATABMapper;
 import org.isatools.tablib.schema.FormatSetInstance;
 import org.isatools.tablib.utils.BIIObjectStore;
 import org.junit.Test;
-import uk.ac.ebi.embl.era.sra.xml.*;
+
+import uk.ac.ebi.embl.era.sra.xml.EXPERIMENTSETDocument;
+import uk.ac.ebi.embl.era.sra.xml.RUNSETDocument;
+import uk.ac.ebi.embl.era.sra.xml.SAMPLESETDocument;
+import uk.ac.ebi.embl.era.sra.xml.StudyType;
+import uk.ac.ebi.embl.era.sra.xml.SubmissionType;
 
 
 import java.io.File;
@@ -69,14 +74,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.System.out;
+import static java.lang.System.setOut;
 import static junit.framework.Assert.assertTrue;
 
 
+/**
+ *
+ * Test class for SraExport
+ *
+ */
 public class SraExportTest {
 
 
     @Test
-    public void testBasicExport() throws XmlException {
+    public void testBasicExport() throws XmlException, IOException {
         Map<String, String> testData = getTestData();
         for (String directory : testData.keySet()) {
 
@@ -87,6 +98,11 @@ public class SraExportTest {
                     "(This study is linked to the BII project, see http://www.ebi.ac.uk/bioinvindex/study.seam?studyId=${study-acc})");
 
             String baseDir = System.getProperty("basedir");
+
+            if ( baseDir == null )
+            {
+                baseDir = new File( "./import_layer" ).getCanonicalPath();
+            }
 
             System.out.println("basedir = " + baseDir);
 
@@ -106,23 +122,37 @@ public class SraExportTest {
             ISATABMapper mapper = new ISATABMapper(store, isatabInstance);
             mapper.map();
 
-            String studyExportPath = baseDir + "/target/export/";
+            String studyExportPath = baseDir + "/target/export";
+
+            File studyExportPathFile = new File(studyExportPath);
+            studyExportPathFile.mkdirs();
 
             SraExporter sraExporter = new SraExporter(store, filesPath, studyExportPath);
             sraExporter.export();
 
-            System.out.println("exportPath = " + studyExportPath);
+            System.out.println("studyExportPath = " + studyExportPath);
 
-            System.out.println(studyExportPath + "/sra/" + testData.get(directory) + "/study.xml");
+            File exportDirectory = new File(studyExportPath + "/sra/" +testData.get(directory));
+            exportDirectory.mkdirs();
+
+            System.out.println("exportDirectory = "+exportDirectory);
+
+            File studyFile = new File(exportDirectory + "/study.xml");
+
+            System.out.println("studyFile = " +studyFile);
+
+            System.out.println( studyFile.exists() );
 
             assertTrue("Ouch! No SRA export directory created for " + directory + ": " + studyExportPath, new File(studyExportPath).exists());
-            assertTrue("Ouch! No SRA study.xml created", new File(studyExportPath + "/sra/" + testData.get(directory) + "/study.xml").exists());
+            assertTrue("Ouch! No SRA study.xml created", studyFile.exists());
 
             // Validate the generated XML files
             try {
                 XmlOptions xopts = new XmlOptions();
                 xopts.setValidateOnSet();
-                SubmissionType xsub = SubmissionType.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/submission.xml"), xopts);
+                File submissionFile = new File(exportDirectory + "/submission.xml");
+                System.out.println("submission file exists = "+submissionFile.exists());
+                SubmissionType xsub = SubmissionType.Factory.parse(new File(exportDirectory + "/submission.xml"), xopts);
                 StudyType xstudy = StudyType.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/study.xml"), xopts);
                 SAMPLESETDocument xsamples = SAMPLESETDocument.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/sample_set.xml"), xopts);
                 EXPERIMENTSETDocument xexps = EXPERIMENTSETDocument.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/experiment_set.xml"), xopts);
@@ -141,7 +171,8 @@ public class SraExportTest {
 
         //testData.put("BII-S-4", "BII-S-4");
         //testData.put("TEST", "LTR_ARC");
-        testData.put("BPA-Wheat-Genome","BPA-Wheat-Cultivars");
+        //testData.put("BPA-Wheat-Genome","BPA-Wheat-Cultivars");
+        testData.put("BPA-Wheat-Genome","BPA-Wheat-Genome");
 
         return testData;
 
