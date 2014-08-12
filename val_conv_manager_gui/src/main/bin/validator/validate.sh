@@ -10,6 +10,6 @@ CP="isatools_deps.jar"
 
 VALIDATE="validate"
 ISATAB_DIR="mydir/BII-I-1"
-CONFIGURATION_DIR="config/default-config"
+CONFIGURATION_DIR="config/config-files"
 
 java -Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=128m -cp "$CP" org.isatools.isatab.manager.SimpleManager $VALIDATE $ISATAB_DIR $CONFIGURATION_DIR

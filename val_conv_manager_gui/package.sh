@@ -15,6 +15,9 @@ echo "ISAvalidator-ISAconverter-BIImanager packaging for type " $PACKAGE_TYPE
 if [ "$PACKAGE_TYPE" = "mixs"  ]
 then
     CONFIGURATION=isaconfig-mixs-v4.zip
+elif [ "$PACKAGE_TYPE" = "scidata"  ]
+then
+    CONFIGURATION=isaconfig-Scientific-Data-v1.2.zip
 else
     CONFIGURATION=isaconfig-default_v2014-01-16.zip
 fi
@@ -46,7 +49,7 @@ echo $filename
 
 #pause "Check filename"
 
-mv $filename default-config
+mv $filename config-files
 
 #pause "Renamed file"
 
