@@ -49,6 +49,7 @@
 package org.isatools.isatab.export.sra;
 
 import org.apache.commons.lang.StringUtils;
+import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Material;
 import uk.ac.ebi.bioinvindex.model.processing.Assay;
@@ -197,7 +198,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
         SAMPLEATTRIBUTES sampleAttrs = SAMPLEATTRIBUTES.Factory.newInstance();
 
-        populateSampleAttributes(sample, sampleAttrs, xsampleName);
+        populateSampleAttributes(sample, sampleAttrs, xsampleName, false);
 
         // Lookup the sample this sample derives from and and collect all their characteristics. We think it makes sense to
         // do that cause we're not sure the sample members (in a pool) will be taken into account
@@ -207,8 +208,9 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         String sourceName = getSourceName(backwardNodes);
 
         for (MaterialNode backwardMaterialNode : backwardNodes) {
-            populateSampleAttributes(backwardMaterialNode.getMaterial(), sampleAttrs, xsampleName);
+            populateSampleAttributes(backwardMaterialNode.getMaterial(), sampleAttrs, xsampleName, true);
         }
+
 
         xsample.setAlias(sourceName);
         xsample.setTITLE(sourceName);
@@ -235,7 +237,10 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         return null;
     }
 
-    private void populateSampleAttributes(Material material, SAMPLEATTRIBUTES sampleAttrs, SAMPLENAME xsampleName) {
+    private void populateSampleAttributes(Material material, SAMPLEATTRIBUTES sampleAttrs, SAMPLENAME xsampleName, boolean checkTaxonID) {
+
+        boolean taxonIDFound = false;
+
         for (CharacteristicValue cvalue : material.getCharacteristicValues()) {
 
 
@@ -280,11 +285,9 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                     }
                     try {
 
-                       // log.info("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
-                       // System.out.println("cvalue.getType().getValue()) = " + cvalue.getType().getValue());
-
                         xsampleName.setTAXONID(Integer.parseInt(taxon));
                         xsampleName.setSCIENTIFICNAME(oe.getName());
+                        taxonIDFound = true;
                        // System.out.println("xattr: " + xattr + oe.getName());
 
 
@@ -295,6 +298,15 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 }
             }
         } // for ( cvalue )
+
+
+        if (checkTaxonID && !taxonIDFound){
+            throw new TabMissingValueException(MessageFormat.format(
+                    "The sample ''{0}'' has no  NCBI Taxonomy Identifier (TAXON_ID). Please, provide an NCBI taxonomy annotation for the sample (e.g. in the Characteristics[organism] column).",
+                    material.getName()
+            ));
+        }
+
     }
 
     private boolean checkCharacteristicValue(CharacteristicValue cValue, String regex) {

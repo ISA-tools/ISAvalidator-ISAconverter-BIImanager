@@ -41,6 +41,7 @@ WD=$(pwd)
 
 pwd
 cd ../config
+rm -rf config-files
 unzip $CONFIGURATION
 
 filename="${CONFIGURATION%.*}"
