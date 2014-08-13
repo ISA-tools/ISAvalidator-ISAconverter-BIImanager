@@ -16,7 +16,7 @@ NOTE: this is a not yet fully stable!
         <READ_CLASS>Technical Read</READ_CLASS>
         <READ_TYPE>BarCode</READ_TYPE>
         <EXPECTED_BASECALL_TABLE>
-            <BASECALL min_match="$(min_match)" max_mismatch="0" match_edge="full" read_group_tag="$(read_group_tag)">$(read_group_tag) </BASECALL>
+            <BASECALL min_match="$(min_match)" max_mismatch="0" match_edge="full" read_group_tag="$(read_group_tag)">$(read_group_tag)</BASECALL>
         </EXPECTED_BASECALL_TABLE>
     </READ_SPEC>
     <READ_SPEC>

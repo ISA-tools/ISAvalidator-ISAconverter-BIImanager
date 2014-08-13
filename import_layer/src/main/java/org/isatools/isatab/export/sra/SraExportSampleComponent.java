@@ -302,7 +302,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
         if (checkTaxonID && !taxonIDFound){
             throw new TabMissingValueException(MessageFormat.format(
-                    "The sample ''{0}'' has no  NCBI Taxonomy Identifier (TAXON_ID). Please, provide an NCBI taxonomy annotation for the sample (e.g. in the Characteristics[organism] column).",
+                    "The source name ''{0}'' has no  NCBI Taxonomy Identifier (TAXON_ID). Please, provide an NCBI taxonomy annotation for the sample (e.g. in the Characteristics[organism] column).",
                     material.getName()
             ));
         }

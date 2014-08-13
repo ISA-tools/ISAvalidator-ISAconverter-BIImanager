@@ -767,31 +767,41 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             // now output rest of the barcodes (if there is more than one :) )
 
             if (barcodes.length > 1) {
+
                 // output the barcode
-
-                SpotDescriptorType.SPOTDECODESPEC.READSPEC readSpec = getReadSpecWithBaseCalls(xspotd.getSPOTDECODESPEC());
-
-                // create new array of base calls and place the already added base call item into the array
-
-                SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL[] baseCallArray = new SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL[barcodes.length];
-
+                SpotDescriptorType.SPOTDECODESPEC xspotDecodeSpec = xspotd.getSPOTDECODESPEC();
+                SpotDescriptorType.SPOTDECODESPEC.READSPEC[] readSpecArray = getReadSpecArray(xspotDecodeSpec);
+                SpotDescriptorType.SPOTDECODESPEC.READSPEC readSpec = getReadSpecWithBaseCalls(xspotDecodeSpec);
+                int readIndex = readSpec.getREADINDEX().intValue();
                 SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE table = readSpec.getEXPECTEDBASECALLTABLE();
 
+                System.out.println("Length of original base call array = " +table.getBASECALLArray().length);
+
+                // create new array of base calls and place the already added base call item into the array
+                SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL[] baseCallArray = new SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL[barcodes.length];
+
+                SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL completeBaseCall = table.getBASECALLArray(0);
 
                 for (int barcodeIndex = 0; barcodeIndex < barcodes.length; barcodeIndex++) {
 
                     SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL baseCall = SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL.Factory.newInstance();
+
+                    baseCall.setMinMatch(completeBaseCall.getMinMatch());
+                    baseCall.setMaxMismatch(completeBaseCall.getMaxMismatch());
+                    baseCall.setMatchEdge(completeBaseCall.getMatchEdge());
+
                     baseCall.setReadGroupTag(barcodes[barcodeIndex]);
                     baseCall.setStringValue(barcodes[barcodeIndex]);
-
                     baseCallArray[barcodeIndex] = baseCall;
                 }
 
-                System.out.println("BASE CALL TABLE: " + readSpec.getEXPECTEDBASECALLTABLE());
-                System.out.println("MY BASE CALL ARRAY: \n" + baseCallArray[0].toString());
-                readSpec.getEXPECTEDBASECALLTABLE().setBASECALLArray(baseCallArray);
-            }
+                table.setBASECALLArray(baseCallArray);
+                readSpec.setEXPECTEDBASECALLTABLE(table);
+                readSpecArray[readIndex] = readSpec;
+                xspotDecodeSpec.setREADSPECArray(readSpecArray);
+                xspotd.setSPOTDECODESPEC(xspotDecodeSpec);
 
+            }
 
             return xspotd;
 
@@ -804,7 +814,18 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         return xspotd;
     }
 
+    private SpotDescriptorType.SPOTDECODESPEC.READSPEC[] getReadSpecArray(SpotDescriptorType.SPOTDECODESPEC spotDecodeSpec) {
+        if (spotDecodeSpec.getREADSPECArray().length > 0) {
+           return spotDecodeSpec.getREADSPECArray();
+        }
+        return null;
+    }
 
+    /**
+     * Returns the first READSPEC whose EXPECTED_BASE_CALL_TABLE is not null
+     * @param spotDecodeSpec
+     * @return
+     */
     private SpotDescriptorType.SPOTDECODESPEC.READSPEC getReadSpecWithBaseCalls(SpotDescriptorType.SPOTDECODESPEC spotDecodeSpec) {
         if (spotDecodeSpec.getREADSPECArray().length > 0) {
             for (SpotDescriptorType.SPOTDECODESPEC.READSPEC readSpec : spotDecodeSpec.getREADSPECArray()) {
