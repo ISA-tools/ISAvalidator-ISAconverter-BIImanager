@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- INSDC Sequence Read Archive resource Common object XML specification -->
-<!-- $Id: SRA.common.xsd,v 1.1 2013/01/22 14:41:50 rasko Exp $ -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:com="SRA.common"
-    targetNamespace="SRA.common">
+<!-- $Id: SRA.common.xsd,v 1.4 2014/08/06 10:59:49 rajeshr Exp $ -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:com="SRA.common" targetNamespace="SRA.common">
 
     <xs:attributeGroup name="NameGroup">
         <xs:attribute name="alias" type="xs:string" use="optional">
@@ -98,8 +97,7 @@
                     <xs:documentation>A secondary identifier in the INSDC namespace.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="EXTERNAL_ID" type="com:QualifiedNameType" minOccurs="0"
-                maxOccurs="unbounded">
+            <xs:element name="EXTERNAL_ID" type="com:QualifiedNameType" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>An identifer rom a public non-INSDC resource.</xs:documentation>
                 </xs:annotation>
@@ -230,8 +228,7 @@
                             </xs:annotation>
                         </xs:element>
                         <xs:choice>
-                            <xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="1"
-                                maxOccurs="1">
+                            <xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="1" maxOccurs="1">
                                 <xs:annotation>
                                     <xs:documentation>
                                         Numeric record id meaningful to the NCBI Entrez system.
@@ -274,8 +271,7 @@
             <xs:element name="SPOT_DECODE_SPEC">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="SPOT_LENGTH" type="xs:nonNegativeInteger" minOccurs="0"
-                            maxOccurs="1">
+                        <xs:element name="SPOT_LENGTH" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation> Number of base/color calls, cycles, or flows per
                                     spot (raw sequence length or flow length including all
@@ -288,14 +284,12 @@
                         <xs:element name="READ_SPEC" minOccurs="1" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="READ_INDEX" type="xs:nonNegativeInteger"
-                                        nillable="false">
+                                    <xs:element name="READ_INDEX" type="xs:nonNegativeInteger" nillable="false">
                                         <xs:annotation>
                                             <xs:documentation>READ_INDEX starts at 0 and is incrementally increased for each sequential READ_SPEC within a SPOT_DECODE_SPEC</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="READ_LABEL" type="xs:string" minOccurs="0"
-                                        maxOccurs="1">
+                                    <xs:element name="READ_LABEL" type="xs:string" minOccurs="0" maxOccurs="1">
                                         <xs:annotation>
                                             <xs:documentation>READ_LABEL is a name for this tag, and can be used to on output to determine read name, for example F or R.</xs:documentation>
                                         </xs:annotation>
@@ -337,16 +331,14 @@
                                                     </xs:documentation>
                                             </xs:annotation>
                                             <xs:complexType>
-                                                <xs:attribute name="follows_read_index"
-                                                  type="xs:nonNegativeInteger" use="optional">
+                                                <xs:attribute name="follows_read_index" type="xs:nonNegativeInteger" use="optional">
                                                   <xs:annotation>
                                                   <xs:documentation>
                                                                 Specify the read index that precedes this read.
                                                             </xs:documentation>
                                                   </xs:annotation>
                                                 </xs:attribute>
-                                                <xs:attribute name="precedes_read_index"
-                                                  type="xs:nonNegativeInteger" use="optional">
+                                                <xs:attribute name="precedes_read_index" type="xs:nonNegativeInteger" use="optional">
                                                   <xs:annotation>
                                                   <xs:documentation>
                                                                 Specify the read index that follows this read.
@@ -379,24 +371,21 @@
                                                   <xs:complexType>
                                                   <xs:simpleContent>
                                                   <xs:extension base="xs:string">
-                                                  <xs:attribute name="read_group_tag"
-                                                  type="xs:string" use="optional">
+                                                  <xs:attribute name="read_group_tag" type="xs:string" use="optional">
                                                   <xs:annotation>
                                                   <xs:documentation>
                                                        When match occurs, the read will be tagged with this group membership
                                                   </xs:documentation>
                                                   </xs:annotation>
                                                   </xs:attribute>
-                                                  <xs:attribute name="min_match"
-                                                  type="xs:nonNegativeInteger" use="optional">
+                                                  <xs:attribute name="min_match" type="xs:nonNegativeInteger" use="optional">
                                                   <xs:annotation>
                                                   <xs:documentation>
                                                        Minimum number of matches to trigger identification.
                                                   </xs:documentation>
                                                   </xs:annotation>
                                                   </xs:attribute>
-                                                  <xs:attribute name="max_mismatch"
-                                                  type="xs:nonNegativeInteger" use="optional">
+                                                  <xs:attribute name="max_mismatch" type="xs:nonNegativeInteger" use="optional">
                                                   <xs:annotation>
                                                   <xs:documentation>
                                                        Maximum number of mismatches 
@@ -444,16 +433,14 @@
                                                   </xs:complexType>
                                                   </xs:element>
                                                 </xs:sequence>
-                                                <xs:attribute name="default_length"
-                                                  type="xs:nonNegativeInteger" use="optional">
+                                                <xs:attribute name="default_length" type="xs:nonNegativeInteger" use="optional">
                                                   <xs:annotation>
                                                   <xs:documentation>
                                                       Specify whether the spot should have a default length for this tag if the expected base cannot be matched.
                                                   </xs:documentation>
                                                   </xs:annotation>
                                                 </xs:attribute>
-                                                <xs:attribute name="base_coord"
-                                                  type="xs:nonNegativeInteger" use="optional">
+                                                <xs:attribute name="base_coord" type="xs:nonNegativeInteger" use="optional">
                                                   <xs:annotation>
                                                   <xs:documentation>
                                                       Specify an optional starting point for tag (base offset from 1).  
@@ -514,9 +501,12 @@
                                     <xs:enumeration value="Illumina Genome Analyzer IIx"/>
                                     <xs:enumeration value="Illumina HiSeq 2500"/>
                                     <xs:enumeration value="Illumina HiSeq 2000"/>
+                                    <xs:enumeration value="Illumina HiSeq 1500"/>
                                     <xs:enumeration value="Illumina HiSeq 1000"/>
                                     <xs:enumeration value="Illumina MiSeq"/>
-                                    <xs:enumeration value="Illumina HiScanSQ"/>
+                                    <xs:enumeration value="Illumina HiScanSQ"/>                                    
+                                    <xs:enumeration value="HiSeq X Ten"/>
+                                    <xs:enumeration value="NextSeq 500"/>
                                     <xs:enumeration value="unspecified"/>
                                 </xs:restriction>
                             </xs:simpleType>
@@ -583,6 +573,7 @@
                             <xs:simpleType>
                                 <xs:restriction base="xs:string">
                                     <xs:enumeration value="PacBio RS"/>
+                                    <xs:enumeration value="PacBio RS II"/>
                                     <xs:enumeration value="unspecified"/>
                                 </xs:restriction>
                             </xs:simpleType>
@@ -602,6 +593,21 @@
                                 <xs:restriction base="xs:string">
                                     <xs:enumeration value="Ion Torrent PGM"/>
                                     <xs:enumeration value="Ion Torrent Proton"/>
+                                    <xs:enumeration value="unspecified"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="OXFORD_NANOPORE">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="INSTRUMENT_MODEL" maxOccurs="1" minOccurs="1">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="MinION"/>
+                                    <xs:enumeration value="GridION"/>
                                     <xs:enumeration value="unspecified"/>
                                 </xs:restriction>
                             </xs:simpleType>
@@ -687,8 +693,7 @@
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="PREV_STEP_INDEX" type="xs:string" nillable="true"
-                            minOccurs="1" maxOccurs="unbounded">
+                        <xs:element name="PREV_STEP_INDEX" type="xs:string" nillable="true" minOccurs="1" maxOccurs="unbounded">
                             <xs:annotation>
                                 <xs:documentation>
                                     STEP_INDEX of the previous step in the workflow.  Set toNIL if the first pipe section.
@@ -774,15 +779,13 @@
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:all>
-                                    <xs:element maxOccurs="1" minOccurs="0" name="LABEL"
-                                        type="xs:string">
+                                    <xs:element maxOccurs="1" minOccurs="0" name="LABEL" type="xs:string">
                                         <xs:annotation>
                                             <xs:documentation> Text label to display for the
                                                  link. </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element maxOccurs="1" minOccurs="1" name="URL"
-                                        type="xs:anyURI">
+                                    <xs:element maxOccurs="1" minOccurs="1" name="URL" type="xs:anyURI">
                                         <xs:annotation>
                                             <xs:documentation> The internet service link
                                                  (file:, http:, ftp:, etc). </xs:documentation>
@@ -848,8 +851,7 @@
                     <xs:documentation> Generic processing pipeline specification. </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="DIRECTIVES" type="com:SequencingDirectivesType" minOccurs="0"
-                maxOccurs="1">
+            <xs:element name="DIRECTIVES" type="com:SequencingDirectivesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation> Processing directives tell the Sequence Read Archive how to
                         treat the input data, if any treatment is requested. </xs:documentation>

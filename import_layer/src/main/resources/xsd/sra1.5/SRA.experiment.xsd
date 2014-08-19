@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- INSDC Sequence Read Archive resource Experiment (SRX/ERX/DRX) object XML specification -->
-<!-- $Id: SRA.experiment.xsd,v 1.1 2013/01/22 14:41:50 rasko Exp $ -->
+<!-- $Id: SRA.experiment.xsd,v 1.2 2014/08/06 12:28:27 rajeshr Exp $ -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:com="SRA.common">
     <xs:import schemaLocation="SRA.common.xsd" namespace="SRA.common"/>
 
@@ -59,9 +59,8 @@
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="DEFAULT_MEMBER" type="PoolMemberType" minOccurs="0"
-                            maxOccurs="1"> </xs:element>
-                        <xs:element name="MEMBER" type="PoolMemberType" minOccurs="1" maxOccurs="unbounded" />
+                        <xs:element name="DEFAULT_MEMBER" type="PoolMemberType" minOccurs="0" maxOccurs="1"> </xs:element>
+                        <xs:element name="MEMBER" type="PoolMemberType" minOccurs="1" maxOccurs="unbounded"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -271,6 +270,13 @@
                                     immunoprecipitates.</xs:documentation>
                             </xs:annotation>
                         </xs:enumeration>
+                        <xs:enumeration value="RAD-Seq">
+                            <xs:annotation>
+                                <xs:documentation>RAD (Restriction site Associated DNA) Sequencing is a 
+                                method for sampling the genomes of multiple individuals in a population 
+                                using next generation DNA sequencing.</xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
                         <xs:enumeration value="OTHER">
                             <xs:annotation>
                                 <xs:documentation> Library strategy not listed. </xs:documentation>
@@ -478,6 +484,22 @@
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:enumeration>
+                        <xs:enumeration value="Oligo-dT">
+                            <xs:annotation>
+                                <xs:documentation> 
+                                    Select primarily messenger RNA, which conveniently is polyadenylated so these 
+                                    transcripts can be captured with oligo-dT beads (mRNA-seq). 
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="Inverse rRNA selection">
+                            <xs:annotation>
+                                <xs:documentation>
+                                	Remove the ribosomal transcripts by inverse selection: you capture them by annealing with specific 
+                                	oligos, also bound to beads, and then discard that (total RNA-seq). 
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
                         <xs:enumeration value="other">
                             <xs:annotation>
                                 <xs:documentation>
@@ -620,8 +642,7 @@
                     <xs:restriction base="xs:string"> </xs:restriction>
                 </xs:simpleType>
             </xs:element>
-            <xs:element name="LIBRARY_CONSTRUCTION_PROTOCOL" type="xs:string" minOccurs="0" 
-            maxOccurs="1">
+            <xs:element name="LIBRARY_CONSTRUCTION_PROTOCOL" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
                       Free form text describing the protocol by which the sequencing library was constructed.                             
@@ -698,8 +719,7 @@
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="IDENTIFIERS" type="com:IdentifierType" maxOccurs="1"
-                            minOccurs="0"> </xs:element>
+                        <xs:element name="IDENTIFIERS" type="com:IdentifierType" maxOccurs="1" minOccurs="0"> </xs:element>
                     </xs:sequence>
                     <xs:attributeGroup ref="com:RefNameGroup"/>
 

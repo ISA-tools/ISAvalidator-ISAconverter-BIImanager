@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- INSDC Sequence Read Archive resource Analysis (SRZ/ERZ/DRZ) object XML specification -->
-<!-- $Id: SRA.analysis.xsd,v 1.6 2013/08/06 15:33:33 rajeshr Exp $ -->
+<!-- $Id: SRA.analysis.xsd,v 1.10 2014/08/06 14:11:28 rajeshr Exp $ -->
 <xs:schema xmlns:com="SRA.common" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:import namespace="SRA.common" schemaLocation="SRA.common.xsd"/>
 
@@ -10,8 +10,7 @@
             <xs:element minOccurs="0" name="CHECKLIST">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS"
-                            type="com:IdentifierType"> </xs:element>
+                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS" type="com:IdentifierType"> </xs:element>
                     </xs:sequence>
                     <xs:attributeGroup ref="com:NameGroup"/>
                 </xs:complexType>
@@ -55,6 +54,7 @@
                     <xs:enumeration value="wig"/>
                     <xs:enumeration value="bed"/>
                     <xs:enumeration value="gff"/>
+                    <xs:enumeration value="fasta"/>
                     <xs:enumeration value="contig_fasta"/>
                     <xs:enumeration value="contig_flatfile"/>
                     <xs:enumeration value="scaffold_fasta"/>
@@ -129,15 +129,14 @@
                     <xs:documentation>Describes the analysis in detail.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="STUDY_REF">
+            <xs:element name="STUDY_REF" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation>Establishes a relationship between the analysis and the
                         parent study.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS"
-                            type="com:IdentifierType"> </xs:element>
+                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS" type="com:IdentifierType"> </xs:element>
                     </xs:sequence>
                     <xs:attributeGroup ref="com:RefNameGroup"/>
                 </xs:complexType>
@@ -149,8 +148,7 @@
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS"
-                            type="com:IdentifierType"> </xs:element>
+                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS" type="com:IdentifierType"> </xs:element>
                     </xs:sequence>
                     <xs:attributeGroup ref="com:RefNameGroup"/>
                     <xs:attribute name="label" type="xs:string">
@@ -160,6 +158,14 @@
                     </xs:attribute>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="EXPERIMENT_REF" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS" type="com:IdentifierType"> </xs:element>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="com:RefNameGroup"/>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="RUN_REF" maxOccurs="unbounded" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation>One or more runs associated with the
@@ -167,8 +173,7 @@
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS"
-                            type="com:IdentifierType"> </xs:element>
+                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS" type="com:IdentifierType"> </xs:element>
                     </xs:sequence>
                     <xs:attributeGroup ref="com:RefNameGroup"/>
                     <xs:attribute name="label" type="xs:string">
@@ -185,8 +190,7 @@
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS"
-                            type="com:IdentifierType"> </xs:element>
+                        <xs:element maxOccurs="1" minOccurs="0" name="IDENTIFIERS" type="com:IdentifierType"> </xs:element>
                     </xs:sequence>
                     <xs:attributeGroup ref="com:RefNameGroup"/>
                     <xs:attribute name="label" type="xs:string">
@@ -218,16 +222,14 @@
                                                   <xs:enumeration value="Whole genome sequencing"/>
                                                   <xs:enumeration value="Exome sequencing"/>
                                                   <xs:enumeration value="Genotyping by array"/>
-                                                  <xs:enumeration value="Curation"/>
+                                                  <xs:enumeration value="transcriptomics"/>
+                                                  <xs:enumeration value="Curation"/>                                                  
                                                   </xs:restriction>
                                                 </xs:simpleType>
                                             </xs:element>
-                                            <xs:element minOccurs="0" name="PROGRAM"
-                                                type="xs:string"/>
-                                            <xs:element name="PLATFORM" type="xs:string"
-                                                minOccurs="0"/>
-                                            <xs:element minOccurs="0" name="IMPUTATION"
-                                                type="xs:boolean"/>
+                                            <xs:element minOccurs="0" name="PROGRAM" type="xs:string"/>
+                                            <xs:element name="PLATFORM" type="xs:string" minOccurs="0"/>
+                                            <xs:element minOccurs="0" name="IMPUTATION" type="xs:boolean"/>
                                         </xs:sequence>
                                     </xs:extension>
                                 </xs:complexContent>
@@ -241,8 +243,7 @@
                                     <xs:element name="COVERAGE" type="xs:string"/>
                                     <xs:element name="PROGRAM" type="xs:string"/>
                                     <xs:element name="PLATFORM" type="xs:string"/>
-                                    <xs:element minOccurs="0" name="MIN_GAP_LENGTH"
-                                        type="xs:integer"/>
+                                    <xs:element minOccurs="0" name="MIN_GAP_LENGTH" type="xs:integer"/>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -271,8 +272,7 @@
                     <xs:complexType>
 
                         <xs:sequence>
-                            <xs:element maxOccurs="unbounded" minOccurs="1" name="FILE"
-                                type="AnalysisFileType"/>
+                            <xs:element maxOccurs="unbounded" minOccurs="1" name="FILE" type="AnalysisFileType"/>
                         </xs:sequence>
 
                     </xs:complexType>
