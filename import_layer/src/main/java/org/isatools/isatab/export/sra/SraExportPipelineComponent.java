@@ -767,15 +767,12 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             // now output rest of the barcodes (if there is more than one :) )
 
             if (barcodes.length > 1) {
-
                 // output the barcode
                 SpotDescriptorType.SPOTDECODESPEC xspotDecodeSpec = xspotd.getSPOTDECODESPEC();
                 SpotDescriptorType.SPOTDECODESPEC.READSPEC[] readSpecArray = getReadSpecArray(xspotDecodeSpec);
                 SpotDescriptorType.SPOTDECODESPEC.READSPEC readSpec = getReadSpecWithBaseCalls(xspotDecodeSpec);
                 int readIndex = readSpec.getREADINDEX().intValue();
                 SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE table = readSpec.getEXPECTEDBASECALLTABLE();
-
-                System.out.println("Length of original base call array = " +table.getBASECALLArray().length);
 
                 // create new array of base calls and place the already added base call item into the array
                 SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL[] baseCallArray = new SpotDescriptorType.SPOTDECODESPEC.READSPEC.EXPECTEDBASECALLTABLE.BASECALL[barcodes.length];
