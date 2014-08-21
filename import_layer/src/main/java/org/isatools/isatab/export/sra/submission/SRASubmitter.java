@@ -1,6 +1,7 @@
 package org.isatools.isatab.export.sra.submission;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -37,7 +38,7 @@ public class SRASubmitter {
 
     }
 
-    public void submit(ENARestServer server, String user, String password, String folder_path) {
+    public String submit(ENARestServer server, String user, String password, String folder_path) {
         try {
             String authURL = urlGenerator.getAuthenticatedURL(server, user, password);
 
@@ -132,15 +133,27 @@ public class SRASubmitter {
             fdmp.bodyPart(fdp_run);
 
 
-            String reString = webResource.type(MediaType.MULTIPART_FORM_DATA)
+            ClientResponse clientResponse = webResource.type(MediaType.MULTIPART_FORM_DATA)
                     .accept(MediaType.APPLICATION_XML)
-                    .post(String.class, fdmp);
-            System.out.println(reString);
+                    .post(ClientResponse.class, fdmp);
+
+            System.out.println(clientResponse.getStatusInfo().getStatusCode());
+
+            if (clientResponse.getStatusInfo().getStatusCode() == ClientResponse.Status.OK.getStatusCode())
+            {
+                String response = clientResponse.getEntity(String.class);
+                return response;
+            }
+            else
+            {
+                return null;
+            }
 
         } catch (Exception ex) {
             System.err.println("error!");
             ex.printStackTrace();
         }
+        return null;
     }
 
     private SSLContext getSSLContext() throws NoSuchAlgorithmException,
