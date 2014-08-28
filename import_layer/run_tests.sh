@@ -5,5 +5,4 @@ if [ "$MVN" == "" ]; then
 fi
 #MVN="mvn2 -s $HOME/.m2_old/settings.xml -Dmaven.repo.local=$HOME/.m2_old/repository"
 
-$MVN clean test -DargLine="-Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=512m" \
-    -Dsurefire.useFile=true -Ph2,test
+$MVN clean test -DargLine="-Xms256m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=512m"  -Ph2,test -Dtest=SraExportTest

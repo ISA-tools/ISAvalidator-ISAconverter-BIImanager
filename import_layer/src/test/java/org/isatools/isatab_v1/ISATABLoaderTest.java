@@ -196,7 +196,7 @@ public class ISATABLoaderTest {
     }
 
 
-    @Ignore
+    @Test
     public void loadAndValidateSlimTest() throws Exception {
         out.println("\n\n__________ loadAndValidateSlimTest__________\n\n");
 
@@ -214,7 +214,7 @@ public class ISATABLoaderTest {
         out.println("\n\n_________ /end: loadAndValidateSlimTest __________\n\n\n");
     }
 
-    @Ignore
+    @Test
     public void loadAndTestCommentPersistenceTest() throws Exception {
         out.println("\n\n__________ loadAndTestCommentPersistenceTest__________\n\n");
 

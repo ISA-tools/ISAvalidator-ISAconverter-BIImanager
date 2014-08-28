@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.System.out;
+import static java.lang.System.setOut;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -135,8 +136,6 @@ public class ValidatorTest {
 		out.println("\n" + StringUtils.center("/end:Testing validator for the dupe files case", 120, "-") + "\n\n");
 	}
 
-	// TODO: assertions
-	// TODO: cardinality checking
 	@Test
 	public void testValidatorFieldOrder() throws Exception {
 		out.println("\n\n" + StringUtils.center("Testing validator for the wrong field order case", 120, "-") + "\n");
@@ -184,25 +183,24 @@ public class ValidatorTest {
         out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
     }
 
-//    @Test
-//    public void testValidatorForOntologyHeaders() {
-//        out.println("\n\n" + StringUtils.center("Testing validator when using ontology value to define headers", 120, "-") + "\n");
-//
-//        ISAConfigurationSet.setConfigPath("/Users/eamonnmaguire/git/isarepo/ISAcreator/Configurations/isaconfig-default_v2013-02-13/");
-//        String baseDir = System.getProperty("basedir");
-//        String subDir = "/Users/eamonnmaguire/Dropbox/ISATAB-datasets/SCIDATA-sample2-ISA-tab_metadata";
-//
-//        GUIISATABValidator validator = new GUIISATABValidator();
-//
-//        GUIInvokerResult result = validator.validate(subDir);
-//        assertEquals("Validation should have succeeded.", GUIInvokerResult.SUCCESS, result);
-//
-//        System.out.println(validator.report());
-//
-//        out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
-//    }
-//
-//
+    @Test
+    public void testValidatorForOntologyHeaders() {
+        out.println("\n\n" + StringUtils.center("Testing validator with +/+ sequence...", 120, "-") + "\n");
+
+        String baseDir = System.getProperty("basedir");
+        String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/StemCellCommons-Example";
+
+        GUIISATABValidator validator = new GUIISATABValidator();
+
+        GUIInvokerResult result = validator.validate(subDir);
+        assertEquals("Validation should have succeeded.", GUIInvokerResult.SUCCESS, result);
+
+        System.out.println(validator.report());
+
+        out.println("\n" + StringUtils.center("/end:Testing validator for the wrong field order case", 120, "-") + "\n\n");
+    }
+
+
 //    @Test
 //    public void testValidatorForFallbackCase() {
 //        out.println("\n\n" + StringUtils.center("Testing validator when using fallback generic assay to validate failed", 120, "-") + "\n");

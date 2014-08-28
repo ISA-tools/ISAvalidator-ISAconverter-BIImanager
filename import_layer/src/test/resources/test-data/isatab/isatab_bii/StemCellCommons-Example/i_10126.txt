@@ -1,0 +1,92 @@
+ONTOLOGY SOURCE REFERENCE
+Term Source Name	"OBI"	"EFO"	"BTO"	"FMA"	"CHEBI"	"NCBITAXON"	"CL"
+Term Source File	"http://data.bioontology.org/ontologies/OBI"	"http://data.bioontology.org/ontologies/EFO"	"http://data.bioontology.org/ontologies/BTO"	"http://data.bioontology.org/ontologies/FMA"	"http://data.bioontology.org/ontologies/CHEBI"	"http://data.bioontology.org/ontologies/NCBITAXON"	"http://data.bioontology.org/ontologies/CL"
+Term Source Version	"21"	"111"	"1.2"	"3.1"	"78"	"1.2"	"43"
+Term Source Description	"Ontology for Biomedical Investigations"	"Experimental Factor Ontology"	"BRENDA Tissue and Enzyme Source Ontology"	"Foundational Model of Anatomy"	"Chemical Entities of Biological Interest Ontology"	"National Center for Biotechnology Information (NCBI) Organismal Classification"	"Cell Ontology"
+INVESTIGATION
+Investigation Identifier
+Investigation Title
+Investigation Description
+Investigation Submission Date
+Investigation Public Release Date
+INVESTIGATION PUBLICATIONS
+Investigation PubMed ID
+Investigation Publication DOI
+Investigation Publication Author list
+Investigation Publication Title
+Investigation Publication Status
+Investigation Publication Status Term Accession Number
+Investigation Publication Status Term Source REF
+INVESTIGATION CONTACTS
+Investigation Person Last Name
+Investigation Person Mid Initials
+Investigation Person First Name
+Investigation Person Address
+Investigation Person Phone
+Investigation Person Fax
+Investigation Person Email
+Investigation Person Affiliation
+Investigation Person Roles
+Investigation Person Roles Term Accession Number
+Investigation Person Roles Term Source REF
+STUDY
+Study Identifier	"10126"
+Study Title	"Molecular Signatures Orchestrating the Fate of Human Hematopoietic Stem Cells Originating From Different Stages of Ontogeny"
+Study Submission Date	"2011-12-18"
+Study Public Release Date	""
+Study Description	"Investigation of human hematopoietic stem cells gene expression patterns originating from different stages of ontogeny including fetal blood, cord blood, bone marrow, and mobilized peripheral blood in Lin-CD34+CD38- versus Lin-CD34+CD38+ populations.    "
+Study File Name	"s_10126.txt"
+STUDY DESIGN DESCRIPTORS
+Study Design Type	"Parallel Group Design"
+Study Design Type Term Accession Number	""
+Study Design Type Term Source REF	""
+STUDY PUBLICATIONS
+Study PubMed ID	"NA"	
+Study Publication DOI	"NA"	
+Study Publication Author list	"NA"	
+Study Publication Title	"NA"	
+Study Publication Status	""	""
+Study Publication Status Term Accession Number	""	""
+Study Publication Status Term Source REF	""	""
+STUDY FACTORS
+Study Factor Name	"organism part"	"positive markers"	"negative markers"
+Study Factor Type	"organism part"	"positive markers"	"negative markers"
+Study Factor Type Term Accession Number	""	""	""
+Study Factor Type Term Source REF	""	""	""
+STUDY ASSAYS
+Study Assay Measurement Type	"transcription profiling"
+Study Assay Measurement Type Term Accession Number	"424"
+Study Assay Measurement Type Term Source REF	"OBI"
+Study Assay Technology Type	"DNA microarray"
+Study Assay Technology Type Term Accession Number	"400148"
+Study Assay Technology Type Term Source REF	"OBI"
+Study Assay Technology Platform	Affymetrix Human Genome U133A Array	Affymetrix Human Genome U133B Array
+Study Assay File Name	"a_10126.txt"
+STUDY PROTOCOLS
+Study Protocol Name	"growth protocol"	"treatment protocol"	"sample collection"	"nucleic acid extraction"	"labeling"	"hybridization"	"data collection"	"arrayQM"	"normalization data transformation"	"Pathprint"	"Pathprint pluriconsensus"	"Pathprint GEO"
+Study Protocol Type	"growth protocol"	"treatment protocol"	"sample collection"	"nucleic acid extraction"	"labeling"	"hybridization"	"data collection"	"arrayQM"	"normalization data transformation"	"Pathprint"	"Pathprint pluriconsensus"	"Pathprint GEO"
+Study Protocol Type Term Accession Number	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Type Term Source REF	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Description	""	""	""	"Cell purification method: 1. Ficoll separation to isolate mononuclear cells, 2. Lineage depleted cocktail to enrich progenitors, 3. CD34 and CD38 fluorochromes to enrich hematopoietic stem cells using FACS-Vantage.
+Method for estimating purity: Purity was checked after sorting the cells on FACS-Vantage. RNA prep method:	RNeasy"	""	""	""	""	""	""	""	""
+Study Protocol URI	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Version	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Parameters Name	""	""	""	""	""	""	""	""	"array design;annotation file"	""	""	""
+Study Protocol Parameters Name Term Accession Number	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Parameters Name Term Source REF	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Components Name	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Components Type	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Components Type Term Accession Number	""	""	""	""	""	""	""	""	""	""	""	""
+Study Protocol Components Type Term Source REF	""	""	""	""	""	""	""	""	""	""	""	""
+STUDY CONTACTS
+Study Person Last Name	"Bhatia"
+Study Person First Name	"Mickie"
+Study Person Mid Initials	""
+Study Person Email	""
+Study Person Phone	""
+Study Person Fax	""
+Study Person Address	""
+Study Person Affiliation	"Ontario Genomics Innovation Centre (OGIC)"
+Study Person Roles	""
+Study Person Roles Term Accession Number	""
+Study Person Roles Term Source REF	""
