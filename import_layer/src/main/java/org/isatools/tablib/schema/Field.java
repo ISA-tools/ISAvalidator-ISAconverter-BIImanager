@@ -81,8 +81,8 @@ public class Field extends SchemaNode implements Cloneable {
      * How we match an header, either in X or in X[Y](Z), X,Y,Z must match this pattern
      */
     public static final String ID_PATTERN = "" +
-            "[\\w_]+(?: *[\\w/_\\-\\:\\.\\, ]+)? *";
-    public static final String WORDS_PATTERN = "[\\w_\\s,/\\-#\\(\\)]+";
+            "[\\w_]+(?: *[\\w/_\\-\\:\\+\\.\\, ]+)? *";
+    public static final String WORDS_PATTERN = "[\\w_\\s,/\\-\\+#\\(\\)]+";
     public static final String URL_PATTERN = "\\b(((\\S+)?)(@|mailto\\:|(news|(ht|f)tp(s?))\\://)\\S+)\\b";
 
     public Field() {
@@ -130,7 +130,7 @@ public class Field extends SchemaNode implements Cloneable {
         // REs are our friends here
         //
         String pattern = "^ *(" + ID_PATTERN + ") *(?:\\[ *(" + ID_PATTERN + ")* *(?:\\( *(" + ID_PATTERN + "|" + WORDS_PATTERN + "|" + URL_PATTERN + ") *\\))?\\])? *$";
-
+//        System.out.println(pattern);
         log.trace("Field.parseHeader( '" + header + "' ), using the pattern: '" + pattern + "'");
         String bits[] = new RegEx(pattern, isCaseSensitive ? 0 : Pattern.CASE_INSENSITIVE).groups(header);
         log.trace(String.format("Field.parseHeaderRawResult('%s'), bits are: %s", header, Arrays.toString(bits)));
