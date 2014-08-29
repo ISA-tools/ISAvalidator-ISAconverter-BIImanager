@@ -109,6 +109,7 @@ public class OntologyValidator extends AbstractValidatorComponent {
                 result = false;
                 continue;
             }
+
             for (Record record : table.getRecords()) {
                 result &= validateSingleField(record, idx, cfg, cfield);
             }
@@ -136,22 +137,6 @@ public class OntologyValidator extends AbstractValidatorComponent {
             messages.add(
                     "Source '" + source + "' doesn't match the required source(s) for the field '" + cfgField.getHeader()
                             + "' in the file '" + record.getParent().getFileId() + "'"
-            );
-            result = false;
-        }
-
-        if (!ovalidator.sourceExists(source)) {
-            messages.add(
-                    "No information in Ontology Services about the source  '" + source + "', terms from this ontology won't be"
-                            + " validated. Check that your Internet connection and OLS/Bioportal sites."
-            );
-            return true;
-        }
-
-        if (!ovalidator.validateTermExistence(source, acc)) {
-            messages.add(
-                    "Term '" + acc + "/" + value + "' not existing in the ontology '" + source + "', in field '"
-                            + cfgField.getHeader() + "' in the file '" + record.getParent().getFileId() + "'"
             );
             result = false;
         }

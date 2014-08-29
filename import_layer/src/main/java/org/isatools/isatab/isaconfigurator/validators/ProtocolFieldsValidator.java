@@ -198,7 +198,6 @@ public class ProtocolFieldsValidator extends AbstractValidatorComponent {
                         if (StringUtils.equalsIgnoreCase(cfPtype, ptypeStr)) {
                             isMatched = true;
                             matchedCfProtos.put(cfproto, MapUtils.getInteger(matchedCfProtos, cfproto, 0) + 1);
-                            // TODO: Do specific checkings
                         }
                     }
                 }

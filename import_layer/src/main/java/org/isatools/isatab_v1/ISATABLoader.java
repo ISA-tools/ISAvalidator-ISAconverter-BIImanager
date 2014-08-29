@@ -129,9 +129,6 @@ public class ISATABLoader extends org.isatools.isatab.ISATABLoader {
                     String technology = StringUtils.trimToEmpty(record.getString(technologyFieldIdx));
                     String assayFileName = StringUtils.trimToEmpty(record.getString(assayFileNameIdx));
 
-                    System.out.println(technology);
-                    System.out.println(assayFileName);
-
                     if (StringUtils.trimToNull(endPoint) == null && assayFileName.isEmpty()) {
                         continue;
                     } else if (endPoint == null) {
