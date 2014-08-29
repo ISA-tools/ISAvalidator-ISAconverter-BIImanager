@@ -25,7 +25,7 @@
  * To contact the developers: isatools@googlegroups.com
  *
  * To report bugs: http://sourceforge.net/tracker/?group_id=215183&atid=1032649
- * To request enhancements: Êhttp://sourceforge.net/tracker/?group_id=215183&atid=1032652
+ * To request enhancements: ï¿½http://sourceforge.net/tracker/?group_id=215183&atid=1032652
  *
  *
  * __________
@@ -79,7 +79,6 @@ public class MAGETABExporterTest {
 				"bioinvindex.converters.magetab.backlink",
 				"(This experiment is linked to the BII project, see http://www.ebi.ac.uk/bioinvindex/study.seam?studyId=${study-acc}) "
 		);
-
 
 		String baseDir = System.getProperty("basedir");
 		String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_v1_200810/griffin_gauguier_200810";

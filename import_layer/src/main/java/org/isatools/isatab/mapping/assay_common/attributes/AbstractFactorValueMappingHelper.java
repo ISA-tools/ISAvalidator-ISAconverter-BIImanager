@@ -137,6 +137,7 @@ public abstract class AbstractFactorValueMappingHelper<T extends Identifiable>
         store.valueOfType(TabMappingContext.class).put(
                 "used.factorType." + study.getAcc() + "\\" + type.getValue(), type
         );
+        log.debug("FINISHED MAPPING" + mappedObject);
         return result;
     }
 

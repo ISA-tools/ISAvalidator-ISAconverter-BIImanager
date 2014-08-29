@@ -204,23 +204,19 @@ public class ISATABLoader extends TabLoader {
                 String technology = record.getString(technologyFieldIdx);
                 String assayFileName = record.getString(assayFileNameIdx);
 
-//			  DNA microarray
-//			  Gel Electrophoresis
-//			  Mass Spectrometry
-//			  NMR Spectroscopy
-//			  High throughput sequencing
+                if (!assayFileName.isEmpty()) {
+                    String assayFormatId = null;
+                    if ("DNA Microarray".equalsIgnoreCase(technology)) {
+                        assayFormatId = "transcriptomics_assay";
+                    } else if ("Mass Spectrometry".equalsIgnoreCase(technology)) {
+                        assayFormatId = "ms_spec_assay";
+                    } else {
+                        throw new TabInvalidValueException(i18n.msg("unknown_assay_type", endPoint, technology));
+                    }
 
-                String assayFormatId = null;
-                if ("DNA Microarray".equalsIgnoreCase(technology)) {
-                    assayFormatId = "transcriptomics_assay";
-                } else if ("Mass Spectrometry".equalsIgnoreCase(technology)) {
-                    assayFormatId = "ms_spec_assay";
-                } else {
-                    throw new TabInvalidValueException(i18n.msg("unknown_assay_type", endPoint, technology));
+                    FormatInstance assayFileInstance = load(assayFileName, assayFormatId);
+                    formatSetInstance.addFormatInstance(assayFileInstance);
                 }
-
-                FormatInstance assayFileInstance = load(assayFileName, assayFormatId);
-                formatSetInstance.addFormatInstance(assayFileInstance);
             }
         }
     }
@@ -238,8 +234,10 @@ public class ISATABLoader extends TabLoader {
         // Load the studies in Investigation.studyFileName
         loadStudies();
 
+
         // For all the assay files named in the assays, load the file
         loadAssays();
+        log.debug("Finished loading Assays");
 
         return getFormatSetInstance();
     }

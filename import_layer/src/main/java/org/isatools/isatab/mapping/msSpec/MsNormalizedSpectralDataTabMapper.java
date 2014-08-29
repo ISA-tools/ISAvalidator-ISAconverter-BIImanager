@@ -107,9 +107,7 @@ public class MsNormalizedSpectralDataTabMapper extends DataNodeTabMapper {
      */
     @Override
     public Data newMappedObject() throws InstantiationException, IllegalAccessException {
-        // TODO: we need proper constants for the roles
-        // TODO: fix to use real ReferenceSource
-        //
+
         return new Data(
                 "", new DataType("bii:ms_spec_normalized_data", "MS Normalized Spectral Data", new ReferenceSource("bii:data_types", "bii:data_types"))
         );

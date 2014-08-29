@@ -107,12 +107,19 @@ public class ISATABMapper extends FormatSetTabMapper {
         mergeProcessings();
         removeDeadPaths();
         setupCascadedProperties();
+        log.debug("Finished setupCascadedProperties");
         copyFactorValuesFromSamples();
+        log.debug("Finished copyFactorValuesFromSamples");
         setupAssayResult2AssayLinks();
+        log.debug("Finished setupAssayResult2AssayLinks");
         checkAssayResultsExist();
+        log.debug("Finished checkAssayResultsExist");
         checkChaining();
+        log.debug("Finished checkChaining");
         checkUnusedDeclaredEntities();
+        log.debug("Finished checkUnusedDeclaredEntities");
         checkInconsistentProperties();
+        log.debug("Finished checkInconsistentProperties");
 
         return getStore();
     }
@@ -301,18 +308,17 @@ public class ISATABMapper extends FormatSetTabMapper {
         }
 
         // OK, they're physically different but equivalent, let's merge them
-        //
         log.trace("Merging same data items: [ " + data1.getName() + " ]");
 
-        String url2 = StringUtils.trimToEmpty(data2.getUrl());
-        if (!StringUtils.trimToEmpty(data1.getUrl()).equals(url2)) {
-            throw new TabInconsistentValuesException(i18n.msg("same_file_name_2_urls", data1.getName()));
-        }
+//        String url2 = StringUtils.trimToEmpty(data2.getUrl());
+//        if (!StringUtils.trimToEmpty(data1.getUrl()).equals(url2)) {
+//            throw new TabInconsistentValuesException(i18n.msg("same_file_name_2_urls", data1.getName(), data1.getUrl(), url2));
+//        }
 
-        String matrixUrl2 = StringUtils.trimToEmpty(data2.getDataMatrixUrl());
-        if (!StringUtils.trimToEmpty(data1.getDataMatrixUrl()).equals(matrixUrl2)) {
-            throw new TabInconsistentValuesException(i18n.msg("same_file_name_2_DM_urls", data1.getName()));
-        }
+//        String matrixUrl2 = StringUtils.trimToEmpty(data2.getDataMatrixUrl());
+//        if (!StringUtils.trimToEmpty(data1.getDataMatrixUrl()).equals(matrixUrl2)) {
+//            throw new TabInconsistentValuesException(i18n.msg("same_file_name_2_DM_urls", data1.getName()));
+//        }
 
         for (Annotation annotation : data2.getAnnotations()) {
             data1.addAnnotation(annotation);
@@ -425,6 +431,7 @@ public class ISATABMapper extends FormatSetTabMapper {
         for (Study study : getStore().valuesOfType(Study.class)) {
             Set<AssayResult> assayResults = new HashSet<AssayResult>(study.getAssayResults());
             for (AssayResult assayResult : assayResults) {
+
                 final Collection<FactorValue> fvs = new ArrayList<FactorValue>();
 
                 graphVisitor.setActionAndReset(
@@ -469,6 +476,7 @@ public class ISATABMapper extends FormatSetTabMapper {
     private void setupAssayResult2AssayLinks() {
         for (Study study : getStore().valuesOfType(Study.class)) {
             for (final Assay assay : study.getAssays()) {
+                log.debug("Assay is " + assay);
                 for (AssayResult ar : ProcessingUtils.findAssayResultsFromAssay(assay)) {
                     ar.addAssay(assay);
                 }
@@ -568,7 +576,6 @@ public class ISATABMapper extends FormatSetTabMapper {
 
     /**
      * Provides a human-readable report of the BII objects in the store.
-     * TODO: this methods should be in the model, but together with {@link AssayGroup}.
      */
     public static String report(BIIObjectStore store) {
 
@@ -604,7 +611,7 @@ public class ISATABMapper extends FormatSetTabMapper {
             // Then we have to go back to the graph for AG totals
             //
             for (AssayGroup ag : assayGroups) {
-                if (ag.getStudy() != study) {
+                if (ag.getMeasurement() == null || ag.getStudy() != study) {
                     continue;
                 }
 
@@ -953,8 +960,6 @@ public class ISATABMapper extends FormatSetTabMapper {
     /**
      * This implements the criteria that are used to determine, during mapping, if two nodes are to be considered
      * equivalent. The class simply wraps {@link Node} and implements {@link #equals(Object)} and {@link #hashCode()}.
-     * <p/>
-     * TODO: probably this should simply go inside {@link Node}, {@link MaterialNode} etc.
      *
      * @author brandizi
      *         <b>date</b>: Apr 24, 2009

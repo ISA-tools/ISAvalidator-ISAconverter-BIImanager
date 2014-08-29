@@ -108,7 +108,6 @@ public class SimpleManager {
     }
 
     public void loadISAtab(String isatabFile, String userName) {
-
         GUIISATABValidator isatabValidator = new GUIISATABValidator();
         GUIInvokerResult validationResult = isatabValidator.validate(isatabFile);
 
@@ -116,7 +115,7 @@ public class SimpleManager {
             GUIISATABLoader loader = new GUIISATABLoader();
             log.info("Validation successful, now proceeding to load ISAtab into the BII...");
 
-            // even if the shared entitymanager is null, it will be generated in anycase by the loader code.
+            // even if the shared entity manager is null, it will be generated in anycase by the loader code.
             GUIInvokerResult loadingResult = loader.persist(isatabValidator.getStore(), isatabFile, sharedEntityManager);
 
             if (loadingResult == GUIInvokerResult.SUCCESS) {
@@ -135,7 +134,6 @@ public class SimpleManager {
         } else {
             log.error("Loading failed. See log for details.");
         }
-
     }
 
     public void closeEntityManager() {
@@ -173,7 +171,6 @@ public class SimpleManager {
             // continue
             loadISAtab(isatabFile, userName);
         }
-
     }
 
     protected Collection<Study> loadStudiesFromDatabase() {

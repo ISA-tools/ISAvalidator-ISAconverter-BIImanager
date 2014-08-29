@@ -101,7 +101,6 @@ public class OntologyValidator extends AbstractValidatorComponent {
             String rheader = rfield == null ? null : rfield.getAttr("header"),
                     rrheader = rrfield == null ? null : rrfield.getAttr("header");
 
-            // TODO: spaces don't count
             if (
                     !(BIIPropertyValueMappingHelper.TERM_SOURCE_HEADER.equalsIgnoreCase(rheader)
                             && BIIPropertyValueMappingHelper.ACCESSION_HEADER.equalsIgnoreCase(rrheader))
@@ -169,7 +168,7 @@ public class OntologyValidator extends AbstractValidatorComponent {
                     "Term '" + source + ":" + acc + "/" + value + "' is not among the valid terms for the field '"
                             + cfgField.getHeader() + "' in the file '" + record.getParent().getFileId() + "'"
             );
-            result = false;
+            return false;
         }
 
         return true;

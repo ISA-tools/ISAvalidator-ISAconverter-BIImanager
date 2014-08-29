@@ -49,6 +49,7 @@
 package org.isatools.isatab.export.sra;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.soap.encoding.soapenc.SoapEncUtils;
 import org.isatools.tablib.exceptions.TabMissingValueException;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Material;
@@ -58,6 +59,7 @@ import uk.ac.ebi.bioinvindex.model.term.CharacteristicValue;
 import uk.ac.ebi.bioinvindex.model.term.MaterialRole;
 import uk.ac.ebi.bioinvindex.model.term.OntologyTerm;
 import uk.ac.ebi.bioinvindex.model.xref.ReferenceSource;
+import uk.ac.ebi.bioinvindex.utils.i18n;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
 import uk.ac.ebi.embl.era.sra.xml.*;
 import uk.ac.ebi.embl.era.sra.xml.SampleDescriptorType.POOL;
@@ -109,6 +111,11 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         // Check left (backward) materials until you meet a sample. We cannot have pooling until then.
         while (true) {
             Collection<MaterialNode> leftMaterialNodes = ProcessingUtils.findBackwardMaterialNodes(materialNode, "", true);
+
+            for (MaterialNode mn : leftMaterialNodes) {
+                System.out.println(mn.getMaterial().getCharacteristicValues());
+            }
+
             if (leftMaterialNodes.size() != 1) {
                 String msg = MessageFormat.format(
                         "The assay file of type {0} / {1} for study {2} has an experimental graph that is not compatible with the " +
@@ -140,6 +147,9 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                     return null;
                 }
 
+
+                log.info(baseMatNode.getMaterial());
+
                 SampleType xsample = buildSingleExportedSample(baseMatNode);
                 if (xsample == null) {
                     return null;
@@ -158,7 +168,6 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 }
 
                 // If the pool is not empty, add it to the sample descriptor
-                // TODO: READ_LABEL and multiplexed experiments not supported yet.
                 if (xpoolMembers.size() > 0) {
                     POOL xpool = xSampledescriptor.addNewPOOL();
                     for (SampleType xpoolMember : xpoolMembers) {
@@ -198,7 +207,8 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
         SAMPLEATTRIBUTES sampleAttrs = SAMPLEATTRIBUTES.Factory.newInstance();
 
-        populateSampleAttributes(sample, sampleAttrs, xsampleName, false);
+        boolean taxonIDFound = populateSampleAttributes(sample, sampleAttrs, xsampleName);
+
 
         // Lookup the sample this sample derives from and and collect all their characteristics. We think it makes sense to
         // do that cause we're not sure the sample members (in a pool) will be taken into account
@@ -208,7 +218,13 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         String sourceName = getSourceName(backwardNodes);
 
         for (MaterialNode backwardMaterialNode : backwardNodes) {
-            populateSampleAttributes(backwardMaterialNode.getMaterial(), sampleAttrs, xsampleName, true);
+            taxonIDFound = populateSampleAttributes(backwardMaterialNode.getMaterial(), sampleAttrs, xsampleName) || taxonIDFound;
+        }
+
+        if (!taxonIDFound) {
+            throw new TabMissingValueException(
+                    i18n.msg("sra_no_tax_id", sample.getName())
+            );
         }
 
 
@@ -237,18 +253,16 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
         return null;
     }
 
-    private void populateSampleAttributes(Material material, SAMPLEATTRIBUTES sampleAttrs, SAMPLENAME xsampleName, boolean checkTaxonID) {
+    private boolean populateSampleAttributes(Material material, SAMPLEATTRIBUTES sampleAttrs, SAMPLENAME xsampleName) {
 
         boolean taxonIDFound = false;
 
         for (CharacteristicValue cvalue : material.getCharacteristicValues()) {
 
-
             AttributeType xattr = characteristicValue2SampleAttr(cvalue);
-            System.out.println("cvalue = " + cvalue.getType().getValue());
+            log.info("cvalue = " + cvalue.getType().getValue());
+            log.info(cvalue.getValue());
             boolean isOrganismTag = checkCharacteristicValue(cvalue, "(?i)tax|(?i)organism");
-
-            System.out.println("Is an organism tag? " + isOrganismTag);
 
             if (xattr != null) {
                 if (!isOrganismTag) {
@@ -258,6 +272,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
             }
 
             if (isOrganismTag) {
+
                 for (OntologyTerm oe : cvalue.getOntologyTerms()) {
 
                     ReferenceSource src = oe.getSource();
@@ -266,9 +281,9 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                         break;
                     }
 
-                   // wrong logic here. Was OR, should have been AND. In the case where both statements are true,
-                   // the overriding conclusion is false due to the negation operation.
-                    if ((!StringUtils.containsIgnoreCase(src.getDescription(), "ncbi")) && (!StringUtils.containsIgnoreCase(src.getDescription(), "taxonomy"))) {
+                    // wrong logic here. Was OR, should have been AND. In the case where both statements are true,
+                    // the overriding conclusion is false due to the negation operation.
+                    if ((!StringUtils.containsIgnoreCase(src.getDescription(), "ncbi"))) {
                         break;
                     }
 
@@ -276,9 +291,9 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
                     //dealing with accesssions as URLs
                     int index_underscore = taxon.indexOf('_');
-                    if (index_underscore!=-1)
-                        taxon = taxon.substring(index_underscore+1);
-                    System.out.println("taxon = " + taxon);
+                    taxon = (index_underscore != -1) ? taxon.substring(index_underscore + 1) : taxon;
+
+                    log.info("taxon = " + taxon);
 
                     if (taxon == null) {
                         break;
@@ -288,7 +303,6 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                         xsampleName.setTAXONID(Integer.parseInt(taxon));
                         xsampleName.setSCIENTIFICNAME(oe.getName());
                         taxonIDFound = true;
-                       // System.out.println("xattr: " + xattr + oe.getName());
 
 
                     } catch (NumberFormatException ex) {
@@ -298,15 +312,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 }
             }
         } // for ( cvalue )
-
-
-        if (checkTaxonID && !taxonIDFound){
-            throw new TabMissingValueException(MessageFormat.format(
-                    "The source name ''{0}'' has no  NCBI Taxonomy Identifier (TAXON_ID). Please, provide an NCBI taxonomy annotation for the sample or associated source material (e.g. in the Characteristics[organism] column).",
-                    material.getName()
-            ));
-        }
-
+        return taxonIDFound;
     }
 
     private boolean checkCharacteristicValue(CharacteristicValue cValue, String regex) {
@@ -332,6 +338,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
             Material leftMat = leftNode.getMaterial();
             MaterialRole leftTypeTerm = leftMat.getType();
             String leftType = leftTypeTerm.getAcc();
+
             if (StringUtils.containsIgnoreCase(leftType, "sample")) {
                 leftType = "sample";
             } else if (StringUtils.containsIgnoreCase(leftType, "source")) {
@@ -357,14 +364,10 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
             if ("sample".equals(firstLeftType)) {
                 if (!"sample".equals(leftType)) {
                     // Should never happen, cause we don't allow gaps, but anyway...
-                    String msg = MessageFormat.format(
-                            "The assay file of type {0} / {1} for study {2} has an experimental graph structure that is not "
-                                    + "compatible with the SRA format (irregular pooling structure). "
-                                    + "Please review the ISATAB/SRA formatting guidelines",
+                    String msg = i18n.msg("sra_graph_structure_unsupported",
                             assay.getMeasurement().getName(),
                             assay.getTechnologyName(),
-                            assay.getStudy().getAcc()
-                    );
+                            assay.getStudy().getAcc());
                     nonRepeatedMessages.add(msg);
                     log.trace(msg + ". Assay is: " + assay.getAcc());
                     return null;
@@ -398,14 +401,10 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 }
 
                 if (leftLeftNode.getDownstreamProcessings().size() != 0) {
-                    String msg = MessageFormat.format(
-                            "The assay file of type {0} / {1} for study {2} has an experimental graph structure that is not "
-                                    + "compatible with the SRA format (sources with derived nodes). Please review the ISATAB/SRA "
-                                    + "formatting guidelines.",
+                    String msg = i18n.msg("sra_graph_structure_unsupported",
                             assay.getMeasurement().getName(),
                             assay.getTechnologyName(),
-                            assay.getStudy().getAcc()
-                    );
+                            assay.getStudy().getAcc());
                     nonRepeatedMessages.add(msg);
                     log.trace(msg + ". Assay is: " + assay.getAcc());
                     return null;
@@ -421,28 +420,20 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 //
                 if (!"source".equals(leftType)) {
                     // Should never happen, cause we don't allow gaps, but anyway...
-                    String msg = MessageFormat.format(
-                            "The assay file of type {0} / {1} for study {2} has an experimental graph structure that is not "
-                                    + "compatible with the SRA format (irregular pooling structure). "
-                                    + "Please review the ISATAB/SRA formatting guidelines.",
-                            assay.getMeasurement().getName(),
-                            assay.getTechnologyName(),
-                            assay.getStudy().getAcc()
-                    );
+                    String msg = i18n.msg("sra_graph_structure_unsupported",
+                                    assay.getMeasurement().getName(),
+                                    assay.getTechnologyName(),
+                                    assay.getStudy().getAcc());
                     nonRepeatedMessages.add(msg);
                     log.trace(msg + ". Assay is: " + assay.getAcc());
                     return null;
                 }
 
                 if (leftNode.getDownstreamProcessings().size() != 0) {
-                    String msg = MessageFormat.format(
-                            "The assay file of type {0} / {1} for study {2} has an experimental graph structure that is not "
-                                    + "compatible with the SRA format (sources with derived nodes). "
-                                    + "Please review the ISATAB/SRA formatting guidelines.",
+                    String msg = i18n.msg("sra_graph_structure_unsupported",
                             assay.getMeasurement().getName(),
                             assay.getTechnologyName(),
-                            assay.getStudy().getAcc()
-                    );
+                            assay.getStudy().getAcc());
                     nonRepeatedMessages.add(msg);
                     log.trace(msg + ". Assay is: " + assay.getAcc());
                     return null;

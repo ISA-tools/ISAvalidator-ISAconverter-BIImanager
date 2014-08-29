@@ -126,6 +126,7 @@ public class AssayGroupTabMapper extends ClassTabMapper<AssayGroup> implements S
                         "Study Assay Measurement Type Term Source REF",
                         Measurement.class
                 );
+
                 if (measurement == null) {
                     throw new TabInternalErrorException(i18n.msg("missing_measurement", rval.getFilePath()));
                 }

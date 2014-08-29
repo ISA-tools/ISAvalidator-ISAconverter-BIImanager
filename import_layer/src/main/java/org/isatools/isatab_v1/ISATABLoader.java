@@ -129,7 +129,12 @@ public class ISATABLoader extends org.isatools.isatab.ISATABLoader {
                     String technology = StringUtils.trimToEmpty(record.getString(technologyFieldIdx));
                     String assayFileName = StringUtils.trimToEmpty(record.getString(assayFileNameIdx));
 
-                    if (endPoint == null) {
+                    System.out.println(technology);
+                    System.out.println(assayFileName);
+
+                    if (StringUtils.trimToNull(endPoint) == null && assayFileName.isEmpty()) {
+                        continue;
+                    } else if (endPoint == null) {
                         throw new TabMissingValueException("No Measurement specified for the assay file: '" + assayFileName
                                 + "' (column #" + (assayFileNameIdx + 1) + "), measurement type is a mandatory attribute for the assay file");
                     }

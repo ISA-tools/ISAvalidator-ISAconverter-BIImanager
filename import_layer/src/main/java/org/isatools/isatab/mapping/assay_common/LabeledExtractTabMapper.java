@@ -96,11 +96,8 @@ public class LabeledExtractTabMapper extends MaterialNodeTabMapper<Material> {
      * Provides a new sample
      */
     public Material newMappedObject() throws InstantiationException, IllegalAccessException {
-        // TODO: we need proper constants for the roles
-        // TODO: fix to use real ReferenceSource
-        //
         return new Material(
-                "", new MaterialRole("bii:labelled_extract", "Labelled Extract",
+                "", new MaterialRole("bii:labeled_extract", "Labeled Extract",
                         new ReferenceSource("bii:roles", "BII Roles"))
         );
     }

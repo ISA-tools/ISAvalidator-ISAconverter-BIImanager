@@ -25,9 +25,9 @@
         <!--
         TODO: See below the note about the jdbc drivers
 
-          I do need some defaults for these values, cause otherwise Eclipse gets crazy and doesn't recognize
-        the POM and causes a lot of trouble. In practice they're always overridden by the profiles.
-      -->
+            I do need some defaults for these values, cause otherwise Eclipse gets crazy and doesn't recognize
+            the POM and causes a lot of trouble. In practice they're always overridden by the profiles.
+        -->
 
         <jdbc.groupId>com.h2database</jdbc.groupId>
         <jdbc.artifactId>h2</jdbc.artifactId>

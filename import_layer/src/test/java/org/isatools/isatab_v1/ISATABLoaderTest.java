@@ -214,40 +214,4 @@ public class ISATABLoaderTest {
         out.println("\n\n_________ /end: loadAndValidateSlimTest __________\n\n\n");
     }
 
-    @Test
-    public void loadAndTestCommentPersistenceTest() throws Exception {
-        out.println("\n\n__________ loadAndTestCommentPersistenceTest__________\n\n");
-
-        String baseDir = System.getProperty("basedir");
-        String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/MTBLS35";
-        ISATABLoader loader = new ISATABLoader(filesPath);
-        FormatSetInstance isatabInstance = loader.load();
-
-        out.println("\n\n_________Validating__________\n\n\n");
-        ISATABValidator validator = new ISATABValidator(isatabInstance);
-        GUIInvokerResult result =validator.validate();
-
-        assertTrue("Oh, validation was successful without any warnings.", result == GUIInvokerResult.WARNING);
-
-        Investigation investigation = validator.getStore().valueOfType(Investigation.class);
-        for(Study study : investigation.getStudies()) {
-
-            for (Assay assay : study.getAssays()) {
-                Collection<AssayResult> results = ProcessingUtils.findAllDataInAssay(assay);
-                System.out.println("ANNOTATIONS");
-                for(Annotation annotation : assay.getMaterial().getAnnotations()) {
-
-                    System.out.println(annotation.getType().getValue() + " > " + annotation.getText());
-                }
-                System.out.println("-----");
-
-                for(AssayResult assayResult : results) {
-                    out.println(assayResult.getData().getType().getName() + " > " + assayResult.getData().getUrl() + " (meas:" + assay.getMeasurement().getName() + ", tech: " + assay.getTechnologyName() + ")");
-                }
-            }
-        }
-
-        out.println("\n\n_________ /end: loadAndTestCommentPersistenceTest __________\n\n\n");
-    }
-
 }
