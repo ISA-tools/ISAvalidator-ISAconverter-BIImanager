@@ -742,7 +742,7 @@ public class SraExporter extends SraExportPipelineComponent {
         }
 
         if (xcontacts.sizeOfCONTACTArray() == 0) {
-            throw new TabMissingValueException(MessageFormat.format("The study ''{0}'' has either no SRA contact or no email specified for the contact. Please supply an email, otherwise we cannot export to SRA.", study.getAcc()));
+            throw new TabMissingValueException(MessageFormat.format("The study ''{0}'' has either no SRA contact or no email specified for the contact. Please ensure you have one contact with a 'Role' as 'SRA Inform On Status', otherwise we cannot export to SRA.", study.getAcc()));
         }
         xsub.setCONTACTS(xcontacts);
     }
