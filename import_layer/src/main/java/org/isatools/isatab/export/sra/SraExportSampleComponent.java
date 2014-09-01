@@ -283,15 +283,20 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
 
                     // wrong logic here. Was OR, should have been AND. In the case where both statements are true,
                     // the overriding conclusion is false due to the negation operation.
-                    if ((!StringUtils.containsIgnoreCase(src.getDescription(), "ncbi"))) {
+                    if ((!StringUtils.containsIgnoreCase(src.getDescription(), "ncbi")) && (!StringUtils.containsIgnoreCase(src.getName(), "ncbi"))) {
                         break;
                     }
 
                     String taxon = oe.getAcc();
 
                     //dealing with accesssions as URLs
+
                     int index_underscore = taxon.indexOf('_');
-                    taxon = (index_underscore != -1) ? taxon.substring(index_underscore + 1) : taxon;
+                    if (index_underscore >= 0) {
+                        taxon = taxon.substring(index_underscore + 1);
+                    } else{
+                        taxon = taxon.lastIndexOf("/")> -1 ? taxon.substring(taxon.lastIndexOf("/") + 1) : taxon;
+                    }
 
                     log.info("taxon = " + taxon);
 
@@ -300,6 +305,7 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                     }
                     try {
 
+                        System.out.println(taxon);
                         xsampleName.setTAXONID(Integer.parseInt(taxon));
                         xsampleName.setSCIENTIFICNAME(oe.getName());
                         taxonIDFound = true;
@@ -421,9 +427,9 @@ abstract class SraExportSampleComponent extends SraPipelineExportUtils {
                 if (!"source".equals(leftType)) {
                     // Should never happen, cause we don't allow gaps, but anyway...
                     String msg = i18n.msg("sra_graph_structure_unsupported",
-                                    assay.getMeasurement().getName(),
-                                    assay.getTechnologyName(),
-                                    assay.getStudy().getAcc());
+                            assay.getMeasurement().getName(),
+                            assay.getTechnologyName(),
+                            assay.getStudy().getAcc());
                     nonRepeatedMessages.add(msg);
                     log.trace(msg + ". Assay is: " + assay.getAcc());
                     return null;

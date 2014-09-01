@@ -141,8 +141,7 @@ public class SRASubmitter {
 
             if (clientResponse.getStatusInfo().getStatusCode() == ClientResponse.Status.OK.getStatusCode())
             {
-                String response = clientResponse.getEntity(String.class);
-                return response;
+                return clientResponse.getEntity(String.class);
             }
             else
             {

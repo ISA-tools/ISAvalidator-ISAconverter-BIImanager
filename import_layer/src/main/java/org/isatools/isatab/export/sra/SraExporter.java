@@ -113,8 +113,8 @@ import java.util.Date;
  * @author eamonnmag
  * @author agbeltran
  * @author proccaserra
- *
- * <b>date</b>: Jul 20, 2009
+ *         <p/>
+ *         <b>date</b>: Jul 20, 2009
  */
 public class SraExporter extends SraExportPipelineComponent {
     /**
@@ -249,81 +249,9 @@ public class SraExporter extends SraExportPipelineComponent {
             // submission per study
             //
             if (isAssayOk && xstudyDoc != null) {
-                //int xfileSz = xsubFiles.sizeOfFILEArray();
 
-                // It doesn't make sense that we don't have at least one data file. This should prevent
-                // any case of missing experimental elements (e.g.: only the samples are reported).
-                //
-                //if (xfileSz <= minFiles) {
-                //    log.warn(MessageFormat.format(
-                //            "No data file defined for the study {0}, no SRA exporting done for this study",
-                //            study.getAcc()
-                //    ));
-                //} else {
                 String xSubmissionPath = exportPath + "/" + DataLocationManager.accession2FileName(studyAcc);
                 try {
-
-
-//                        log.debug("SRA exporter: copying SRA data files for study " + studyAcc);
-//                        for (int fileCount = 0; fileCount < xfileSz; fileCount++) {
-//                            FILE xfile = xsubFiles.getFILEArray(fileCount);
-//                            String fileName = xfile.getFilename();
-//
-//                            xfile.setChecksumMethod(FILE.ChecksumMethod.MD_5);
-//
-//                            String md5;
-//
-//                            if (!fileToMD5.containsKey(fileName)) {
-//
-//                                try {
-//                                    md5 = IOUtils.getMD5(new File(this.sourcePath + "/" + fileName));
-//                                    fileToMD5.put(fileName, md5);
-//
-//
-//                                    xfile.setChecksum(md5);
-//                                    System.out.println("MD5@submission: " + md5 + xsubFiles.getFILEArray(fileCount).getChecksum());
-//
-//                                } catch (NoSuchAlgorithmException e) {
-//                                    throw new TabInternalErrorException(
-//                                            "Problem while trying to compute the MD5 for '" + fileName + "': " + e.getMessage(), e
-//                                    );
-//                                } catch (IOException e) {
-//                                    throw new TabIOException(
-//                                            "I/O problem while trying to compute the MD5 for '" + fileName + "': " + e.getMessage(), e
-//                                    );
-//
-//                                }
-//                            } else {
-//
-//                                String checksum = fileToMD5.get(fileName);
-//                                xfile.setChecksum(checksum);
-//
-//                                System.out.println("SUBMISSION@MD5checksum: " + fileToMD5.get(fileName));
-//                                System.out.println(xfile.getChecksum());
-//                            }
-//
-//
-//                            xsubmission.setFILES(xsubFiles);
-//
-//
-//                            String filePath = sourcePath + "/" + fileName;
-//                            File srcFile = new File(filePath);
-//                            if (!srcFile.exists()) {
-//                                log.debug("WARNING: source data file '" + filePath + "' not found, ignoring");
-//                                continue;
-//                            }
-//                            String targetFilePath = xSubmissionPath + "/" + fileName;
-//                            File targetFile = new File(targetFilePath);
-//                            log.trace("Copying the file '" + filePath + "' to '" + targetFilePath + "'...");
-//                            FileUtils.copyFile(srcFile, targetFile, true);
-//                            // needed, there's a bug in the previous function
-//                            targetFile.setLastModified(srcFile.lastModified());
-//                            log.trace("...done");
-//                        }
-//
-//                        xsubmission.setFILES(xsubFiles);
-
-
                     File xsubmissionDir = new File(xSubmissionPath);
 
                     if (!xsubmissionDir.exists()) {
