@@ -758,5 +758,19 @@ public class SraExporter extends SraExportPipelineComponent {
             xsub.setACTIONS(xactions);
         }
 
+        if ("SUPPRESS".equalsIgnoreCase(action)) {
+            ACTION.SUPPRESS xsuppressAction = ACTION.SUPPRESS.Factory.newInstance();
+            xsuppressAction.setTarget(study.getAcc());
+            ACTION xaction = xactions.addNewACTION();
+            xaction.setSUPPRESS(xsuppressAction);
+
+            if (xactions.sizeOfACTIONArray() == 0) {
+                throw new TabMissingValueException(MessageFormat.format(
+                        "The study ''{0}'' has no SRA Submission Action, cannot export to SRA", study.getAcc()));
+            }
+
+            xsub.setACTIONS(xactions);
+        }
+
     }
 }
