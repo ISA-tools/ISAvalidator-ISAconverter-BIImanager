@@ -675,6 +675,8 @@ public class ISATABMapper extends FormatSetTabMapper {
                 if (ag.getStudy() != study) {
                     continue;
                 }
+                if (ag.getMeasurement() ==null)
+                    continue;
 
                 visitor = new NodeCountVisitor();
                 graphVisitor.setActionAndReset(visitor);
