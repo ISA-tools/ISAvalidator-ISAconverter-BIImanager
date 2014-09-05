@@ -38,7 +38,7 @@ public class SRASubmitter {
 
     }
 
-    public String submit(ENARestServer server, String user, String password, String folder_path) {
+    public ENAResponse submit(ENARestServer server, String user, String password, String folder_path) {
         try {
             String authURL = urlGenerator.getAuthenticatedURL(server, user, password);
 
@@ -137,16 +137,11 @@ public class SRASubmitter {
                     .accept(MediaType.APPLICATION_XML)
                     .post(ClientResponse.class, fdmp);
 
-            System.out.println(clientResponse.getStatusInfo().getStatusCode());
+            System.out.println("ENASubmitter - client response status = "+ clientResponse.getStatusInfo().getStatusCode());
 
-            if (clientResponse.getStatusInfo().getStatusCode() == ClientResponse.Status.OK.getStatusCode())
-            {
-                return clientResponse.getEntity(String.class);
-            }
-            else
-            {
-                return null;
-            }
+            ENAResponse response = new ENAResponse(clientResponse.getStatusInfo().getStatusCode(), clientResponse.getEntity(String.class));
+
+            return response;
 
         } catch (Exception ex) {
             System.err.println("error!");
