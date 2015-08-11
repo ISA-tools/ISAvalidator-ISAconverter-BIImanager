@@ -36,6 +36,13 @@
     </properties>
 
     <repositories>
+
+        <repository>
+            <id>mvnrepository</id>
+            <name>mvnrepository</name>
+            <url>http://www.mvnrepository.com</url>
+        </repository>
+
         <repository>
             <id>lutin</id>
             <url>http://lutinbuilder.labs.libre-entreprise.org/maven2/net/sourceforge/</url>
@@ -126,7 +133,7 @@
             <version>1.3.150</version>
         </dependency>
 
-	<dependency>
+        <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc5</artifactId>
             <version>11.1.0.7.0</version>
@@ -362,7 +369,7 @@
                 <configuration>
                     <forkMode>pertest</forkMode>
                     <printSummary>true</printSummary>
-
+                    <argLine>-Xms256m -Xmx512m</argLine>
                     <systemProperties>
                         <property>
                             <!-- The import layer reads configuration information from this directory -->
