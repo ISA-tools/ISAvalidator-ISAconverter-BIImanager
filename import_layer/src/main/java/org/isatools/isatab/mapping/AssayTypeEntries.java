@@ -203,13 +203,16 @@ public class AssayTypeEntries {
             if (StringUtils.trimToEmpty(entry[COL_MEASURMENT_LABEL]).equalsIgnoreCase(measurmentTypeLabel)
                     && StringUtils.trimToEmpty(entry[COL_TECHNOLOGY_LABEL]).equalsIgnoreCase(technologyTypeLabel)) {
                 String dispatchTarget = StringUtils.trimToNull(entry[COL_DISPATCH_ID]);
-                if (StringUtils.containsIgnoreCase(dispatchTarget, "New European Nucleotide Archive database")) {
+                System.out.println("COL_MEASURMENT_LABEL: " + entry[COL_MEASURMENT_LABEL]);
+                System.out.println("COL_TECHNOLOGY_LABEL: " + entry[COL_TECHNOLOGY_LABEL]);
+                System.out.println("COL_DISPATCH_ID: " + entry[COL_DISPATCH_ID]);
+                if (StringUtils.containsIgnoreCase(dispatchTarget, "sra")) {
                     dispatchTarget = "sra";
-                } else if (StringUtils.containsIgnoreCase(dispatchTarget, "ArrayExpress")) {
+                } else if (StringUtils.containsIgnoreCase(dispatchTarget, "magetab")) {
                     dispatchTarget = "magetab";
-                } else if (StringUtils.containsIgnoreCase(dispatchTarget, "Pride")) {
+                } else if (StringUtils.containsIgnoreCase(dispatchTarget, "prideml")) {
                     dispatchTarget = "prideml";
-                } else if (StringUtils.containsIgnoreCase(dispatchTarget, "BII metabolomic")) {
+                } else if (StringUtils.containsIgnoreCase(dispatchTarget, "meda")) {
                     dispatchTarget = "meda";
                 } else {
                     dispatchTarget = "generic";
