@@ -54,6 +54,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import org.isatools.isatab.ISATABValidator;
+import org.isatools.isatab.isaconfigurator.ISAConfigurationSet;
 import org.isatools.isatab.mapping.ISATABMapper;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.model.Identifiable;
@@ -98,6 +100,12 @@ public class ValidateShellCommand extends AbstractImportLayerShellCommand {
                     .withLongOpt("report-dir")
                     .create("d")
             );
+            clopts.addOption(OptionBuilder.withArgName("configuration-path")
+                            .withDescription("Is the directory where to load the configuration files from")
+                            .hasArg()
+                            .withLongOpt("report-dir")
+                            .create("c")
+            );
             CommandLine cmdl = AbstractImportLayerShellCommand.parseCommandLine(
                     clopts, args, ValidateShellCommand.class
             );
@@ -120,6 +128,8 @@ public class ValidateShellCommand extends AbstractImportLayerShellCommand {
             // Need to initialize this here, otherwise above config will fail
             log = Logger.getLogger(ValidateShellCommand.class);
 
+            String cfgPath = cmdl.getOptionValue("c");
+            ISAConfigurationSet.setConfigPath(cfgPath);
             BIIObjectStore store = loadIsaTab();
 
             log.info("ISATAB submission loaded, we have the following results:");

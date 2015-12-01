@@ -6,14 +6,14 @@
     <groupId>org.isatools</groupId>
     <artifactId>val_conv_manager</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.8</version>
+    <version>1.7.9</version>
 
     <name>ISAvalidator, ISAconverter and BII Data Management tool</name>
     <url>http://isa-tools.org/</url>
     <description>ISAvalidator, ISAconverter and BII Data Management tools</description>
 
     <properties>
-        <isatools.version>1.6.8</isatools.version>
+        <isatools.version>1.7.9</isatools.version>
     </properties>
 
     <modules>
@@ -53,7 +53,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.2</version>
-
             </plugin>
 
         </plugins>
