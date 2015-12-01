@@ -78,7 +78,8 @@ public class ConverterShellCommand extends AbstractImportLayerShellCommand {
 				exporter.export();
 				log.info(i18n.msg("converter_export_done", "PRIDE", exportPath + "/pride"));
 			}
-			if (wantAll || "prideml".equals(targetType)) {
+			if (wantAll || "sra".equals(targetType)) {
+				log.info("Using SraExporter");
 				SraExporter exporter = new SraExporter(store, sourceDirPath, exportPath);
 				exporter.export();
 				log.info(i18n.msg("converter_export_done", "SRA", exportPath + "/sra"));
