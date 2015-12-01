@@ -126,6 +126,7 @@ public class SraExporter extends SraExportPipelineComponent {
      */
     public SraExporter(BIIObjectStore store, String sourcePath, String exportPath) {
         super(store, sourcePath, exportPath);
+        log.info("Successfully created SraExporter");
     }
 
 
@@ -133,7 +134,7 @@ public class SraExporter extends SraExportPipelineComponent {
      * The procedure to call for triggering the export
      */
     public void export() {
-
+        log.info("SraExporter.export()");
         for (final Study study : store.valuesOfType(Study.class)) {
             // Go ahead only if there is some SRA assay
             boolean haveSra = false;
@@ -144,6 +145,7 @@ public class SraExporter extends SraExportPipelineComponent {
                 }
             }
             if (!haveSra) {
+                nonRepeatedMessages.add("No SRA assay found, skipping processing");
                 continue;
             }
 
@@ -287,7 +289,6 @@ public class SraExporter extends SraExportPipelineComponent {
                 } catch (IOException ex) {
                     throw new TabIOException(MessageFormat.format("Error during SRA export of study {0}: {1}", studyAcc, ex.getMessage()), ex);
                 } finally {
-
                     //we need to add the schema namespace to the output files in order to allow validation
                     SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/submission_initial.xml"), "SRA.submission.xsd", "<SUBMISSION center_name");
                     SRAXMLSchemaInjector.addNameSpaceToFile(new File(xSubmissionPath + "/study_initial.xml"), "SRA.study.xsd", "<STUDY alias");
