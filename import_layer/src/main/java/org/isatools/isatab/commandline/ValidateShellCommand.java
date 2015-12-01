@@ -127,9 +127,9 @@ public class ValidateShellCommand extends AbstractImportLayerShellCommand {
 
             // Need to initialize this here, otherwise above config will fail
             log = Logger.getLogger(ValidateShellCommand.class);
-
-            String cfgPath = cmdl.getOptionValue("c");
-            ISAConfigurationSet.setConfigPath(cfgPath);
+            String configPath = cmdl.getOptionValue("c");
+            log.info("Validating using config: " + configPath);
+            ISAConfigurationSet.setConfigPath(configPath);
             BIIObjectStore store = loadIsaTab();
 
             log.info("ISATAB submission loaded, we have the following results:");
