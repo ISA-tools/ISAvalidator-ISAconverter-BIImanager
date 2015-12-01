@@ -10,6 +10,11 @@ import org.apache.log4j.Logger;
 import org.isatools.isatab.export.magetab.MAGETABExporter;
 import org.isatools.isatab.export.pride.DraftPrideExporter;
 import org.isatools.isatab.export.sra.SraExporter;
+import org.isatools.isatab.gui_invokers.GUIInvokerResult;
+import org.isatools.isatab.isaconfigurator.ISAConfigurationSet;
+import org.isatools.isatab.isaconfigurator.ISAConfiguratorValidator;
+import org.isatools.isatab_v1.ISATABLoader;
+import org.isatools.isatab_v1.mapping.ISATABReducedMapper;
 import org.isatools.tablib.utils.BIIObjectStore;
 import uk.ac.ebi.bioinvindex.utils.i18n;
 
@@ -79,10 +84,23 @@ public class ConverterShellCommand extends AbstractImportLayerShellCommand {
 				log.info(i18n.msg("converter_export_done", "PRIDE", exportPath + "/pride"));
 			}
 			if (wantAll || "sra".equals(targetType)) {
-				log.info("Using SraExporter");
-				SraExporter exporter = new SraExporter(store, sourceDirPath, exportPath);
-				exporter.export();
-				log.info(i18n.msg("converter_export_done", "SRA", exportPath + "/sra"));
+				log.info("Validating ISA-Tab before export first");
+				String configPath = args[2];
+				log.info("Using config: " + configPath);
+				ISAConfigurationSet.setConfigPath(configPath);
+				log.info("Loading ISA-Tab from: " + sourceDirPath);
+				ISATABLoader loader = new ISATABLoader(sourceDirPath);
+				ISATABReducedMapper mapper = new ISATABReducedMapper(new BIIObjectStore(), loader.load());
+				ISAConfiguratorValidator validator = new ISAConfiguratorValidator(mapper.map());
+				log.info("Running validator");
+				if (validator.validate() != GUIInvokerResult.SUCCESS) {
+					log.warn("Validation failed");
+				} else {
+					log.info("Using SraExporter");
+					SraExporter exporter = new SraExporter(store, sourceDirPath, exportPath);
+					exporter.export();
+					log.info(i18n.msg("converter_export_done", "SRA", exportPath + "/sra"));
+				}
 			}
 		}
 		catch (Exception ex) {
