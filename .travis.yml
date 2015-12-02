@@ -2,4 +2,4 @@ language: java
 jdk:
   - openjdk6
 before_script:
-  - sed -i.bak -e 's|https://nexus.codehaus.org/snapshots/|https://oss.sonatype.org/content/repositories/codehaus-snapshots/|g' ~/.m2/settings.xml
+  - cp maven_settings.xml ~/.m2/settings.xml
