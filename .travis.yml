@@ -1,5 +1,5 @@
 language: java
 jdk:
   - openjdk6
-before_script:
+before_install:
   - cp maven_settings.xml ~/.m2/settings.xml
