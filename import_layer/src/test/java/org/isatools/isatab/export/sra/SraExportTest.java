@@ -75,6 +75,7 @@ import java.util.Map;
 
 import static java.lang.System.out;
 import static java.lang.System.setOut;
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 
@@ -85,6 +86,8 @@ import static junit.framework.Assert.assertTrue;
  */
 public class SraExportTest {
 
+    public static final String VALID = "VALID";
+    public static final String NOT_VALID = "NOT VALID";
 
     @Test
     public void testBasicExport() throws XmlException, IOException {
@@ -101,7 +104,7 @@ public class SraExportTest {
 
             if ( baseDir == null )
             {
-                baseDir = new File( "./import_layer" ).getCanonicalPath();
+                baseDir = new File( "" ).getCanonicalPath();
             }
 
             System.out.println("basedir = " + baseDir);
@@ -128,11 +131,15 @@ public class SraExportTest {
             studyExportPathFile.mkdirs();
 
             SraExporter sraExporter = new SraExporter(store, filesPath, studyExportPath);
-            sraExporter.export();
+
+            boolean flag = sraExporter.export();
+            boolean isExpectedValid = testData.get(directory).equals(VALID);
+
+            assertEquals("The return value is true if at least one study was converted", isExpectedValid, flag);
 
             System.out.println("studyExportPath = " + studyExportPath);
 
-            File exportDirectory = new File(studyExportPath + "/sra/" +testData.get(directory));
+            File exportDirectory = new File(studyExportPath + "/sra/" +directory);
             exportDirectory.mkdirs();
 
             System.out.println("exportDirectory = "+exportDirectory);
@@ -143,24 +150,27 @@ public class SraExportTest {
 
             System.out.println( studyFile.exists() );
 
-            assertTrue("Ouch! No SRA export directory created for " + directory + ": " + studyExportPath, new File(studyExportPath).exists());
-            assertTrue("Ouch! No SRA study.xml created", studyFile.exists());
+            if (isExpectedValid) {
+                assertTrue("Ouch! No SRA export directory created for " + directory + ": " + studyExportPath, new File(studyExportPath).exists());
+                assertTrue("Ouch! No SRA study.xml created", studyFile.exists());
 
-            // Validate the generated XML files
-            try {
-                XmlOptions xopts = new XmlOptions();
-                xopts.setValidateOnSet();
-                File submissionFile = new File(exportDirectory + "/submission.xml");
-                System.out.println("submission file exists = "+submissionFile.exists());
-                SubmissionType xsub = SubmissionType.Factory.parse(new File(exportDirectory + "/submission.xml"), xopts);
-                StudyType xstudy = StudyType.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/study.xml"), xopts);
-                SAMPLESETDocument xsamples = SAMPLESETDocument.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/sample_set.xml"), xopts);
-                EXPERIMENTSETDocument xexps = EXPERIMENTSETDocument.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/experiment_set.xml"), xopts);
-                RUNSETDocument xruns = RUNSETDocument.Factory.parse(new File(studyExportPath + "/sra/" + testData.get(directory) + "/run_set.xml"), xopts);
-            } catch (XmlException ex) {
-                throw new XmlException("Argh! Validation of resulting SRA/XML failed!: " + ex.getMessage(), ex);
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                // Validate the generated XML files
+                try {
+                    XmlOptions xopts = new XmlOptions();
+                    xopts.setValidateOnSet();
+                    File submissionFile = new File(exportDirectory + "/submission.xml");
+                    System.out.println("submission file exists = "+submissionFile.exists());
+                    SubmissionType xsub = SubmissionType.Factory.parse(new File(exportDirectory + "/submission.xml"), xopts);
+                    StudyType xstudy = StudyType.Factory.parse(new File(studyExportPath + "/sra/" + directory + "/study.xml"), xopts);
+                    SAMPLESETDocument xsamples = SAMPLESETDocument.Factory.parse(new File(studyExportPath + "/sra/" + directory + "/sample_set.xml"), xopts);
+                    EXPERIMENTSETDocument xexps = EXPERIMENTSETDocument.Factory.parse(new File(studyExportPath + "/sra/" + directory + "/experiment_set.xml"), xopts);
+                    RUNSETDocument xruns = RUNSETDocument.Factory.parse(new File(studyExportPath + "/sra/" + directory + "/run_set.xml"), xopts);
+                } catch (XmlException ex) {
+                    throw new XmlException("Argh! Validation of resulting SRA/XML failed!: " + ex.getMessage(), ex);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -169,9 +179,11 @@ public class SraExportTest {
     private Map<String, String> getTestData() {
         Map<String, String> testData = new HashMap<String, String>();
 
-        testData.put("BII-S-4", "BII-S-4");
-        testData.put("BPA-Wheat-Genome","BPA-Wheat-Cultivars");
-
+        //testData.put("BII-S-4", VALID);
+        //testData.put("BII-S-7-missing-sra-header", NOT_VALID);
+        //testData.put("BII-S-7-not-converting", NOT_VALID);
+        testData.put("BII-S-7", VALID);
+        //testData.put("BPA-Wheat-Genome","BPA-Wheat-Cultivars");
 
         return testData;
 
