@@ -9,3 +9,6 @@ target
 /.settings
 /.project
 /.classpath
+
+# intelliJ env dir
+.idea
