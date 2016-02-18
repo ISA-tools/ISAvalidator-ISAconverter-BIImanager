@@ -98,8 +98,16 @@ public class ConverterShellCommand extends AbstractImportLayerShellCommand {
 				} else {
 					log.info("Using SraExporter");
 					SraExporter exporter = new SraExporter(store, sourceDirPath, exportPath);
-					exporter.export();
+					boolean flag = exporter.export();
 					log.info(i18n.msg("converter_export_done", "SRA", exportPath + "/sra"));
+					// SRA output correctly produced
+					if (flag) {
+						System.exit(0);
+					}
+					// no study has been converted to SRA
+					else {
+						System.exit(1);
+					}
 				}
 			}
 		}
