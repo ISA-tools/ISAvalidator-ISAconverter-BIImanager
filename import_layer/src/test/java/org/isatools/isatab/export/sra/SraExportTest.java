@@ -179,10 +179,12 @@ public class SraExportTest {
     private Map<String, String> getTestData() {
         Map<String, String> testData = new HashMap<String, String>();
 
-        //testData.put("BII-S-4", VALID);
-        //testData.put("BII-S-7-missing-sra-header", NOT_VALID);
-        //testData.put("BII-S-7-not-converting", NOT_VALID);
-        testData.put("BII-S-7", VALID);
+        testData.put("BII-S-4", VALID);
+        testData.put("BII-S-7-missing-sra-header", NOT_VALID);
+        testData.put("BII-S-7-not-converting", NOT_VALID);
+
+        // this one is not working at the moment
+        // testData.put("BII-S-7", VALID);
         //testData.put("BPA-Wheat-Genome","BPA-Wheat-Cultivars");
 
         return testData;

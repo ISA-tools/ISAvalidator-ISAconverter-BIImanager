@@ -74,6 +74,8 @@ public class ConverterShellCommand extends AbstractImportLayerShellCommand {
 			log.info(i18n.msg("mapping_done_now_exporting", store.size()));
 
 			boolean wantAll = "all".equals(targetType);
+			boolean flag = false;
+
 			if (wantAll || "magetab".equals(targetType)) {
 				MAGETABExporter.dispatch(store, sourceDirPath, exportPath);
 				log.info(i18n.msg("converter_export_done", "MAGETAB", exportPath + "/magetab"));
@@ -94,22 +96,26 @@ public class ConverterShellCommand extends AbstractImportLayerShellCommand {
 				ISAConfiguratorValidator validator = new ISAConfiguratorValidator(mapper.map());
 				log.info("Running validator");
 				if (validator.validate() != GUIInvokerResult.SUCCESS) {
-					log.warn("Validation failed");
+					log.warn("ConverterShellCommand - Validation failed");
 				} else {
 					log.info("Using SraExporter");
 					SraExporter exporter = new SraExporter(store, sourceDirPath, exportPath);
-					boolean flag = exporter.export();
+					flag = exporter.export();
 					log.info(i18n.msg("converter_export_done", "SRA", exportPath + "/sra"));
-					// SRA output correctly produced
-					if (flag) {
-						System.exit(0);
-					}
-					// no study has been converted to SRA
-					else {
-						System.exit(1);
-					}
 				}
 			}
+
+			// SRA output correctly produced
+			if (flag) {
+				log.info("ConverterShellCommand - conversion went fine, exiting with code 0");
+				System.exit(0);
+			}
+			// no study has been converted to SRA
+			else {
+				log.info("ConverterShellCommand - conversion failed, exiting with code 1");
+				System.exit(1);
+			}
+
 		}
 		catch (Exception ex) {
 			String msg = "ERROR: problem while running the ISATAB converter: " + ex.getMessage();

@@ -5,17 +5,24 @@ import org.isatools.isatab.gui_invokers.GUIISATABValidator;
 import org.isatools.isatab.gui_invokers.GUIInvokerResult;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
 
 public class ISATABNanoValidatorTest {
 
     @Test
-    public void testValidateISATABNanoFile() {
+    public void testValidateISATABNanoFile() throws IOException {
 
         out.println("\n\n" + StringUtils.center("Testing validator for ISATAB Nano case.", 120, "-") + "\n");
 
         String baseDir = System.getProperty("basedir");
+        if ( baseDir == null )
+        {
+            baseDir = new File( "" ).getCanonicalPath();
+        }
         String subDir = baseDir + "/target/test-classes/test-data/isatab/isatab_nano/Decuzzi";
 
         GUIISATABValidator validator = new GUIISATABValidator();

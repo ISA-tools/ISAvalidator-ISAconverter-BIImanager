@@ -65,6 +65,7 @@ import uk.ac.ebi.bioinvindex.model.*;
 import uk.ac.ebi.bioinvindex.model.processing.Assay;
 import uk.ac.ebi.bioinvindex.utils.processing.ProcessingUtils;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -80,6 +81,11 @@ public class ISATABLoaderTest {
         out.println("\n\n__________ Advanced ISATAB Loading Test __________\n\n");
 
         String baseDir = System.getProperty("basedir");
+
+        if (baseDir == null) {
+            baseDir = new File("").getCanonicalPath();
+        }
+
         String filesPath = baseDir + "/target/test-classes/test-data/isatab/isatab_bii/JCastrillo-BII-I-1";
         ISATABLoader loader = new ISATABLoader(filesPath);
 
