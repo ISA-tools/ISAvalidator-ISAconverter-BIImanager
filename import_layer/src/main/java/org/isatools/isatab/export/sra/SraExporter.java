@@ -66,32 +66,18 @@ import uk.ac.ebi.bioinvindex.model.term.ContactRole;
 import uk.ac.ebi.bioinvindex.model.term.Design;
 import uk.ac.ebi.bioinvindex.model.term.PublicationStatus;
 import uk.ac.ebi.bioinvindex.utils.datasourceload.DataLocationManager;
-
-import uk.ac.ebi.embl.era.sra.xml.AttributeType;
-import uk.ac.ebi.embl.era.sra.xml.EXPERIMENTSETDocument;
-import uk.ac.ebi.embl.era.sra.xml.ExperimentSetType;
-import uk.ac.ebi.embl.era.sra.xml.LinkType;
+import uk.ac.ebi.embl.era.sra.xml.*;
 import uk.ac.ebi.embl.era.sra.xml.LinkType.ENTREZLINK;
 import uk.ac.ebi.embl.era.sra.xml.LinkType.URLLINK;
-import uk.ac.ebi.embl.era.sra.xml.RUNSETDocument;
-import uk.ac.ebi.embl.era.sra.xml.RunSetType;
-import uk.ac.ebi.embl.era.sra.xml.SAMPLESETDocument;
-import uk.ac.ebi.embl.era.sra.xml.STUDYDocument;
-import uk.ac.ebi.embl.era.sra.xml.SUBMISSIONDocument;
-import uk.ac.ebi.embl.era.sra.xml.SampleSetType;
-import uk.ac.ebi.embl.era.sra.xml.StudyType;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.DESCRIPTOR.STUDYTYPE;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.DESCRIPTOR.STUDYTYPE.ExistingStudyType;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.STUDYATTRIBUTES;
 import uk.ac.ebi.embl.era.sra.xml.StudyType.STUDYLINKS;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.ADD;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.MODIFY;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.VALIDATE;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.HOLD;
-import uk.ac.ebi.embl.era.sra.xml.SubmissionType.ACTIONS.ACTION.CANCEL;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS;
 import uk.ac.ebi.embl.era.sra.xml.SubmissionType.CONTACTS.CONTACT;
 
@@ -178,26 +164,28 @@ public class SraExporter extends SraExportPipelineComponent {
             xsubmission.setAlias(studyAcc);
 
 
-            //brokerName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Broker Name"));
+            brokerName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Broker Name"));
             if (brokerName == null) {
                 brokerName = "ISAcreator";
-//                log.warn(MessageFormat.format(
-//                        "The study ''{0}'' has no 'SRA Broker Name'",
-//                        study.getAcc()
-//                ));
+                xsubmission.setBrokerName(brokerName);
+                log.warn(MessageFormat.format(
+                        "The study ''{0}'' has no 'SRA Broker Name'",
+                        study.getAcc()
+                ));
             } else {
                 xsubmission.setBrokerName(brokerName);
             }
 
-            String labName = null; //StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Lab Name"));
+            //String labName = null;
+            String labName = StringUtils.trimToNull(study.getSingleAnnotationValue("comment:SRA Lab Name"));
             if (labName == null) {
-//                labName=centerName;
-//                xsubmission.setLabName(labName);
+                labName=centerName;
+                xsubmission.setLabName(labName);
 
-//                log.warn(MessageFormat.format(
-//                        "The study ''{0}'' has no 'SRA Lab Name'",
-//                        study.getAcc()
-//                ));
+                log.warn(MessageFormat.format(
+                        "The study ''{0}'' has no 'SRA Lab Name'",
+                        study.getAcc()
+                ));
             } else {
                 xsubmission.setLabName(centerName);
             }
@@ -221,7 +209,7 @@ public class SraExporter extends SraExportPipelineComponent {
 
             //final int minFiles = xsubFiles.sizeOfFILEArray();
 
-            STUDYDocument xstudyDoc = null;
+            STUDYSETDocument xstudyDoc = null;
 
             boolean isAssayOk = true;
 
@@ -327,16 +315,17 @@ public class SraExporter extends SraExportPipelineComponent {
      *
      * @return the SRA STUDY element that is to be used to build the corresponding XML study file.
      */
-    private STUDYDocument buildExportedStudy(Study study) {
+    private STUDYSETDocument buildExportedStudy(Study study) {
 
         final String studyAcc = study.getAcc();
         final Investigation investigation = study.getUniqueInvestigation();
 
         XmlOptions xmlOptions = new XmlOptions();
         xmlOptions.setSaveNamespacesFirst();
-
-        STUDYDocument xstudyDoc = STUDYDocument.Factory.newInstance(xmlOptions);
-        StudyType xstudy = StudyType.Factory.newInstance();
+        STUDYSETDocument xstudyDoc = STUDYSETDocument.Factory.newInstance(xmlOptions);
+        StudySetType xstudySet = StudySetType.Factory.newInstance();
+//        STUDYDocument xstudyDoc = STUDYDocument.Factory.newInstance(xmlOptions);
+        StudyType xstudy = xstudySet.addNewSTUDY();
         xstudy.setAlias(studyAcc);
 
         StudyType.DESCRIPTOR xdescriptor = StudyType.DESCRIPTOR.Factory.newInstance();
@@ -363,6 +352,12 @@ public class SraExporter extends SraExportPipelineComponent {
         String title = StringUtils.trimToNull(study.getTitle());
         if (title != null) {
             xdescriptor.setSTUDYTITLE(title);
+        }
+        else {
+            throw new TabMissingValueException(MessageFormat.format(
+                    "The study ''{0}'' has no 'Study Title', cannot export to SRA format",
+                    study.getAcc()
+            ));
         }
 
         String studyAbstract = StringUtils.trimToNull(study.getDescription());
@@ -489,7 +484,8 @@ public class SraExporter extends SraExportPipelineComponent {
             xstudy.setDESCRIPTOR(xdescriptor);
         }
 
-        xstudyDoc.setSTUDY(xstudy);
+//        xstudyDoc.setSTUDY(xstudy);
+        xstudyDoc.setSTUDYSET(xstudySet);
         return xstudyDoc;
     }
 

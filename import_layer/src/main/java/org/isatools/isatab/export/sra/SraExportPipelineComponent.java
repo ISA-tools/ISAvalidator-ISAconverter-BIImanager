@@ -1,6 +1,7 @@
 /**
 
- The ISAconverter, ISAvalidator & BII Management Tool are components of the ISA software suite (http://www.isa-tools.org)
+ The ISAconverter, ISAvalidator & BII Management Tool are components of the ISA software suite (http://www.isa-tools.
+ org)
 
  Exhibit A
  The ISAconverter, ISAvalidator & BII Management Tool are licensed under the Mozilla Public License (MPL) version
@@ -178,12 +179,12 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             EXPERIMENTREF xexpRef = EXPERIMENTREF.Factory.newInstance();
             xexpRef.setRefname(materialAcc);
 
-              STUDYREF.Factory.newInstance();
+            STUDYREF.Factory.newInstance();
 
 
 
 
-           // DESIGN xdesign = DESIGN.Factory.newInstance();
+            // DESIGN xdesign = DESIGN.Factory.newInstance();
             LibraryType xdesign =  LibraryType.Factory.newInstance();
             xdesign.setDESIGNDESCRIPTION("See study and sample descriptions for details");
 
@@ -352,8 +353,8 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 //        if (targetTaxon != null) { xlib.setLIBRARYNAME(assay.getAcc() + "_" + targetTaxon);      }
 //        else {
 //            //IF no 'parameter [library name] is found', then set the library name to be that on the assay
-            xlib.setLIBRARYNAME(assay.getAcc() + "");
-       // }
+        xlib.setLIBRARYNAME(assay.getAcc() + "");
+        // }
 
         StringBuffer protocol = new StringBuffer();
         String pDescription = StringUtils.trimToNull(papp.getProtocol().getDescription());
@@ -361,67 +362,372 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             protocol.append("\n protocol_description: " + pDescription);
         }
 
-
-        //HERE we handle SRA way of coding transcription profiling using sequencing. We can automatically set LIBRARY SOURCE to TRANSCRIPTOMIC
+        //HERE we handle SRA way of coding whole genome sequencing using nucleic sequencing. We can automatically set LIBRARY SOURCE to GENOMIC
         //same for Strategy and selection however we check against the user input via the ISA file
-        if (measurement.equalsIgnoreCase("transcription profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
+        if ((measurement.equalsIgnoreCase("genome sequencing") ||
+                (measurement.equalsIgnoreCase("whole genome sequencing"))
+                        &&  technology.equalsIgnoreCase("nucleotide sequencing"))){
 
+            String source = getParameterValue(assay, papp, "library source", true);
+            String selection = getParameterValue(assay, papp, "library selection", true);
+            String strategy = getParameterValue(assay, papp, "library strategy", true);
 
+            //xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC);
+            if (("GENOMIC".equalsIgnoreCase(source)) ||
+                    ("GENOMIC SINGLE CELL".equalsIgnoreCase(source)) ||
+                    ("METAGENOMIC".equalsIgnoreCase(source)) ||
+                    ("OTHER".equalsIgnoreCase(source))
+                    ) {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.Enum.forString(source));
+            } else {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + source);
+            }
 
-            xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.TRANSCRIPTOMIC);
-            xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.RNA_SEQ);
-            xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.RT_PCR);
+            if (("WGS".equalsIgnoreCase(strategy)) || ("OTHER".equalsIgnoreCase(strategy))) {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.Enum.forString(strategy));
+            } else {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + strategy);
+            }
+
+            if (("RANDOM".equalsIgnoreCase(selection)) || ("UNSPECIFIED".equalsIgnoreCase(selection))) {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.Enum.forString(selection));
+            } else {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.UNSPECIFIED);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + selection);
+            }
 
             ProtocolApplication pappIp = getProtocol(assay, "library construction");
             if (pappIp == null) {
                 return null;
             }
-
-
         }
 
-        if (measurement.equalsIgnoreCase("DNA methylation profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
 
-            xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC);
+        //HERE we handle SRA way of coding targeted genome sequencing using nucleic sequencing. We can automatically set LIBRARY SOURCE to GENOMIC
+        //same for Strategy and selection however we check against the user input via the ISA file
+        if ((measurement.equalsIgnoreCase("exome sequencing") &&  technology.equalsIgnoreCase("nucleotide sequencing"))){
 
+            String source = getParameterValue(assay, papp, "library source", true);
             String selection = getParameterValue(assay, papp, "library selection", true);
             String strategy = getParameterValue(assay, papp, "library strategy", true);
 
-            //String strategy = getParameterValue(assay, papp, "library strategy", true);
-
-            //now checking that the input obtained from parsing ISA is compatible with SRA CV
-
-            if (("MRE-Seq".equalsIgnoreCase(strategy)) ||
-                    ("MeDIP-Seq".equalsIgnoreCase(strategy)) ||
-                    ("MBD-Seq".equalsIgnoreCase(strategy)) ||
-                    ("Bisulfite-Seq".equalsIgnoreCase(strategy)) ||
-                    ("OTHER".equalsIgnoreCase(strategy))
+            //xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC);
+            if (("GENOMIC".equalsIgnoreCase(source)) ||
+                    ("GENOMIC SINGLE CELL".equalsIgnoreCase(source)) ||
+                    ("METAGENOMIC".equalsIgnoreCase(source)) ||
+                    ("OTHER".equalsIgnoreCase(source))
                     ) {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.Enum.forString(source));
+            } else {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + source);
+            }
 
+            if (("WXS".equalsIgnoreCase(strategy)) || ("OTHER".equalsIgnoreCase(strategy))) {
                 xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.Enum.forString(strategy));
             } else {
                 xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.OTHER);
-                System.out.println("ERROR:value supplied is not compatible with SRA1.2 schema" + strategy);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + strategy);
             }
 
-
-            //String selection = getParameterValue(assay, papp, "library selection", true);
-
-            if (("MF".equalsIgnoreCase(selection)) ||
+            if (("RANDOM".equalsIgnoreCase(selection)) ||
+                    ("Hybrid Selection".equalsIgnoreCase(selection)) ||
+                    ("Reduced Representation".equalsIgnoreCase(selection)) ||
+                    ("MDA".equalsIgnoreCase(selection)) ||
+                    ("RANDOM PCR".equalsIgnoreCase(selection)) ||
+                    ("RANDOM".equalsIgnoreCase(selection)) ||
                     ("PCR".equalsIgnoreCase(selection)) ||
-                    ("HMPR".equalsIgnoreCase(selection)) ||
-                    ("MSLL".equalsIgnoreCase(selection)) ||
-                    ("5-methylcytidine antibody".equalsIgnoreCase(selection)) ||
-                    ("MBD2 protein methyl-CpG binding domain".equals(selection)) ||
+                    ("other".equalsIgnoreCase(selection)) ||
+                    ("unspecified".equalsIgnoreCase(selection))
+                    ) {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.Enum.forString(selection));
+            } else {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.UNSPECIFIED);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + selection);
+            }
+
+            ProtocolApplication pappIp = getProtocol(assay, "library construction");
+            if (pappIp == null) {
+                return null;
+            }
+        }
+
+
+
+        //HERE we handle SRA way of coding transcription profiling using sequencing. We can automatically set LIBRARY SOURCE to TRANSCRIPTOMIC
+        //same for Strategy and selection however we check against the user input via the ISA file
+        if (measurement.equalsIgnoreCase("transcription profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
+
+            String source = getParameterValue(assay, papp, "library source", true);
+            String strategy = getParameterValue(assay, papp, "library strategy", true);
+            String selection = getParameterValue(assay, papp, "library selection", true);
+
+            //now checking that the input obtained from parsing ISA is compatible with SRA CV
+            //xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.TRANSCRIPTOMIC);
+            if (("TRANSCRIPTOMIC".equalsIgnoreCase(source)) ||
+                    ("TRANSCRIPTOMIC SINGLE CELL".equalsIgnoreCase(source)) ||
+                    ("METATRANSCRIPTOMIC".equalsIgnoreCase(source)) ||
+                    ("OTHER".equalsIgnoreCase(source))
+                    ) {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.Enum.forString(source));
+            } else {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + source);
+            }
+            if (("RNA-Seq".equalsIgnoreCase(strategy)) ||
+                    ("ssRNA-Seq".equalsIgnoreCase(strategy)) ||
+                    ("miRNA-Seq".equalsIgnoreCase(strategy)) ||
+                    ("ncRNA-Seq".equalsIgnoreCase(strategy)) ||
+                    ("FL-cDNA".equalsIgnoreCase(strategy)) ||
+                    ("EST".equalsIgnoreCase(strategy)) ||
+                    ("OTHER".equalsIgnoreCase(strategy))
+                    ) {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.Enum.forString(strategy));
+            } else {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + strategy);
+            }
+            //xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.RNA_SEQ);
+            //xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.RT_PCR);
+            if (("RT-PCR".equalsIgnoreCase(selection)) ||
+                    ("cDNA".equalsIgnoreCase(selection)) ||
+                    ("cDNA_randomPriming".equalsIgnoreCase(selection)) ||
+                    ("cDNA_oligo_dT".equalsIgnoreCase(selection)) ||
+                    ("PolyA".equalsIgnoreCase(selection)) ||
+                    ("Oligo-dT".equals(selection)) ||
+                    ("Inverse rRNA".equals(selection)) ||
+                    ("Inverse rRNA selection".equals(selection)) ||
+                    ("CAGE".equals(selection)) ||
+                    ("RACE".equals(selection)) ||
                     ("other".equalsIgnoreCase(selection))
                     ) {
                 xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.Enum.forString(selection));
             } else {
                 xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.OTHER);
-                System.out.println("ERROR:value supplied is not compatible with SRA1.2 schema" + selection);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + selection);
             }
 
+
+            ProtocolApplication pappIp = getProtocol(assay, "library construction");
+            if (pappIp == null) {
+                return null;
+            }
         }
+
+        //HERE we handle SRA way of coding DNA Methylation profiling using nucleotide sequencing. We can automatically
+        //set LIBRARY SOURCE to GENOMIC
+        //but Library Strategy and Selection are supplied by users and need to be checked.
+        //allowed values: {Bisulfite-Seq,MRE-Seq,MeDIP-Seq,MBD-Seq,OTHER} and {PCR,RANDOM-PCR,HMPR,MF,MSLL,5-methyl
+        //cytidine antibody,MBD2 protein methyl-CpG binding domain,other,unspecified} respectively
+        if (measurement.equalsIgnoreCase("DNA methylation profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
+            xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC);
+            String source = getParameterValue(assay, papp, "library source", true);
+            String strategy = getParameterValue(assay, papp, "library strategy", true);
+            String selection = getParameterValue(assay, papp, "library selection", true);
+            //now checking that the input obtained from parsing ISA is compatible with SRA CV
+            //xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC); //formerly inferred
+            if (("GENOMIC".equalsIgnoreCase(source)) ||
+                    ("GENOMIC SINGLE CELL".equalsIgnoreCase(source)) ||
+                    ("METAGENOMIC".equalsIgnoreCase(source)) ||
+                    ("OTHER".equalsIgnoreCase(source))
+                    ) {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.Enum.forString(source));
+            } else {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + source);
+            }
+            if (("MRE-Seq".equalsIgnoreCase(strategy)) ||
+                    ("MeDIP-Seq".equalsIgnoreCase(strategy)) ||
+                    ("MBD-Seq".equalsIgnoreCase(strategy)) ||
+                    ("Bisulfite-Seq".equalsIgnoreCase(strategy)) ||
+                    ("MNase-Seq".equalsIgnoreCase(strategy)) ||
+                    ("MRE-Seq".equalsIgnoreCase(strategy)) ||
+                    ("OTHER".equalsIgnoreCase(strategy))
+                    ) {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.Enum.forString(strategy));
+            } else {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + strategy);
+            }
+
+            if (("MF".equalsIgnoreCase(selection)) ||
+                    ("PCR".equalsIgnoreCase(selection)) ||
+                    ("HMPR".equalsIgnoreCase(selection)) ||
+                    ("MNase".equalsIgnoreCase(selection)) ||
+                    ("Restriction Digest".equalsIgnoreCase(selection)) ||
+                    ("MF".equalsIgnoreCase(selection)) ||
+                    ("MSLL".equalsIgnoreCase(selection)) ||
+                    ("5-methylcytidine antibody".equalsIgnoreCase(selection)) ||
+                    ("MBD2 protein methyl-CpG binding domain".equals(selection)) ||
+                    ("other".equalsIgnoreCase(selection)) ||
+                    ("unspecified".equalsIgnoreCase(selection))
+                    ) {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.Enum.forString(selection));
+            } else {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + selection);
+            }
+        }
+        //HERE we handle SRA way of coding Chromatin modifications profiling using nucleotide sequencing.
+        //but Library Strategy and Selection are supplied by users and need to be checked.
+        //allowed values: {Bisulfite-Seq,MRE-Seq,MeDIP-Seq,MBD-Seq,OTHER} and {PCR,RANDOM-PCR,HMPR,MF,MSLL,5-methyl
+        //cytidine antibody,MBD2 protein methyl-CpG binding domain,other,unspecified} respectively
+        if (measurement.equalsIgnoreCase("chromatin modification profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
+
+            String source = getParameterValue(assay, papp, "library source", true);
+            String strategy = getParameterValue(assay, papp, "library strategy", true);
+            String selection = getParameterValue(assay, papp, "library selection", true);
+
+            //now checking that the input obtained from parsing ISA is compatible with SRA CV
+            //xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC); //formerly inferred
+            if (("GENOMIC".equalsIgnoreCase(source)) ||
+                    ("GENOMIC SINGLE CELL".equalsIgnoreCase(source)) ||
+                    ("METAGENOMIC".equalsIgnoreCase(source)) ||
+                    ("OTHER".equalsIgnoreCase(source))
+                    ) {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.Enum.forString(source));
+            } else {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + source);
+            }
+
+            if (("Hi-C".equalsIgnoreCase(strategy)) ||
+                    ("Targeted-Capture".equalsIgnoreCase(strategy)) ||
+                    ("Tethered Chromatin Conformation Capture".equalsIgnoreCase(strategy)) ||
+                    ("ATAC-Seq".equalsIgnoreCase(strategy)) ||
+                    ("ChIP-Seq".equalsIgnoreCase(strategy)) ||
+                    ("OTHER".equalsIgnoreCase(strategy))
+                    ) {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.Enum.forString(strategy));
+            } else {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + strategy);
+            }
+
+            if (("MDA".equalsIgnoreCase(selection)) ||
+                    ("Hybrid Selection".equalsIgnoreCase(selection)) ||
+                    ("Reduced Representation".equalsIgnoreCase(selection)) ||
+                    ("padlock probes capture method".equalsIgnoreCase(selection)) ||
+                    ("RANDOM PCR".equalsIgnoreCase(selection)) ||
+                    ("RANDOM".equalsIgnoreCase(selection)) ||
+                    ("PCR".equalsIgnoreCase(selection)) ||
+                    ("other".equalsIgnoreCase(selection)) ||
+                    ("unspecified".equalsIgnoreCase(selection))
+                    ) {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.Enum.forString(selection));
+            } else {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + selection);
+            }
+        }
+
+
+
+        //HERE we handle SRA way of coding Chromatin modifications profiling using nucleotide sequencing.
+        //but Library Strategy and Selection are supplied by users and need to be checked.
+        //allowed values: {Bisulfite-Seq,MRE-Seq,MeDIP-Seq,MBD-Seq,OTHER} and {PCR,RANDOM-PCR,HMPR,MF,MSLL,5-methyl
+        //cytidine antibody,MBD2 protein methyl-CpG binding domain,other,unspecified} respectively
+        if (measurement.equalsIgnoreCase("protein-DNA binding site identification profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
+
+            String source = getParameterValue(assay, papp, "library source", true);
+            String strategy = getParameterValue(assay, papp, "library strategy", true);
+            String selection = getParameterValue(assay, papp, "library selection", true);
+
+            //now checking that the input obtained from parsing ISA is compatible with SRA CV
+            //xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC); //formerly inferred
+            if (("GENOMIC".equalsIgnoreCase(source)) ||
+                    ("GENOMIC SINGLE CELL".equalsIgnoreCase(source)) ||
+                    ("METAGENOMIC".equalsIgnoreCase(source)) ||
+                    ("OTHER".equalsIgnoreCase(source))
+                    ) {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.Enum.forString(source));
+            } else {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + source);
+            }
+
+            if (("Hi-C".equalsIgnoreCase(strategy)) ||
+                    ("ChIP-Seq".equalsIgnoreCase(strategy)) ||
+                    ("ChIA-PET".equalsIgnoreCase(strategy)) ||
+                    ("FAIRE-Seq".equalsIgnoreCase(strategy)) ||
+                    ("Targeted-Capture".equalsIgnoreCase(strategy)) ||
+                    ("Tethered Chromatin Conformation Capture".equalsIgnoreCase(strategy)) ||
+                    ("OTHER".equalsIgnoreCase(strategy))
+                    ) {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.Enum.forString(strategy));
+            } else {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + strategy);
+            }
+
+            if (("MDA".equalsIgnoreCase(selection)) ||
+                    ("Hybrid Selection".equalsIgnoreCase(selection)) ||
+                    ("Reduced Representation".equalsIgnoreCase(selection)) ||
+                    ("padlock probes capture method".equalsIgnoreCase(selection)) ||
+                    ("RANDOM PCR".equalsIgnoreCase(selection)) ||
+                    ("RANDOM".equalsIgnoreCase(selection)) ||
+                    ("PCR".equalsIgnoreCase(selection)) ||
+                    ("other".equalsIgnoreCase(selection)) ||
+                    ("unspecified".equalsIgnoreCase(selection))
+                    ) {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.Enum.forString(selection));
+            } else {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + selection);
+            }
+        }
+
+        //HERE we handle SRA way of coding Chromatin modifications profiling using nucleotide sequencing.
+        //but Library Strategy and Selection are supplied by users and need to be checked.
+        //allowed values: {Bisulfite-Seq,MRE-Seq,MeDIP-Seq,MBD-Seq,OTHER} and {PCR,RANDOM-PCR,HMPR,MF,MSLL,5-methyl
+        //cytidine antibody,MBD2 protein methyl-CpG binding domain,other,unspecified} respectively
+        if (measurement.equalsIgnoreCase("protein-RNA binding site identification profiling") && technology.equalsIgnoreCase("nucleotide sequencing")) {
+
+            String source = getParameterValue(assay, papp, "library source", true);
+            String strategy = getParameterValue(assay, papp, "library strategy", true);
+            String selection = getParameterValue(assay, papp, "library selection", true);
+
+            //now checking that the input obtained from parsing ISA is compatible with SRA CV
+            //xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC); //formerly inferred
+            if (("TRANSCRIPTOMIC".equalsIgnoreCase(source)) ||
+                    ("TRANSCRIPTOMIC SINGLE CELL".equalsIgnoreCase(source)) ||
+                    ("METATRANSCRIPTOMIC".equalsIgnoreCase(source)) ||
+                    ("OTHER".equalsIgnoreCase(source))
+                    ) {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.Enum.forString(source));
+            } else {
+                xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + source);
+            }
+
+            if (("Hi-C".equalsIgnoreCase(strategy)) ||
+                    ("RIP-Seq".equalsIgnoreCase(strategy)) ||
+                    ("OTHER".equalsIgnoreCase(strategy))
+                    ) {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.Enum.forString(strategy));
+            } else {
+                xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + strategy);
+            }
+
+            if (("MDA".equalsIgnoreCase(selection)) ||
+                    ("Hybrid Selection".equalsIgnoreCase(selection)) ||
+                    ("Reduced Representation".equalsIgnoreCase(selection)) ||
+                    ("RANDOM PCR".equalsIgnoreCase(selection)) ||
+                    ("RANDOM".equalsIgnoreCase(selection)) ||
+                    ("PCR".equalsIgnoreCase(selection)) ||
+                    ("other".equalsIgnoreCase(selection)) ||
+                    ("unspecified".equalsIgnoreCase(selection))
+                    ) {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.Enum.forString(selection));
+            } else {
+                xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.OTHER);
+                System.out.println("ERROR:value supplied is not compatible with SRA1.5 schema" + selection);
+            }
+        }
+
 
 
         //Here, we deal with chromatin remodeling use case, user input via ISA is about library strategy, library selection, library layout
@@ -435,23 +741,19 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             if (pappIp == null) {
                 return null;
             }
-
             //dealing with Chromatin immunoprecipitation requirements in ISA_TAB and dumping those in SRA Library Construction Protocol section
             String crosslink = getParameterValue(assay, pappIp, "cross linking", true);
             if (crosslink != null) {
                 protocol.append("\n cross-linking: ").append(crosslink);
             }
-
             String fragmentation = getParameterValue(assay, pappIp, "DNA fragmentation", true);
             if (fragmentation != null) {
                 protocol.append("\n DNA fragmentation: ").append(fragmentation);
             }
-
             String fragsize = getParameterValue(assay, pappIp, "DNA fragment size", true);
             if (fragsize != null) {
                 protocol.append("\n DNA fragment size: ").append(fragsize);
             }
-
             String ipAntibody = getParameterValue(assay, pappIp, "immunoprecipitation antibody", true);
             if (ipAntibody != null) {
 
@@ -468,14 +770,13 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 if (interestingbits[3] != null) {
                     protocol.append("\n immunoprecipitation antibody: ").append(interestingbits[3]);
                 }
-
             }
         }
 
+        //Here, we deal with metagenome sequencing use case, SRA library_source is automatically set to METAGENOMICS
+        //relying on user input via ISA to obtain values for library strategy, library selection and library layout
         if (measurement.equalsIgnoreCase("metagenome sequencing") &&
-                    technology.equalsIgnoreCase("nucleotide sequencing")) {
-
-            // xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.GENOMIC);
+                technology.equalsIgnoreCase("nucleotide sequencing")) {
 
             String selection = getParameterValue(assay, papp, "library selection", true);
             String strategy = getParameterValue(assay, papp, "library strategy", true);
@@ -497,20 +798,15 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
             ProtocolApplication pappIp = getProtocol(assay, "library construction");
             if (pappIp == null) {
-                    return null;
+                return null;
             }
-
-            }
-
+        }
 
 
-        //HERE, we handle the MIMARKS annotation for library construction in environmental gene survey and map those to SRA objects
+        //HERE, we handle the MIMARKS annotation for library construction in environmental gene survey (aka targeted approach) and map those to SRA objects
         //reliance on ISA parameters tagged to INSDC codes 'target taxon,target_gene,target_subfragment, mid,
-
+        //deducing the values for source.strategy.selection from ISA assay
         if (measurement.equalsIgnoreCase("environmental gene survey") && technology.equalsIgnoreCase("nucleotide sequencing")) {
-
-            //deducing the values for source.strategy.selection from ISA assay
-
             xlib.setLIBRARYSOURCE(LibraryDescriptorType.LIBRARYSOURCE.METAGENOMIC);
             xlib.setLIBRARYSTRATEGY(LibraryDescriptorType.LIBRARYSTRATEGY.AMPLICON);
             xlib.setLIBRARYSELECTION(LibraryDescriptorType.LIBRARYSELECTION.PCR);
@@ -520,38 +816,28 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             if (pBibRef != null) {
                 protocol.append("\n "+INSDC.nuclAcidAmp[0]+": ").append(pBibRef);
             }
-
             String pUrl = getParameterValue(assay, papp, "url", false);
             if (pUrl != null) {
                 protocol.append("\n url: ").append(pUrl);
-
             }
-
             String targetTaxon = "";
             targetTaxon = getParameterValue(assay, papp, INSDC.targetTaxon, false);
             if (targetTaxon != null) {
                 protocol.append("\n "+INSDC.targetTaxon[0]+": ").append(targetTaxon);
                 xlib.setLIBRARYNAME(assay.getAcc() + "_" + targetTaxon);
             }
-
             String targetGene = getParameterValue(assay, papp, INSDC.targetGene, true);
             if (targetGene != null) {
                 protocol.append("\n "+INSDC.targetGene[0]+": ").append(targetGene);
             }
-
             String targetSubfrag = getParameterValue(assay, papp, INSDC.targetSubfragment, true);
             if (targetSubfrag != null) {
                 protocol.append("\n target_subfragment: ").append(targetSubfrag);
             }
-
             String pcrPrimers = getParameterValue(assay, papp, INSDC.pcrPrimers, true);
             if (pcrPrimers != null) {
                 protocol.append("\n pcr_primers: ").append(pcrPrimers.replaceAll("=", ":"));
             }
-
-
-
-
             String pcrConditions = getParameterValue(assay, papp, INSDC.pcrCond, true);
             if (pcrConditions != null) {
                 protocol.append("\n pcr_cond: ").append(pcrConditions.replaceAll("=", ":"));
@@ -577,36 +863,36 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                 locusXref.setID("pcrPrimersXref");
                 locusXref.setDB("PubMed");
             }
-            
+
             if (locus != null) {
                 if (locus.toLowerCase().contains("16s")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.X_16_S_R_RNA);
-                   // xlocus.setPROBESET(locusXref);
+                    // xlocus.setPROBESET(locusXref);
                 }
                 else if (locus.toLowerCase().contains("18s")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.X_18_S_R_RNA);
-                   // xlocus.setPROBESET(locusXref);
+                    // xlocus.setPROBESET(locusXref);
                 }
 
                 else if (locus.toLowerCase().contains("cox")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.COX_1);
-                  //  xlocus.setPROBESET(locusXref);
+                    //  xlocus.setPROBESET(locusXref);
                 }
                 else if (locus.toLowerCase().contains("its")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.ITS_1_5_8_S_ITS_2);
-                 //  xlocus.setPROBESET(locusXref);
+                    //  xlocus.setPROBESET(locusXref);
                 }
                 else if (locus.toLowerCase().contains("matk")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.MAT_K);
-                  //  xlocus.setPROBESET(locusXref);
+                    //  xlocus.setPROBESET(locusXref);
                 }
                 else if (locus.toLowerCase().contains("rbcl")) {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.RBCL);
-                   // xlocus.setPROBESET(locusXref);
+                    // xlocus.setPROBESET(locusXref);
                 }
                 else {
                     xlocus.setLocusName(LibraryDescriptorType.TARGETEDLOCI.LOCUS.LocusName.OTHER);
-                   // xlocus.setDescription(locus);
+                    // xlocus.setDescription(locus);
                 }
             }
 
@@ -614,7 +900,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             xtargetedloci.setLOCUSArray(xlocusArray);
 
             xlib.setTARGETEDLOCI(xtargetedloci);
-
         }
 
 
@@ -665,7 +950,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             xlib.setPOOLINGSTRATEGY(xpoolingstrategy.getStringValue());
 
         }
-              return xlib;
+        return xlib;
     }
 
 
@@ -813,7 +1098,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
     private SpotDescriptorType.SPOTDECODESPEC.READSPEC[] getReadSpecArray(SpotDescriptorType.SPOTDECODESPEC spotDecodeSpec) {
         if (spotDecodeSpec.getREADSPECArray().length > 0) {
-           return spotDecodeSpec.getREADSPECArray();
+            return spotDecodeSpec.getREADSPECArray();
         }
         return null;
     }
@@ -964,6 +1249,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             //if we can detect which instrument it was that is consistent with SRA schema
             if (sequencinginst.equalsIgnoreCase("454 GS") ||
                     sequencinginst.equalsIgnoreCase("454 GS FLX") ||
+                    sequencinginst.equalsIgnoreCase("454 GS FLX+") ||
                     sequencinginst.equalsIgnoreCase("454 GS 20") ||
                     sequencinginst.equalsIgnoreCase("454 GS FLX Titanium") ||
                     sequencinginst.equalsIgnoreCase("454 GS Junior")) {
@@ -978,7 +1264,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             //ls454.setFLOWSEQUENCE("TACG");
             //ls454.setFLOWCOUNT(BigInteger.valueOf(800));
             xplatform.setLS454(ls454);
-        } else if (sequencinginst.toLowerCase().contains("illumina")) {
+        } else if (sequencinginst.toLowerCase().contains("illumina") || sequencinginst.toLowerCase().contains("HiSeq") || sequencinginst.toLowerCase().contains("NextSeq")) {
 
             PlatformType.ILLUMINA illumina = PlatformType.ILLUMINA.Factory.newInstance();
 
@@ -987,13 +1273,20 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                     sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer II") ||
                     sequencinginst.equalsIgnoreCase("Illumina Genome Analyzer IIx") ||
                     sequencinginst.equalsIgnoreCase("Illumina HiScanSQ") ||
+                    sequencinginst.equalsIgnoreCase("Illumina HiSeq 4000") ||
+                    sequencinginst.equalsIgnoreCase("Illumina HiSeq 3000") ||
                     sequencinginst.equalsIgnoreCase("Illumina HiSeq 2500") ||
                     sequencinginst.equalsIgnoreCase("Illumina HiSeq 2000") ||
+                    sequencinginst.equalsIgnoreCase("Illumina HiSeq 1500") ||
                     sequencinginst.equalsIgnoreCase("Illumina HiSeq 1000") ||
-                    sequencinginst.equalsIgnoreCase("Illumina MiSeq")) {
-
+                    sequencinginst.equalsIgnoreCase("Illumina HiScanSQ") ||
+                    sequencinginst.equalsIgnoreCase("Illumina MiSeq") ||
+                    sequencinginst.equalsIgnoreCase("HiSeq X Five") ||
+                    sequencinginst.equalsIgnoreCase("HiSeq X Ten") ||
+                    sequencinginst.equalsIgnoreCase("NextSeq 500") ||
+                    sequencinginst.equalsIgnoreCase("NextSeq 550"))
+            {
                 illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.INSTRUMENTMODEL.Enum.forString(sequencinginst));
-
             }
             //otherwise, we fall back on the 'unspecified' value to avoid falling over
             else {
@@ -1009,7 +1302,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             PlatformType.HELICOS helicos = PlatformType.HELICOS.Factory.newInstance();
 
             if (sequencinginst.equalsIgnoreCase("Helicos HeliScope")) {
-
                 helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString(sequencinginst));
             } else {
                 helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString("unspecified"));
@@ -1018,7 +1310,6 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             //helicos.setFLOWSEQUENCE(getParameterValue(assay, pApp, "Flow Sequence", true));
             //helicos.setFLOWCOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Flow Count", true))));
             xplatform.setHELICOS(helicos);
-
 
         } else if (sequencinginst.toLowerCase().contains("ion torrent")) {
 
@@ -1033,9 +1324,13 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
             xplatform.setIONTORRENT(iontorrent);
 
+        } else if (sequencinginst.equalsIgnoreCase("MinION") || sequencinginst.equalsIgnoreCase("GridION") ) {
+            PlatformType.OXFORDNANOPORE oxfordnanopore = PlatformType.OXFORDNANOPORE.Factory.newInstance();
+            oxfordnanopore.setINSTRUMENTMODEL(PlatformType.OXFORDNANOPORE.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+            xplatform.setOXFORDNANOPORE(oxfordnanopore);
         }
 
-        else if (sequencinginst.toLowerCase().contains("solid")) {
+        else if (sequencinginst.toLowerCase().contains("AB ")) {
 
             PlatformType.ABISOLID abisolid = PlatformType.ABISOLID.Factory.newInstance();
 
@@ -1049,7 +1344,8 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                     sequencinginst.equalsIgnoreCase("AB SOLiD 5500") ||
                     sequencinginst.equalsIgnoreCase("AB SOLiD 5500xl") ||
                     sequencinginst.equalsIgnoreCase("AB 5500 Genetic Analyzer") ||
-                    sequencinginst.equalsIgnoreCase("AB 5500xl Genetic Analyzer")
+                    sequencinginst.equalsIgnoreCase("AB 5500xl Genetic Analyzer") ||
+                    sequencinginst.equalsIgnoreCase("AB 5500xl-W Genetic Analysis System")
                     ) {
 
                 abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString(sequencinginst));
@@ -1058,23 +1354,23 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             }
 
             //{
-                //String colorMatrix = getParameterValue(assay, pApp, "Color Matrix", false);
-                // single dibase colours are semicolon-separated
-                //if (colorMatrix != null) {
-                    //PlatformType.ABISOLID.COLORMATRIX xcolorMatrix = PlatformType.ABISOLID.COLORMATRIX.Factory.newInstance();
-                    //String dibases[] = colorMatrix.split("\\;");
-                    //if (dibases != null && dibases.length > 0) {
-                        //PlatformType.ABISOLID.COLORMATRIX.COLOR xcolors[] = new PlatformType.ABISOLID.COLORMATRIX.COLOR[dibases.length];
-                        //int i = 0;
-                        //for (String dibase : dibases) {
-                            //PlatformType.ABISOLID.COLORMATRIX.COLOR xcolor = PlatformType.ABISOLID.COLORMATRIX.COLOR.Factory.newInstance();
-                            //xcolor.setDibase(dibase);
-                            //xcolors[i++] = xcolor;
-                        //}
-                        //xcolorMatrix.setCOLORArray(xcolors);
-                        //abisolid.setCOLORMATRIX(xcolorMatrix);
-                    //}
-                //}
+            //String colorMatrix = getParameterValue(assay, pApp, "Color Matrix", false);
+            // single dibase colours are semicolon-separated
+            //if (colorMatrix != null) {
+            //PlatformType.ABISOLID.COLORMATRIX xcolorMatrix = PlatformType.ABISOLID.COLORMATRIX.Factory.newInstance();
+            //String dibases[] = colorMatrix.split("\\;");
+            //if (dibases != null && dibases.length > 0) {
+            //PlatformType.ABISOLID.COLORMATRIX.COLOR xcolors[] = new PlatformType.ABISOLID.COLORMATRIX.COLOR[dibases.length];
+            //int i = 0;
+            //for (String dibase : dibases) {
+            //PlatformType.ABISOLID.COLORMATRIX.COLOR xcolor = PlatformType.ABISOLID.COLORMATRIX.COLOR.Factory.newInstance();
+            //xcolor.setDibase(dibase);
+            //xcolors[i++] = xcolor;
+            //}
+            //xcolorMatrix.setCOLORArray(xcolors);
+            //abisolid.setCOLORMATRIX(xcolorMatrix);
+            //}
+            //}
             //}
 
             //{

@@ -93,9 +93,13 @@ public class ConverterShellCommand extends AbstractImportLayerShellCommand {
 				ISATABReducedMapper mapper = new ISATABReducedMapper(new BIIObjectStore(), loader.load());
 				ISAConfiguratorValidator validator = new ISAConfiguratorValidator(mapper.map());
 				log.info("Running validator");
-				if (validator.validate() != GUIInvokerResult.SUCCESS) {
-					log.warn("Validation failed");
+				GUIInvokerResult validationResult = validator.validate();
+				if (validationResult == GUIInvokerResult.ERROR) {
+					throw new Exception("Validation failed");
 				} else {
+					if (validationResult == GUIInvokerResult.WARNING) {
+						log.warn("Validation succceded with warnings");
+					}
 					log.info("Using SraExporter");
 					SraExporter exporter = new SraExporter(store, sourceDirPath, exportPath);
 					exporter.export();
