@@ -1254,17 +1254,17 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                     sequencinginst.equalsIgnoreCase("454 GS FLX Titanium") ||
                     sequencinginst.equalsIgnoreCase("454 GS Junior")) {
 
-                ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+                ls454.setINSTRUMENTMODEL(PlatformType.LS454.Factory.newInstance().getINSTRUMENTMODEL().forString(sequencinginst));
             }
             //otherwise, we fall back on the 'unspecified' value to avoid falling over
             else {
-                ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString("unspecified"));
+                ls454.setINSTRUMENTMODEL(PlatformType.LS454.Factory.newInstance().getINSTRUMENTMODEL().forString("unspecified"));
             }
 
             //ls454.setFLOWSEQUENCE("TACG");
             //ls454.setFLOWCOUNT(BigInteger.valueOf(800));
             xplatform.setLS454(ls454);
-        } else if (sequencinginst.toLowerCase().contains("illumina") || sequencinginst.toLowerCase().contains("HiSeq") || sequencinginst.toLowerCase().contains("NextSeq")) {
+        } else if (sequencinginst.toLowerCase().contains("illumina") || sequencinginst.toLowerCase().contains("hiseq") || sequencinginst.toLowerCase().contains("nextseq")) {
 
             PlatformType.ILLUMINA illumina = PlatformType.ILLUMINA.Factory.newInstance();
 
@@ -1286,11 +1286,11 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                     sequencinginst.equalsIgnoreCase("NextSeq 500") ||
                     sequencinginst.equalsIgnoreCase("NextSeq 550"))
             {
-                illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+                illumina.setINSTRUMENTMODEL(TypeIlluminaModel.Enum.forString(sequencinginst));
             }
             //otherwise, we fall back on the 'unspecified' value to avoid falling over
             else {
-                illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.INSTRUMENTMODEL.Enum.forString("unspecified"));
+                illumina.setINSTRUMENTMODEL(TypeIlluminaModel.Enum.forString("unspecified"));
             }
 
             // illumina.setCYCLESEQUENCE(getParameterValue(assay, pApp, "Cycle Sequence", true));
@@ -1302,9 +1302,9 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
             PlatformType.HELICOS helicos = PlatformType.HELICOS.Factory.newInstance();
 
             if (sequencinginst.equalsIgnoreCase("Helicos HeliScope")) {
-                helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+                helicos.setINSTRUMENTMODEL(TypeHelicosModel.Enum.forString(sequencinginst));
             } else {
-                helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString("unspecified"));
+                helicos.setINSTRUMENTMODEL(TypeHelicosModel.Enum.forString("unspecified"));
             }
 
             //helicos.setFLOWSEQUENCE(getParameterValue(assay, pApp, "Flow Sequence", true));
@@ -1317,20 +1317,20 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 
             if (sequencinginst.equalsIgnoreCase("Ion Torrent PGM") || sequencinginst.equalsIgnoreCase("Ion Torrent Proton") ) {
 
-                iontorrent.setINSTRUMENTMODEL(PlatformType.IONTORRENT.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+                iontorrent.setINSTRUMENTMODEL(TypeIontorrentModel.Enum.forString(sequencinginst));
             } else {
-                iontorrent.setINSTRUMENTMODEL(PlatformType.IONTORRENT.INSTRUMENTMODEL.Enum.forString("unspecified"));
+                iontorrent.setINSTRUMENTMODEL(TypeIontorrentModel.Enum.forString("unspecified"));
             }
 
             xplatform.setIONTORRENT(iontorrent);
 
         } else if (sequencinginst.equalsIgnoreCase("MinION") || sequencinginst.equalsIgnoreCase("GridION") ) {
             PlatformType.OXFORDNANOPORE oxfordnanopore = PlatformType.OXFORDNANOPORE.Factory.newInstance();
-            oxfordnanopore.setINSTRUMENTMODEL(PlatformType.OXFORDNANOPORE.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+            oxfordnanopore.setINSTRUMENTMODEL(TypeOxfordNanoporeModel.Enum.forString(sequencinginst));
             xplatform.setOXFORDNANOPORE(oxfordnanopore);
         }
 
-        else if (sequencinginst.toLowerCase().contains("AB ")) {
+        else if (sequencinginst.toLowerCase().contains("ab ")) {
 
             PlatformType.ABISOLID abisolid = PlatformType.ABISOLID.Factory.newInstance();
 
@@ -1348,9 +1348,9 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
                     sequencinginst.equalsIgnoreCase("AB 5500xl-W Genetic Analysis System")
                     ) {
 
-                abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+                abisolid.setINSTRUMENTMODEL(TypeAbiSolidModel.Enum.forString(sequencinginst));
             } else {
-                abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString("unspecified"));
+                abisolid.setINSTRUMENTMODEL(TypeAbiSolidModel.Enum.forString("unspecified"));
             }
 
             //{
@@ -1388,7 +1388,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
         }
 
 
-        //PlatformType.LS454.INSTRUMENTMODEL.Enum.forString(sequencinginst);
+        //PlatformType.LS454.Factory.newInstance().getINSTRUMENTMODEL().forString(sequencinginst);
 
 //        if (   ("454 GS".equalsIgnoreCase(sequencinginst) ||
 //                "454 GS 20".equalsIgnoreCase(sequencinginst) ||
@@ -1397,7 +1397,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 //                "454 GS Junior".equalsIgnoreCase(sequencinginst))) {
 //
 //            PlatformType.LS454 ls454 = PlatformType.LS454.Factory.newInstance();
-//            ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString(sequencinginst));
+//            ls454.setINSTRUMENTMODEL(PlatformType.LS454.Factory.newInstance().getINSTRUMENTMODEL().forString(sequencinginst));
 //            // todo finish
 //        }
 
@@ -1434,7 +1434,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 //            //if ("LS454".equalsIgnoreCase(platform)) {
 //
 //            PlatformType.LS454 ls454 = PlatformType.LS454.Factory.newInstance();
-//            ls454.setINSTRUMENTMODEL(PlatformType.LS454.INSTRUMENTMODEL.Enum.forString(xinstrument));
+//            ls454.setINSTRUMENTMODEL(PlatformType.LS454.Factory.newInstance().getINSTRUMENTMODEL().forString(xinstrument));
 //
 //            //String keyseqStr = "TACG";
 //
@@ -1449,7 +1449,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 //
 //        } else if (platform.toLowerCase().contains("illumina")) {
 //            PlatformType.ILLUMINA illumina = PlatformType.ILLUMINA.Factory.newInstance();
-//            illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.INSTRUMENTMODEL.Enum.forString(xinstrument));
+//            illumina.setINSTRUMENTMODEL(PlatformType.ILLUMINA.Factory.newInstance().getINSTRUMENTMODEL().forString(xinstrument));
 //            illumina.setCYCLESEQUENCE(getParameterValue(assay, pApp, "Cycle Sequence", true));
 //            illumina.setCYCLECOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Cycle Count", true))));
 //            xplatform.setILLUMINA(illumina);
@@ -1457,7 +1457,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 //        } else if (platform.toLowerCase().contains("helicos")) {
 //            //("HELICOS".equalsIgnoreCase(platform)) {
 //            PlatformType.HELICOS helicos = PlatformType.HELICOS.Factory.newInstance();
-//            helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.INSTRUMENTMODEL.Enum.forString(xinstrument));
+//            helicos.setINSTRUMENTMODEL(PlatformType.HELICOS.Factory.newInstance().getINSTRUMENTMODEL().forString(xinstrument));
 //            helicos.setFLOWSEQUENCE(getParameterValue(assay, pApp, "Flow Sequence", true));
 //            helicos.setFLOWCOUNT(new BigInteger(checkNumericParameter(getParameterValue(assay, pApp, "Flow Count", true))));
 //            xplatform.setHELICOS(helicos);
@@ -1465,7 +1465,7 @@ abstract class SraExportPipelineComponent extends SraExportSampleComponent {
 //        } else if (platform.toLowerCase().contains("solid")) {
 //            // ("ABI SOLID".equalsIgnoreCase(platform) || "ABI_SOLID".equalsIgnoreCase(platform)) {
 //            PlatformType.ABISOLID abisolid = PlatformType.ABISOLID.Factory.newInstance();
-//            abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.INSTRUMENTMODEL.Enum.forString(xinstrument));
+//            abisolid.setINSTRUMENTMODEL(PlatformType.ABISOLID.Factory.newInstance().getINSTRUMENTMODEL().forString(xinstrument));
 //
 //            {
 //                String colorMatrix = getParameterValue(assay, pApp, "Color Matrix", false);
